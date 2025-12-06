@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".activity.LauncherActivity">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/a_main_ll1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="@dimen/top_bar_vertical_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/a_main_tv1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="@dimen/time_size"
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="0dp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/a_main_tv2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="@dimen/time_size"
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/a_main_tv3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="@dimen/time_size"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/a_main_iv1"
+            android:layout_width="@dimen/battery_size"
+            android:layout_height="@dimen/battery_size"
+            android:contentDescription="@string/battery_icon"
+            android:tint="?android:textColorPrimary" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/a_main_vp2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/a_main_ll2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/a_main_ll1" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/a_main_ll2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/a_main_btn_settings"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="@dimen/bottom_icon_size"
+            android:layout_height="@dimen/bottom_icon_size"
+            android:contentDescription="@string/action_settings"
+            android:src="@drawable/baseline_settings_24"
+            android:tint="?android:textColorPrimary" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/a_main_tv4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="@dimen/time_size" />
+
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="0dp" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/a_main_btn_prev_page"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="@dimen/bottom_icon_size"
+            android:layout_height="@dimen/bottom_icon_size"
+            android:contentDescription="@string/prev_page"
+            android:src="@drawable/baseline_navigate_before_24"
+            android:tint="?android:textColorPrimary" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/a_main_btn_next_page"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="@dimen/bottom_icon_size"
+            android:layout_height="@dimen/bottom_icon_size"
+            android:contentDescription="@string/next_page"
+            android:src="@drawable/baseline_navigate_next_24"
+            android:tint="?android:textColorPrimary" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

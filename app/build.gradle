@@ -1,0 +1,63 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace 'com.qch.sumelauncher'
+    compileSdk {
+        version = release(36)
+    }
+
+    defaultConfig {
+        applicationId "com.qch.sumelauncher"
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName '1.0.0'
+
+        ndk {
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a'
+        }
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    buildToolsVersion "36.1.0"
+    dependenciesInfo {
+        includeInApk false
+        includeInBundle false
+    }
+}
+
+dependencies {
+    implementation libs.activity
+    implementation libs.appcompat
+    implementation libs.constraintlayout
+    implementation libs.material
+    implementation libs.navigation.fragment
+    implementation libs.navigation.ui
+    implementation libs.recyclerview
+    implementation 'com.github.bumptech.glide:glide:5.0.5'
+    implementation libs.preference
+    annotationProcessor('com.github.bumptech.glide:compiler:5.0.5')
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+}

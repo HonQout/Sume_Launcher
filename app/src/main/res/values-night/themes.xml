@@ -1,0 +1,11 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.SumeLauncher" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/gray_c</item>
+        <item name="colorOnSurface">@color/gray_3</item>
+        <item name="colorSurfaceVariant">@color/gray_a</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:windowBackground">@color/black</item>
+    </style>
+</resources>

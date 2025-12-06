@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">Sume Launcher</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Button -->
+    <string name="app_info">App info</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="app_market">App market</string>
+    <string name="prev_page">Previous page</string>
+    <string name="next_page">Next page</string>
+
+    <!-- Hint -->
+    <string name="cannot_find_package">Cannot find package.</string>
+    <string name="cannot_find_activity">Cannot find activity.</string>
+    <string name="cannot_access_unexported_activity">Cannot access unexported activity.</string>
+    <string name="activity_requires_extra_permission">This activity requires extra permission to be started.</string>
+    <string name="cannot_uninstall_app">Cannot uninstall this app.</string>
+    <string name="open_app_info_failed">Failed to open app info page.</string>
+
+    <!-- Others -->
+    <string name="app_icon">App icon</string>
+    <string name="page_text" translatable="false">%d/%d</string>
+    <string name="battery_icon">Battery icon</string>
+    <string name="uninstall_app_failed">Failed to uninstall app.</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="header_layout">Layout</string>
+    <string name="header_gesture">Gesture</string>
+    <string name="header_system">System</string>
+    <string name="header_about">About</string>
+
+    <!-- Preference Items -->
+    <string name="grid_count">Grid count</string>
+    <string name="display_top_bar">Display top bar</string>
+    <string name="scroll_to_switch_page">Scroll to switch page</string>
+    <string name="scroll_to_switch_page_on">Allows switching page via clicking button or scrolling view</string>
+    <string name="scroll_to_switch_page_off">Allows switching page via clicking button only</string>
+    <string name="set_default_app">Set default app</string>
+    <string name="version">Version</string>
+    <string name="version_name" translatable="false">1.0.0</string>
+
+</resources>

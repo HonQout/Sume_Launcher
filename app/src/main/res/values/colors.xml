@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="gray_2">#FF222222</color>
+    <color name="gray_3">#FF333333</color>
+    <color name="gray_6">#FF666666</color>
+    <color name="gray_8">#FF888888</color>
+    <color name="gray_9">#FF999999</color>
+    <color name="gray_a">#FFAAAAAA</color>
+    <color name="gray_c">#FFCCCCCC</color>
+    <color name="gray_d">#FFDDDDDD</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>
