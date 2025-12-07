@@ -45,7 +45,7 @@
     <string name="app_icon">App icon</string>
     <string name="page_text" translatable="false">%d/%d</string>
     <string name="battery_icon">Battery icon</string>
-    <string name="battery_percentage" translatable="false">%d%</string>
+    <string name="battery_percentage" translatable="false">%d%%</string>
     <string name="uninstall_app_failed">Failed to uninstall app.</string>
     <string name="title_activity_settings">Settings</string>
 
