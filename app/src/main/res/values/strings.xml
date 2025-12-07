@@ -23,13 +23,6 @@
     <string name="no_matching_activity">No activity can open this link.</string>
     <string name="insist_uninstall_system_app">"This is a system app, which is usually not recommended to uninstall. \nHowever, in some 3rd-party Android systems, this kind of apps are allowed to uninstall. \nIf you insist to uninstall this app, press \"Uninstall\". "</string>
 
-    <!-- Others -->
-    <string name="app_icon">App icon</string>
-    <string name="page_text" translatable="false">%d/%d</string>
-    <string name="battery_icon">Battery icon</string>
-    <string name="uninstall_app_failed">Failed to uninstall app.</string>
-    <string name="title_activity_settings">Settings</string>
-
     <!-- Preference Titles -->
     <string name="header_layout">Layout</string>
     <string name="header_interaction">Interaction</string>
@@ -47,5 +40,13 @@
     <string name="version_name" translatable="false">1.0.0</string>
     <string name="view_github_page">View GitHub page</string>
     <string name="github_address" translatable="false">https://github.com/HonQout/Sume_Launcher</string>
+
+    <!-- Others -->
+    <string name="app_icon">App icon</string>
+    <string name="page_text" translatable="false">%d/%d</string>
+    <string name="battery_icon">Battery icon</string>
+    <string name="battery_percentage" translatable="false">%d%</string>
+    <string name="uninstall_app_failed">Failed to uninstall app.</string>
+    <string name="title_activity_settings">Settings</string>
 
 </resources>

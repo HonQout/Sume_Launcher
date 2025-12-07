@@ -89,7 +89,11 @@ public class LauncherActivity extends AppCompatActivity {
                 ));
         batteryViewModel.getLevel().observe(this, integer -> {
             int i = integer == null ? -1 : integer;
-            binding.aMainTv3.setText(i + "%");
+            binding.aMainTv3.setText(
+                    String.format(
+                            ContextCompat.getString(this, R.string.battery_percentage),
+                            i
+                    ));
         });
         batteryViewModel.getIcon().observe(this, integer -> {
             int i = integer == null ? R.drawable.baseline_battery_unknown_24 : integer;
@@ -99,10 +103,7 @@ public class LauncherActivity extends AppCompatActivity {
             appPagerAdapter.setNumPages(integer);
             binding.aMainTv4.setText(
                     String.format(
-                            ContextCompat.getString(
-                                    LauncherActivity.this,
-                                    R.string.page_text
-                            ),
+                            ContextCompat.getString(this, R.string.page_text),
                             appViewModel.getCurrentPageInt(), integer
                     ));
         });
