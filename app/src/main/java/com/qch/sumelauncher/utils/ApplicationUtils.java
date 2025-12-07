@@ -19,12 +19,11 @@ import android.util.Log;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.core.content.pm.ShortcutManagerCompat;
 
 import com.qch.sumelauncher.bean.ActivityBean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,10 +32,6 @@ public class ApplicationUtils {
 
     public enum ApplicationType {
         UNKNOWN, SYSTEM, UPDATED_SYSTEM, USER
-    }
-
-    public enum IconType {
-        Icon, Banner
     }
 
     @Nullable
@@ -144,7 +139,6 @@ public class ApplicationUtils {
     }
 
     public static ApplicationType getApplicationType(Context context, String packageName) {
-        PackageManager pm = context.getPackageManager();
         ApplicationInfo applicationInfo = getApplicationInfo(context, packageName);
         if (applicationInfo != null) {
             int flags = applicationInfo.flags;
@@ -159,7 +153,6 @@ public class ApplicationUtils {
         return ApplicationType.UNKNOWN;
     }
 
-    @RequiresApi(Build.VERSION_CODES.N_MR1)
     public static List<ShortcutInfo> getShortcuts(Context context, String packageName) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
@@ -167,19 +160,20 @@ public class ApplicationUtils {
                 if (launcherApps != null && launcherApps.hasShortcutHostPermission()) {
                     LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
                     query.setPackage(packageName);
-                    query.setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC
+                    query.setQueryFlags(
+                            LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC
                             | LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED
-                            | LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST);
+                            | LauncherApps.ShortcutQuery.FLAG_MATCH_MANIFEST
+                    );
                     return launcherApps.getShortcuts(query, Process.myUserHandle());
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Failed to get shortcuts of package " + packageName + ".", e);
             }
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
-    @RequiresApi(Build.VERSION_CODES.N_MR1)
     public static boolean launchAppShortcut(Context context, String packageName, String shortcutId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);

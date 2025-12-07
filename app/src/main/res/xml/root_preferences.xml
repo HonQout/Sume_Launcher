@@ -8,12 +8,14 @@
             app:defaultValue="5,5"
             app:entries="@array/grid_count_entries"
             app:entryValues="@array/grid_count_values"
+            app:iconSpaceReserved="false"
             app:key="grid_count"
             app:title="@string/grid_count"
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
+            app:iconSpaceReserved="false"
             app:key="display_top_bar"
             app:title="@string/display_top_bar" />
 
@@ -21,14 +23,20 @@
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
-        app:title="@string/header_gesture">
+        app:title="@string/header_interaction">
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            app:key="allow_scroll_page"
-            app:summaryOff="@string/scroll_to_switch_page_off"
-            app:summaryOn="@string/scroll_to_switch_page_on"
+            app:iconSpaceReserved="false"
+            app:key="scroll_to_switch_page"
             app:title="@string/scroll_to_switch_page" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:iconSpaceReserved="false"
+            app:key="volume_key_switch_page"
+            app:summary="@string/volume_key_switch_page_summary"
+            app:title="@string/volume_key_switch_page" />
 
     </PreferenceCategory>
 
@@ -37,6 +45,7 @@
         app:title="@string/header_system">
 
         <Preference
+            app:iconSpaceReserved="false"
             app:key="set_default_app"
             app:title="@string/set_default_app" />
 
@@ -47,9 +56,16 @@
         app:title="@string/header_about">
 
         <Preference
+            app:iconSpaceReserved="false"
             app:key="version"
             app:summary="@string/version_name"
             app:title="@string/version" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="view_github_page"
+            app:summary="@string/github_address"
+            app:title="@string/view_github_page" />
 
     </PreferenceCategory>
 

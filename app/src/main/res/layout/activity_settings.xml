@@ -19,10 +19,11 @@
             android:id="@+id/a_settings_mt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
+            android:background="?android:windowBackground"
             app:navigationIcon="@drawable/baseline_arrow_back_24"
             app:navigationIconTint="?android:textColorPrimary"
-            app:title="@string/title_activity_settings" />
+            app:title="@string/title_activity_settings"
+            app:titleTextColor="?android:textColorPrimary" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -1,6 +1,7 @@
 package com.qch.sumelauncher.fragment;
 
 import android.content.pm.ShortcutInfo;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.adapter.recyclerview.AppRVAdapter;
 import com.qch.sumelauncher.adapter.recyclerview.FilterableListAdapter;
@@ -93,36 +95,46 @@ public class AppGridFragment extends Fragment {
             public boolean onItemLongClick(ActivityBean item, View view) {
                 PopupMenu popupMenu = new PopupMenu(requireActivity(), view);
                 popupMenu.getMenuInflater().inflate(R.menu.app_op_menu, popupMenu.getMenu());
-                popupMenu.setForceShowIcon(true);
                 int baseIndex = popupMenu.getMenu().size();
-                List<ShortcutInfo> shortcutInfoList = item.getShortcutInfoList();
-                for (int i = 0; i < shortcutInfoList.size(); i++) {
-                    ShortcutInfo shortcutInfo = shortcutInfoList.get(i);
-                    popupMenu.getMenu().add(0, baseIndex + i, baseIndex + i,
-                            shortcutInfo.getShortLabel());
+                List<ShortcutInfo> shortcutInfoList;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                    shortcutInfoList = item.getShortcutInfoList();
+                    for (int i = 0; i < shortcutInfoList.size(); i++) {
+                        ShortcutInfo shortcutInfo = shortcutInfoList.get(i);
+                        popupMenu.getMenu()
+                                .add(0, baseIndex + i, baseIndex + i, shortcutInfo.getShortLabel());
+                    }
+                } else {
+                    shortcutInfoList = new ArrayList<>();
                 }
                 popupMenu.setOnMenuItemClickListener(menuItem -> {
                     int menuId = menuItem.getItemId();
                     if (menuId == R.id.app_info) {
-                        boolean result = IntentUtils.openAppDetailsPage(requireContext(), item.getPackageName());
-                        if (!result) {
-                            Toast.makeText(requireContext(), R.string.open_app_info_failed,
-                                    Toast.LENGTH_SHORT)
-                                    .show();
-                        }
+                        IntentUtils.handleLaunchIntentResult(
+                                requireContext(),
+                                IntentUtils.openAppDetailsPage(requireContext(), item.getPackageName())
+                        );
                         return true;
                     } else if (menuId == R.id.uninstall) {
                         ApplicationUtils.ApplicationType type = ApplicationUtils.getApplicationType(
                                 requireContext(), item.getPackageName());
                         if (type == ApplicationUtils.ApplicationType.UPDATED_SYSTEM
                                 || type == ApplicationUtils.ApplicationType.USER) {
-                            boolean result = IntentUtils.requireUninstallApp(
-                                    requireContext(), item.getPackageName());
-                            if (!result) {
-                                Toast.makeText(requireContext(), R.string.uninstall_app_failed,
-                                                Toast.LENGTH_SHORT)
-                                        .show();
-                            }
+                            IntentUtils.handleLaunchIntentResult(
+                                    requireContext(),
+                                    IntentUtils.requireUninstallApp(requireContext(), item.getPackageName())
+                            );
+                        } else if (type == ApplicationUtils.ApplicationType.SYSTEM) {
+                            new MaterialAlertDialogBuilder(requireContext())
+                                    .setTitle(R.string.hint)
+                                    .setMessage(R.string.insist_uninstall_system_app)
+                                    .setPositiveButton(R.string.uninstall, (dialog, which) ->
+                                            IntentUtils.handleLaunchIntentResult(
+                                                    requireContext(),
+                                                    IntentUtils.requireUninstallApp(requireContext(), item.getPackageName())
+                                            ))
+                                    .setNegativeButton(R.string.cancel, null)
+                                    .show();
                         } else {
                             Toast.makeText(requireContext(), R.string.cannot_uninstall_app,
                                             Toast.LENGTH_SHORT)
@@ -130,13 +142,20 @@ public class AppGridFragment extends Fragment {
                         }
                         return true;
                     } else if (menuId == R.id.app_market) {
-                        IntentUtils.openAppInMarket(requireContext(), item.getPackageName());
+                        IntentUtils.handleLaunchIntentResult(
+                                requireContext(),
+                                IntentUtils.openAppInMarket(requireContext(), item.getPackageName())
+                        );
                         return true;
                     } else if (menuId >= baseIndex) {
-                        ShortcutInfo shortcutInfo = shortcutInfoList.get(menuId - baseIndex);
-                        ApplicationUtils.launchAppShortcut(requireContext(), item.getPackageName(),
-                                shortcutInfo.getId());
-                        return true;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                            ShortcutInfo shortcutInfo = shortcutInfoList.get(menuId - baseIndex);
+                            ApplicationUtils.launchAppShortcut(requireContext(), item.getPackageName(),
+                                    shortcutInfo.getId());
+                            return true;
+                        } else {
+                            return false;
+                        }
                     } else {
                         return false;
                     }

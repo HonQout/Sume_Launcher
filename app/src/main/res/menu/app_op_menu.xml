@@ -2,14 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/app_info"
-        android:icon="@drawable/baseline_info_24"
         android:title="@string/app_info" />
     <item
         android:id="@+id/uninstall"
-        android:icon="@drawable/baseline_delete_24"
         android:title="@string/uninstall" />
     <item
         android:id="@+id/app_market"
-        android:icon="@drawable/baseline_store_24"
         android:title="@string/app_market" />
 </menu>

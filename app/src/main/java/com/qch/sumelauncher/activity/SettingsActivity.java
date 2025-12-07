@@ -13,6 +13,7 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.databinding.ActivitySettingsBinding;
+import com.qch.sumelauncher.utils.IntentUtils;
 
 import java.util.Objects;
 
@@ -54,6 +55,11 @@ public class SettingsActivity extends AppCompatActivity {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+            } else if (Objects.equals(key, "view_github_page")) {
+                IntentUtils.handleLaunchIntentResult(
+                        requireContext(),
+                        IntentUtils.openNetAddress(requireContext(), getString(R.string.github_address))
+                );
             }
             return super.onPreferenceTreeClick(preference);
         }

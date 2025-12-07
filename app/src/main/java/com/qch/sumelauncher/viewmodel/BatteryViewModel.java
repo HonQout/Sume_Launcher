@@ -101,10 +101,8 @@ public class BatteryViewModel extends AndroidViewModel {
         } else {
             if (level < 0) {
                 return R.drawable.baseline_battery_unknown_24;
-            } else if (level == 0) {
-                return R.drawable.baseline_battery_alert_24;
             } else if (level < 100 / 7) {
-                return R.drawable.baseline_battery_0_bar_24;
+                return R.drawable.baseline_battery_alert_24;
             } else if (level < 100 / 7 * 2) {
                 return R.drawable.baseline_battery_1_bar_24;
             } else if (level < 100 / 7 * 3) {

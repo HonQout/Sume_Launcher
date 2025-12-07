@@ -26,14 +26,17 @@
         android:theme="@style/Theme.SumeLauncher">
         <activity
             android:name=".activity.SettingsActivity"
+            android:excludeFromRecents="true"
             android:exported="false"
             android:label="@string/title_activity_settings"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.SumeLauncher" />
         <activity
             android:name=".activity.LauncherActivity"
             android:clearTaskOnLaunch="false"
             android:exported="true"
-            android:launchMode="singleInstance">
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme.SumeLauncher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

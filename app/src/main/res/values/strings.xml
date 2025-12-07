@@ -2,6 +2,10 @@
     <string name="app_name">Sume Launcher</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Basic -->
+    <string name="cancel">Cancel</string>
+    <string name="hint">Hint</string>
+
     <!-- Button -->
     <string name="app_info">App info</string>
     <string name="uninstall">Uninstall</string>
@@ -15,7 +19,9 @@
     <string name="cannot_access_unexported_activity">Cannot access unexported activity.</string>
     <string name="activity_requires_extra_permission">This activity requires extra permission to be started.</string>
     <string name="cannot_uninstall_app">Cannot uninstall this app.</string>
-    <string name="open_app_info_failed">Failed to open app info page.</string>
+    <string name="uri_is_empty">Uri is empty.</string>
+    <string name="no_matching_activity">No activity can open this link.</string>
+    <string name="insist_uninstall_system_app">"This is a system app, which is usually not recommended to uninstall. \nHowever, in some 3rd-party Android systems, this kind of apps are allowed to uninstall. \nIf you insist to uninstall this app, press \"Uninstall\". "</string>
 
     <!-- Others -->
     <string name="app_icon">App icon</string>
@@ -26,7 +32,7 @@
 
     <!-- Preference Titles -->
     <string name="header_layout">Layout</string>
-    <string name="header_gesture">Gesture</string>
+    <string name="header_interaction">Interaction</string>
     <string name="header_system">System</string>
     <string name="header_about">About</string>
 
@@ -34,10 +40,12 @@
     <string name="grid_count">Grid count</string>
     <string name="display_top_bar">Display top bar</string>
     <string name="scroll_to_switch_page">Scroll to switch page</string>
-    <string name="scroll_to_switch_page_on">Allows switching page via clicking button or scrolling view</string>
-    <string name="scroll_to_switch_page_off">Allows switching page via clicking button only</string>
+    <string name="volume_key_switch_page">Use volume key to switch page</string>
+    <string name="volume_key_switch_page_summary">PageUp and PageDown key are also regarded as volume keys</string>
     <string name="set_default_app">Set default app</string>
     <string name="version">Version</string>
     <string name="version_name" translatable="false">1.0.0</string>
+    <string name="view_github_page">View GitHub page</string>
+    <string name="github_address" translatable="false">https://github.com/HonQout/Sume_Launcher</string>
 
 </resources>

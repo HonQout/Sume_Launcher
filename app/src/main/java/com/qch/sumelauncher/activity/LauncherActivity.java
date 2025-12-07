@@ -59,12 +59,8 @@ public class LauncherActivity extends AppCompatActivity {
             Intent intent = new Intent(LauncherActivity.this, SettingsActivity.class);
             startActivity(intent);
         });
-        binding.aMainBtnPrevPage.setOnClickListener(v -> {
-            launcherPageUp();
-        });
-        binding.aMainBtnNextPage.setOnClickListener(v -> {
-            launcherPageDown();
-        });
+        binding.aMainBtnPrevPage.setOnClickListener(v -> launcherPageUp());
+        binding.aMainBtnNextPage.setOnClickListener(v -> launcherPageDown());
         // Initialize viewmodel
         appViewModel = new ViewModelProvider(this).get(AppViewModel.class);
         timeViewModel = new ViewModelProvider(this).get(TimeViewModel.class);
@@ -72,8 +68,8 @@ public class LauncherActivity extends AppCompatActivity {
         // Observe
         appViewModel.getDisplayTopBar().observe(this, displayTopBar ->
                 binding.aMainLl1.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
-        appViewModel.getAllowScrollPage().observe(this, allowScrollPage ->
-                binding.aMainVp2.setUserInputEnabled(allowScrollPage));
+        appViewModel.getScrollToSwitchPage().observe(this, scrollToSwitchPage ->
+                binding.aMainVp2.setUserInputEnabled(scrollToSwitchPage));
         timeViewModel.getCurrentTime().observe(this, currentTime ->
                 binding.aMainTv1.setText(DateUtils.formatDateTime(
                                 LauncherActivity.this,
@@ -140,12 +136,18 @@ public class LauncherActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP: {
-                launcherPageUp();
-                return true;
+                if (appViewModel.getVolumeKeySwitchPageBoolean()) {
+                    launcherPageUp();
+                    return true;
+                }
+                break;
             }
             case KeyEvent.KEYCODE_VOLUME_DOWN: {
-                launcherPageDown();
-                return true;
+                if (appViewModel.getVolumeKeySwitchPageBoolean()) {
+                    launcherPageDown();
+                    return true;
+                }
+                break;
             }
             default:
                 break;

@@ -35,12 +35,12 @@ public class AppViewModel extends AndroidViewModel {
     private static final int defNumColumn = 5;
 
     // multithread
-    //private final ExecutorService executorService = Executors.newFixedThreadPool(4);
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     // data
     private final MutableLiveData<Boolean> mDisplayTopBar = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> mAllowScrollPage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mScrollToSwitchPage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mVolumeKeySwitchPage = new MutableLiveData<>();
     private final MutableLiveData<Integer> mNumRow = new MutableLiveData<>();
     private final MutableLiveData<Integer> mNumColumn = new MutableLiveData<>();
     private final MutableLiveData<Integer> mNumItemsPerPage = new MutableLiveData<>();
@@ -189,7 +189,8 @@ public class AppViewModel extends AndroidViewModel {
 
     public void getStoredPreferences(SharedPreferences sharedPreferences) {
         getStoredDisplayTopBar(sharedPreferences);
-        getStoredAllowScrollPage(sharedPreferences);
+        getStoredScrollToSwitchPage(sharedPreferences);
+        getStoredVolumeKeySwitchPage(sharedPreferences);
         getStoredGridCount(sharedPreferences);
     }
 
@@ -198,9 +199,14 @@ public class AppViewModel extends AndroidViewModel {
         mDisplayTopBar.postValue(displayTopBar);
     }
 
-    public void getStoredAllowScrollPage(SharedPreferences sharedPreferences) {
-        boolean allowScrollPage = sharedPreferences.getBoolean("allow_scroll_page", true);
-        mAllowScrollPage.postValue(allowScrollPage);
+    public void getStoredScrollToSwitchPage(SharedPreferences sharedPreferences) {
+        boolean scrollToSwitchPage = sharedPreferences.getBoolean("scroll_to_switch_page", true);
+        mScrollToSwitchPage.postValue(scrollToSwitchPage);
+    }
+
+    public void getStoredVolumeKeySwitchPage(SharedPreferences sharedPreferences) {
+        boolean volumeKeyToSwitchPage = sharedPreferences.getBoolean("volume_key_switch_page", true);
+        mVolumeKeySwitchPage.postValue(volumeKeyToSwitchPage);
     }
 
     public void getStoredGridCount(SharedPreferences sharedPreferences) {
@@ -248,7 +254,8 @@ public class AppViewModel extends AndroidViewModel {
             // Initialize shared preferences
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             getStoredDisplayTopBar(sharedPreferences);
-            getStoredAllowScrollPage(sharedPreferences);
+            getStoredScrollToSwitchPage(sharedPreferences);
+            getStoredVolumeKeySwitchPage(sharedPreferences);
             String gridCount = sharedPreferences.getString("grid_count", defNumRow + "," + defNumColumn);
             String[] split = gridCount.split(",");
             int actualNumRow = defNumRow;
@@ -370,8 +377,16 @@ public class AppViewModel extends AndroidViewModel {
         return mDisplayTopBar;
     }
 
-    public LiveData<Boolean> getAllowScrollPage() {
-        return mAllowScrollPage;
+    public LiveData<Boolean> getScrollToSwitchPage() {
+        return mScrollToSwitchPage;
+    }
+
+    public LiveData<Boolean> getVolumeKeySwitchPage() {
+        return mVolumeKeySwitchPage;
+    }
+
+    public boolean getVolumeKeySwitchPageBoolean() {
+        return mVolumeKeySwitchPage.getValue() == null || mVolumeKeySwitchPage.getValue();
     }
 
     public LiveData<Integer> getNumRow() {
