@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/time_size"
+            android:textSize="@dimen/top_bar_text_size"
             android:textStyle="bold" />
 
         <Space
@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/time_size"
+            android:textSize="@dimen/top_bar_text_size"
             android:textStyle="bold" />
 
         <Space
@@ -44,18 +44,42 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/a_main_iv1"
+            android:layout_width="@dimen/top_bar_icon_size"
+            android:layout_height="@dimen/top_bar_icon_size"
+            android:contentDescription="@string/wifi_icon"
+            android:tint="?android:textColorPrimary"
+            android:visibility="gone" />
+
+        <Space
+            android:layout_width="4dp"
+            android:layout_height="0dp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/a_main_iv2"
+            android:layout_width="@dimen/top_bar_icon_size"
+            android:layout_height="@dimen/top_bar_icon_size"
+            android:contentDescription="@string/bluetooth_icon"
+            android:tint="?android:textColorPrimary"
+            android:visibility="gone" />
+
+        <Space
+            android:layout_width="4dp"
+            android:layout_height="0dp" />
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/a_main_tv3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/time_size"
+            android:textSize="@dimen/top_bar_text_size"
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/a_main_iv1"
-            android:layout_width="@dimen/battery_size"
-            android:layout_height="@dimen/battery_size"
+            android:id="@+id/a_main_iv3"
+            android:layout_width="@dimen/top_bar_icon_size"
+            android:layout_height="@dimen/top_bar_icon_size"
             android:contentDescription="@string/battery_icon"
             android:tint="?android:textColorPrimary" />
 
@@ -100,7 +124,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/time_size" />
+            android:textSize="@dimen/top_bar_text_size" />
 
         <Space
             android:layout_width="8dp"
