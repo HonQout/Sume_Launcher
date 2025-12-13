@@ -60,7 +60,7 @@ public class BatteryViewModel extends AndroidViewModel {
                         status == BatteryManager.BATTERY_STATUS_FULL;
                 mLevel.postValue((int) batteryPct);
                 mIsCharging.postValue(isCharging);
-                mIcon.postValue(getBatteryIcon(level, isCharging));
+                mIcon.postValue(getBatteryIconRes(level, isCharging));
             }
         };
 
@@ -76,10 +76,10 @@ public class BatteryViewModel extends AndroidViewModel {
 
     private void init() {
         int level = BatteryUtils.getBatteryLevel(getApplication());
-        boolean isCharging = BatteryUtils.getIsCharging(getApplication());
+        boolean isCharging = BatteryUtils.isCharging(getApplication());
         mLevel.postValue(level);
         mIsCharging.postValue(isCharging);
-        mIcon.postValue(getBatteryIcon(level, isCharging));
+        mIcon.postValue(getBatteryIconRes(level, isCharging));
     }
 
     public LiveData<Integer> getLevel() {
@@ -95,7 +95,7 @@ public class BatteryViewModel extends AndroidViewModel {
     }
 
     @DrawableRes
-    public int getBatteryIcon(int level, boolean isCharging) {
+    public int getBatteryIconRes(int level, boolean isCharging) {
         if (isCharging) {
             return R.drawable.baseline_battery_charging_full_24;
         } else {

@@ -21,12 +21,16 @@ import com.qch.sumelauncher.adapter.viewpager2.AppPagerAdapter;
 import com.qch.sumelauncher.databinding.ActivityMainBinding;
 import com.qch.sumelauncher.viewmodel.AppViewModel;
 import com.qch.sumelauncher.viewmodel.BatteryViewModel;
+import com.qch.sumelauncher.viewmodel.BluetoothViewModel;
+import com.qch.sumelauncher.viewmodel.WifiViewModel;
 import com.qch.sumelauncher.viewmodel.TimeViewModel;
 
 public class LauncherActivity extends AppCompatActivity {
     private static final String TAG = "LauncherActivity";
     private ActivityMainBinding binding;
     private TimeViewModel timeViewModel;
+    private WifiViewModel wifiViewModel;
+    private BluetoothViewModel bluetoothViewModel;
     private BatteryViewModel batteryViewModel;
     private AppViewModel appViewModel;
 
@@ -62,9 +66,12 @@ public class LauncherActivity extends AppCompatActivity {
         binding.aMainBtnPrevPage.setOnClickListener(v -> launcherPageUp());
         binding.aMainBtnNextPage.setOnClickListener(v -> launcherPageDown());
         // Initialize viewmodel
-        appViewModel = new ViewModelProvider(this).get(AppViewModel.class);
-        timeViewModel = new ViewModelProvider(this).get(TimeViewModel.class);
-        batteryViewModel = new ViewModelProvider(this).get(BatteryViewModel.class);
+        ViewModelProvider viewModelProvider = new ViewModelProvider(this);
+        appViewModel = viewModelProvider.get(AppViewModel.class);
+        timeViewModel = viewModelProvider.get(TimeViewModel.class);
+        wifiViewModel = viewModelProvider.get(WifiViewModel.class);
+        bluetoothViewModel = viewModelProvider.get(BluetoothViewModel.class);
+        batteryViewModel = viewModelProvider.get(BatteryViewModel.class);
         // Observe
         appViewModel.getDisplayTopBar().observe(this, displayTopBar ->
                 binding.aMainLl1.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
@@ -87,6 +94,20 @@ public class LauncherActivity extends AppCompatActivity {
                                         | DateUtils.FORMAT_ABBREV_WEEKDAY
                         )
                 ));
+        wifiViewModel.getWifiEnabled().observe(this, isEnabled -> {
+            binding.aMainIv1.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
+        });
+        wifiViewModel.getWifiIcon().observe(this, integer -> {
+            int i = integer == null ? R.drawable.baseline_signal_wifi_statusbar_null_24 : integer;
+            binding.aMainIv1.setImageResource(i);
+        });
+        bluetoothViewModel.getBtEnabled().observe(this, isEnabled -> {
+            binding.aMainIv2.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
+        });
+        bluetoothViewModel.getBtConnected().observe(this, isConnected -> {
+            binding.aMainIv2.setImageResource(isConnected ?
+                    R.drawable.baseline_bluetooth_connected_24 : R.drawable.baseline_bluetooth_24);
+        });
         batteryViewModel.getLevel().observe(this, integer -> {
             int i = integer == null ? -1 : integer;
             binding.aMainTv3.setText(
@@ -97,7 +118,7 @@ public class LauncherActivity extends AppCompatActivity {
         });
         batteryViewModel.getIcon().observe(this, integer -> {
             int i = integer == null ? R.drawable.baseline_battery_unknown_24 : integer;
-            binding.aMainIv1.setImageResource(i);
+            binding.aMainIv3.setImageResource(i);
         });
         appViewModel.getNumPage().observe(this, integer -> {
             appPagerAdapter.setNumPages(integer);
