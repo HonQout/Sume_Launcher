@@ -38,6 +38,7 @@ public class AppViewModel extends AndroidViewModel {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     // data
+    private final MutableLiveData<Boolean> mDisplayStatusBar = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayTopBar = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mScrollToSwitchPage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mVolumeKeySwitchPage = new MutableLiveData<>();
@@ -50,13 +51,20 @@ public class AppViewModel extends AndroidViewModel {
     private final MutableLiveData<Map<Integer, List<ActivityBean>>> mActivityBeanMap = new MutableLiveData<>();
 
     // shared preferences
-    public SharedPreferences.OnSharedPreferenceChangeListener spListener = (sharedPreferences, key) -> {
-        if (Objects.equals(key, "grid_count")) {
-            getStoredGridCount(sharedPreferences);
-        } else if (Objects.equals(key, "display_top_bar")) {
-            getStoredDisplayTopBar(sharedPreferences);
-        }
-    };
+    public SharedPreferences.OnSharedPreferenceChangeListener spListener =
+            (sharedPreferences, key) -> {
+                if (Objects.equals(key, "grid_count")) {
+                    getStoredGridCount(sharedPreferences);
+                } else if (Objects.equals(key, "display_status_bar")) {
+                    getStoredDisplayStatusBar(sharedPreferences);
+                } else if (Objects.equals(key, "display_top_bar")) {
+                    getStoredDisplayTopBar(sharedPreferences);
+                } else if (Objects.equals(key, "scroll_to_switch_page")) {
+                    getStoredScrollToSwitchPage(sharedPreferences);
+                } else if (Objects.equals(key, "volume_key_switch_page")) {
+                    getStoredVolumeKeySwitchPage(sharedPreferences);
+                }
+            };
 
     // broadcast receiver
     private BroadcastReceiver localeBroadcastReceiver = null;
@@ -188,10 +196,16 @@ public class AppViewModel extends AndroidViewModel {
     }
 
     public void getStoredPreferences(SharedPreferences sharedPreferences) {
+        getStoredDisplayStatusBar(sharedPreferences);
         getStoredDisplayTopBar(sharedPreferences);
         getStoredScrollToSwitchPage(sharedPreferences);
         getStoredVolumeKeySwitchPage(sharedPreferences);
         getStoredGridCount(sharedPreferences);
+    }
+
+    public void getStoredDisplayStatusBar(SharedPreferences sharedPreferences) {
+        boolean displayStatusBar = sharedPreferences.getBoolean("display_status_bar", true);
+        mDisplayStatusBar.postValue(displayStatusBar);
     }
 
     public void getStoredDisplayTopBar(SharedPreferences sharedPreferences) {
@@ -253,6 +267,7 @@ public class AppViewModel extends AndroidViewModel {
             mActivityBeanList.postValue(list);
             // Initialize shared preferences
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            getStoredDisplayStatusBar(sharedPreferences);
             getStoredDisplayTopBar(sharedPreferences);
             getStoredScrollToSwitchPage(sharedPreferences);
             getStoredVolumeKeySwitchPage(sharedPreferences);
@@ -371,6 +386,10 @@ public class AppViewModel extends AndroidViewModel {
                 mActivityBeanMap.postValue(initMap(list, numItemPerPage));
             }
         });
+    }
+
+    public LiveData<Boolean> getDisplayStatusBar() {
+        return mDisplayStatusBar;
     }
 
     public LiveData<Boolean> getDisplayTopBar() {

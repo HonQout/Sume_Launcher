@@ -1,5 +1,6 @@
 package com.qch.sumelauncher.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,15 +11,22 @@ import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.adapter.viewpager2.AppPagerAdapter;
 import com.qch.sumelauncher.databinding.ActivityMainBinding;
+import com.qch.sumelauncher.utils.IntentUtils;
+import com.qch.sumelauncher.utils.PermissionUtils;
+import com.qch.sumelauncher.utils.UIUtils;
 import com.qch.sumelauncher.viewmodel.AppViewModel;
 import com.qch.sumelauncher.viewmodel.BatteryViewModel;
 import com.qch.sumelauncher.viewmodel.BluetoothViewModel;
@@ -33,9 +41,11 @@ public class LauncherActivity extends AppCompatActivity {
     private BluetoothViewModel bluetoothViewModel;
     private BatteryViewModel batteryViewModel;
     private AppViewModel appViewModel;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         // Immersive system bars
         EdgeToEdge.enable(this);
@@ -73,6 +83,10 @@ public class LauncherActivity extends AppCompatActivity {
         bluetoothViewModel = viewModelProvider.get(BluetoothViewModel.class);
         batteryViewModel = viewModelProvider.get(BatteryViewModel.class);
         // Observe
+        appViewModel.getDisplayStatusBar().observe(this, displayStatusBar -> {
+            Log.i(TAG, "Set status bar visibility to " + (displayStatusBar ? "visible" : "gone"));
+            UIUtils.handleStatusBarVisibility(getWindow(), displayStatusBar);
+        });
         appViewModel.getDisplayTopBar().observe(this, displayTopBar ->
                 binding.aMainLl1.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
         appViewModel.getScrollToSwitchPage().observe(this, scrollToSwitchPage ->
@@ -94,20 +108,17 @@ public class LauncherActivity extends AppCompatActivity {
                                         | DateUtils.FORMAT_ABBREV_WEEKDAY
                         )
                 ));
-        wifiViewModel.getWifiEnabled().observe(this, isEnabled -> {
-            binding.aMainIv1.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
-        });
+        wifiViewModel.getWifiEnabled().observe(this, isEnabled ->
+                binding.aMainIv1.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
         wifiViewModel.getWifiIcon().observe(this, integer -> {
             int i = integer == null ? R.drawable.baseline_signal_wifi_statusbar_null_24 : integer;
             binding.aMainIv1.setImageResource(i);
         });
-        bluetoothViewModel.getBtEnabled().observe(this, isEnabled -> {
-            binding.aMainIv2.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
-        });
-        bluetoothViewModel.getBtConnected().observe(this, isConnected -> {
-            binding.aMainIv2.setImageResource(isConnected ?
-                    R.drawable.baseline_bluetooth_connected_24 : R.drawable.baseline_bluetooth_24);
-        });
+        bluetoothViewModel.getBtEnabled().observe(this, isEnabled ->
+                binding.aMainIv2.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
+        bluetoothViewModel.getBtConnected().observe(this, isConnected ->
+                binding.aMainIv2.setImageResource(isConnected ?
+                        R.drawable.baseline_bluetooth_connected_24 : R.drawable.baseline_bluetooth_24));
         batteryViewModel.getLevel().observe(this, integer -> {
             int i = integer == null ? -1 : integer;
             binding.aMainTv3.setText(
@@ -137,18 +148,47 @@ public class LauncherActivity extends AppCompatActivity {
                                 ),
                                 integer, appViewModel.getNumPageInt()
                         )));
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                wifiViewModel.init();
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        Log.i(TAG, "onStart");
+        super.onStart();
     }
 
     @Override
     protected void onResume() {
+        Log.i(TAG, "onResume");
         super.onResume();
+        // get shared preferences
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(appViewModel.spListener);
         appViewModel.getStoredPreferences(sharedPreferences);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(appViewModel.spListener);
+        // check if permissions are granted
+        if (PermissionUtils.isPermissionGranted(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            wifiViewModel.init();
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.request_permission)
+                    .setMessage(R.string.perm_fine_location_reason)
+                    .setPositiveButton(R.string.app_info, (dialog, which) ->
+                            IntentUtils.openAppDetailsPage(LauncherActivity.this,
+                                    "com.qch.sumelauncher"))
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
     }
 
     @Override
     protected void onPause() {
+        Log.i(TAG, "onPause");
         super.onPause();
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(appViewModel.spListener);

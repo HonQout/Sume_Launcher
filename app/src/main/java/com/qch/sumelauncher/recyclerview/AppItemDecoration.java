@@ -21,12 +21,12 @@ public class AppItemDecoration extends RecyclerView.ItemDecoration {
     public AppItemDecoration(int numRow, int numColumn) {
         this.numRow = numRow;
         this.numColumn = numColumn;
-
     }
 
     @Override
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view,
                                @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        Log.i(TAG, "getItemOffsets");
         super.getItemOffsets(outRect, view, parent, state);
         // check if screen height is >0, which means the view has finished loading process
         Context context = view.getContext();
@@ -86,5 +86,13 @@ public class AppItemDecoration extends RecyclerView.ItemDecoration {
                 outRect.bottom = verticalSpacingPx / 2;
             }
         }
+    }
+
+    public void setNumRow(int numRow) {
+        this.numRow = numRow;
+    }
+
+    public void setNumColumn(int numColumn) {
+        this.numColumn = numColumn;
     }
 }

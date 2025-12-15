@@ -16,6 +16,12 @@
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:iconSpaceReserved="false"
+            app:key="display_status_bar"
+            app:title="@string/display_status_bar" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:iconSpaceReserved="false"
             app:key="display_top_bar"
             app:title="@string/display_top_bar" />
 
