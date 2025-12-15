@@ -29,7 +29,7 @@
     <string name="version">版本</string>
     <string name="scroll_to_switch_page">滑动翻页</string>
     <string name="volume_key_switch_page">音量键翻页</string>
-    <string name="volume_key_switch_page_summary">翻页键也将被视为音量键</string>
+    <string name="volume_key_switch_page_summary">翻页键也被视为音量键</string>
     <string name="view_github_page">访问GitHub页面</string>
     <string name="uri_is_empty">统一资源标识符为空。</string>
     <string name="no_matching_activity">没有找到可以打开链接的应用程序。</string>

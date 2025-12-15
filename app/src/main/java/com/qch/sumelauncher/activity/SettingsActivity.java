@@ -2,14 +2,17 @@ package com.qch.sumelauncher.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -38,6 +41,7 @@ public class SettingsActivity extends AppCompatActivity {
         // Immersive system bars
         EdgeToEdge.enable(this);
         // Set view
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         binding.aSettingsMt.setNavigationOnClickListener(v ->
@@ -83,9 +87,13 @@ public class SettingsActivity extends AppCompatActivity {
         public boolean onPreferenceTreeClick(@NonNull Preference preference) {
             String key = preference.getKey();
             if (Objects.equals(key, "set_default_app")) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getContext(), R.string.cannot_find_activity, Toast.LENGTH_SHORT).show();
+                }
             } else if (Objects.equals(key, "view_github_page")) {
                 IntentUtils.handleLaunchIntentResult(
                         requireContext(),

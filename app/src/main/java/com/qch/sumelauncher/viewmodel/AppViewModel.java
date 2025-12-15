@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -18,9 +19,11 @@ import androidx.preference.PreferenceManager;
 
 import com.qch.sumelauncher.bean.ActivityBean;
 import com.qch.sumelauncher.utils.ApplicationUtils;
+import com.qch.sumelauncher.utils.CollectionUtils;
 
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +43,7 @@ public class AppViewModel extends AndroidViewModel {
     // data
     private final MutableLiveData<Boolean> mDisplayStatusBar = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayTopBar = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mEdgeToEdge = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mScrollToSwitchPage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mVolumeKeySwitchPage = new MutableLiveData<>();
     private final MutableLiveData<Integer> mNumRow = new MutableLiveData<>();
@@ -54,7 +58,7 @@ public class AppViewModel extends AndroidViewModel {
     public SharedPreferences.OnSharedPreferenceChangeListener spListener =
             (sharedPreferences, key) -> {
                 if (Objects.equals(key, "grid_count")) {
-                    getStoredGridCount(sharedPreferences);
+                    getStoredGridCount(sharedPreferences, false);
                 } else if (Objects.equals(key, "display_status_bar")) {
                     getStoredDisplayStatusBar(sharedPreferences);
                 } else if (Objects.equals(key, "display_top_bar")) {
@@ -195,12 +199,12 @@ public class AppViewModel extends AndroidViewModel {
         }
     }
 
-    public void getStoredPreferences(SharedPreferences sharedPreferences) {
+    public void getStoredPreferences(SharedPreferences sharedPreferences, boolean forceUpdate) {
         getStoredDisplayStatusBar(sharedPreferences);
         getStoredDisplayTopBar(sharedPreferences);
         getStoredScrollToSwitchPage(sharedPreferences);
         getStoredVolumeKeySwitchPage(sharedPreferences);
-        getStoredGridCount(sharedPreferences);
+        getStoredGridCount(sharedPreferences, forceUpdate);
     }
 
     public void getStoredDisplayStatusBar(SharedPreferences sharedPreferences) {
@@ -223,7 +227,7 @@ public class AppViewModel extends AndroidViewModel {
         mVolumeKeySwitchPage.postValue(volumeKeyToSwitchPage);
     }
 
-    public void getStoredGridCount(SharedPreferences sharedPreferences) {
+    public void getStoredGridCount(SharedPreferences sharedPreferences, boolean forceUpdate) {
         String gridCount = sharedPreferences.getString("grid_count", defNumRow + "," + defNumColumn);
         String[] split = gridCount.split(",");
         int actualNumRow = defNumRow;
@@ -239,13 +243,17 @@ public class AppViewModel extends AndroidViewModel {
             Log.e(TAG, "Failed to get stored numRow.", e);
         }
         int numItemsPerPage = actualNumRow * actualNumColumn;
-        if (actualNumRow != getNumRowInt() || actualNumColumn != getNumColumnInt()) {
+        if (forceUpdate || actualNumRow != getNumRowInt() || actualNumColumn != getNumColumnInt()) {
             mNumRow.postValue(actualNumRow);
             mNumColumn.postValue(actualNumColumn);
             mNumItemsPerPage.postValue(numItemsPerPage);
             List<ActivityBean> list = mActivityBeanList.getValue();
             if (list == null) {
-                list = new ArrayList<>();
+                list = new ArrayList<>(ApplicationUtils.getActivityBeanList(getApplication(), null));
+                sortActivityBeanList(list);
+                Log.i(TAG, "Size of ActivityBean list is " + list.size());
+                mActivityBeanList.postValue(list);
+                mCurrentPage.postValue(1);
             }
             mNumPage.postValue(calcNumPage(list, numItemsPerPage));
             mActivityBeanMap.postValue(initMap(list, numItemsPerPage));
@@ -255,43 +263,8 @@ public class AppViewModel extends AndroidViewModel {
     private void init() {
         Context context = getApplication();
         executorService.execute(() -> {
-            List<ActivityBean> list = mActivityBeanList.getValue();
-            if (list == null) {
-                list = new ArrayList<>();
-            } else {
-                list.clear();
-            }
-            list.addAll(ApplicationUtils.getActivityBeanList(context, null));
-            sortActivityBeanList(list);
-            Log.i(TAG, "Size of ActivityBean list is " + list.size());
-            mActivityBeanList.postValue(list);
-            // Initialize shared preferences
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            getStoredDisplayStatusBar(sharedPreferences);
-            getStoredDisplayTopBar(sharedPreferences);
-            getStoredScrollToSwitchPage(sharedPreferences);
-            getStoredVolumeKeySwitchPage(sharedPreferences);
-            String gridCount = sharedPreferences.getString("grid_count", defNumRow + "," + defNumColumn);
-            String[] split = gridCount.split(",");
-            int actualNumRow = defNumRow;
-            int actualNumColumn = defNumColumn;
-            try {
-                actualNumRow = Integer.parseInt(split[0]);
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to get stored numRow.", e);
-            }
-            try {
-                actualNumColumn = Integer.parseInt(split[1]);
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to get stored numRow.", e);
-            }
-            int numItemsPerPage = actualNumRow * actualNumColumn;
-            mNumRow.postValue(actualNumRow);
-            mNumColumn.postValue(actualNumColumn);
-            mNumItemsPerPage.postValue(numItemsPerPage);
-            mNumPage.postValue(calcNumPage(list, numItemsPerPage));
-            mCurrentPage.postValue(1);
-            mActivityBeanMap.postValue(initMap(list, numItemsPerPage));
+            getStoredPreferences(sharedPreferences, true);
         });
     }
 
@@ -319,7 +292,7 @@ public class AppViewModel extends AndroidViewModel {
     private void sortActivityBeanList(List<ActivityBean> list) {
         Collator collator = Collator.getInstance();
         if (list != null) {
-            list.sort((o1, o2) -> {
+            Collections.sort(list, (o1, o2) -> {
                 String label1 = o1.getLabel();
                 String label2 = o2.getLabel();
                 return collator.compare(label1, label2);
@@ -351,7 +324,11 @@ public class AppViewModel extends AndroidViewModel {
             List<ActivityBean> list = mActivityBeanList.getValue();
             if (list != null) {
                 try {
-                    list.removeIf(activityBean -> Objects.equals(packageName, activityBean.getPackageName()));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        list.removeIf(item -> Objects.equals(packageName, item.getPackageName()));
+                    } else {
+                        CollectionUtils.removeConditionally(list, item -> Objects.equals(packageName, item.getPackageName()));
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to remove activity beans of " + packageName);
                 }
@@ -370,7 +347,11 @@ public class AppViewModel extends AndroidViewModel {
             List<ActivityBean> list = mActivityBeanList.getValue();
             if (list != null) {
                 try {
-                    list.removeIf(activityBean -> Objects.equals(packageName, activityBean.getPackageName()));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        list.removeIf(item -> Objects.equals(packageName, item.getPackageName()));
+                    } else {
+                        CollectionUtils.removeConditionally(list, item -> Objects.equals(packageName, item.getPackageName()));
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to remove activity beans of " + packageName);
                 }
@@ -394,6 +375,10 @@ public class AppViewModel extends AndroidViewModel {
 
     public LiveData<Boolean> getDisplayTopBar() {
         return mDisplayTopBar;
+    }
+
+    public LiveData<Boolean> getEdgeToEdge() {
+        return mEdgeToEdge;
     }
 
     public LiveData<Boolean> getScrollToSwitchPage() {

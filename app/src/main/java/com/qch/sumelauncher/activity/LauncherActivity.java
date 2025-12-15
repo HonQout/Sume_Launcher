@@ -16,11 +16,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.internal.EdgeToEdgeUtils;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.adapter.viewpager2.AppPagerAdapter;
 import com.qch.sumelauncher.databinding.ActivityMainBinding;
@@ -50,6 +52,7 @@ public class LauncherActivity extends AppCompatActivity {
         // Immersive system bars
         EdgeToEdge.enable(this);
         // Set view
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         // Handle back event
@@ -83,10 +86,6 @@ public class LauncherActivity extends AppCompatActivity {
         bluetoothViewModel = viewModelProvider.get(BluetoothViewModel.class);
         batteryViewModel = viewModelProvider.get(BatteryViewModel.class);
         // Observe
-        appViewModel.getDisplayStatusBar().observe(this, displayStatusBar -> {
-            Log.i(TAG, "Set status bar visibility to " + (displayStatusBar ? "visible" : "gone"));
-            UIUtils.handleStatusBarVisibility(getWindow(), displayStatusBar);
-        });
         appViewModel.getDisplayTopBar().observe(this, displayTopBar ->
                 binding.aMainLl1.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
         appViewModel.getScrollToSwitchPage().observe(this, scrollToSwitchPage ->
@@ -167,7 +166,10 @@ public class LauncherActivity extends AppCompatActivity {
         super.onResume();
         // get shared preferences
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        appViewModel.getStoredPreferences(sharedPreferences);
+        appViewModel.getStoredPreferences(sharedPreferences, false);
+        boolean displayStatusBar =
+                sharedPreferences.getBoolean("display_status_bar", true);
+        UIUtils.handleStatusBarVisibility(getWindow(), displayStatusBar);
         sharedPreferences.registerOnSharedPreferenceChangeListener(appViewModel.spListener);
         // check if permissions are granted
         if (PermissionUtils.isPermissionGranted(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
