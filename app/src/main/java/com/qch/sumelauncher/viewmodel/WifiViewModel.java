@@ -10,10 +10,7 @@ import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
-import android.net.TransportInfo;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.DrawableRes;
@@ -120,26 +117,9 @@ public class WifiViewModel extends AndroidViewModel {
                                               @NonNull NetworkCapabilities networkCapabilities) {
                 Log.i(TAG, "Wifi network capabilities have changed.");
                 super.onCapabilitiesChanged(network, networkCapabilities);
-                TransportInfo transportInfo = null;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    transportInfo = networkCapabilities.getTransportInfo();
-                }
-                if (transportInfo instanceof WifiInfo) {
-                    WifiInfo wifiInfo = (WifiInfo) transportInfo;
-                    int signalLevel = WifiUtils.calcSignalLevel(context, wifiInfo);
-                    Log.i(TAG, "Signal level = " + signalLevel);
-                    mWifiSignalLevel.postValue(signalLevel);
-                    mWifiIcon.postValue(getWifiIconRes(signalLevel));
-                } else {
-                    Log.e(TAG, "TransportInfo is not an instance of WifiInfo.");
-                    if (transportInfo == null) {
-                        Log.e(TAG, "TransportInfo is null.");
-                    } else {
-                        Log.e(TAG, "TransportInfo is an instance of " + transportInfo.getClass());
-                    }
-                    mWifiSignalLevel.postValue(-1);
-                    mWifiIcon.postValue(getWifiIconRes(-1));
-                }
+                int signalLevel = WifiUtils.getSignalLevel(context, networkCapabilities);
+                mWifiSignalLevel.postValue(signalLevel);
+                mWifiIcon.postValue(getWifiIconRes(signalLevel));
             }
 
             @Override

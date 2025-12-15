@@ -155,7 +155,8 @@ public class ApplicationUtils {
 
     public static List<ShortcutInfo> getShortcuts(Context context, String packageName) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+            LauncherApps launcherApps =
+                    (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
             try {
                 if (launcherApps != null && launcherApps.hasShortcutHostPermission()) {
                     LauncherApps.ShortcutQuery query = new LauncherApps.ShortcutQuery();
@@ -176,10 +177,12 @@ public class ApplicationUtils {
 
     public static boolean launchAppShortcut(Context context, String packageName, String shortcutId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            LauncherApps launcherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+            LauncherApps launcherApps =
+                    (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
             try {
                 if (launcherApps != null && launcherApps.hasShortcutHostPermission()) {
-                    launcherApps.startShortcut(packageName, shortcutId, null, null, Process.myUserHandle());
+                    launcherApps.startShortcut(packageName, shortcutId, null,
+                            null, Process.myUserHandle());
                     return true;
                 }
             } catch (Exception e) {
@@ -260,7 +263,9 @@ public class ApplicationUtils {
     }
 
     @Nullable
-    public static ResolveInfo getIntentActivity(Context context, String packageName, String activityName) {
+    public static ResolveInfo getIntentActivity(Context context,
+                                                String packageName,
+                                                String activityName) {
         List<ResolveInfo> intentActivities = getIntentActivityList(context, packageName);
         for (ResolveInfo resolveInfo : intentActivities) {
             if (Objects.equals(getActivityName(resolveInfo), activityName)) {
@@ -270,7 +275,8 @@ public class ApplicationUtils {
         return null;
     }
 
-    private static List<ActivityBean> getActivityBeanList(Context context, List<ResolveInfo> intentActivityList) {
+    private static List<ActivityBean> getActivityBeanList(Context context,
+                                                          List<ResolveInfo> intentActivityList) {
         List<ActivityBean> list = new ArrayList<>();
         for (ResolveInfo resolveInfo : intentActivityList) {
             list.add(new ActivityBean(context, resolveInfo));
@@ -281,8 +287,8 @@ public class ApplicationUtils {
     /**
      * Get a list of ActivityBean of all launchable activity of certain application(s).
      *
-     * @param packageName Specify which package should these ActivityBeans belong to. Simply passing
-     *                    null or empty string ("") to get all ActivityBeans of all installed packages.
+     * @param packageName Specify which package should these ActivityBeans belong to. Passing null
+     *                    or empty string ("") to get all ActivityBeans of all installed packages.
      */
     public static List<ActivityBean> getActivityBeanList(Context context, String packageName) {
         List<ResolveInfo> list = getIntentActivityList(context, packageName);

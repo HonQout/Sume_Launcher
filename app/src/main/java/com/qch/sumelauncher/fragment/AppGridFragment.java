@@ -7,9 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -174,12 +172,15 @@ public class AppGridFragment extends Fragment {
                         viewModel.getNumColumnInt()
                 )
         );
-        viewModel.getDisplayStatusBar().observe(getViewLifecycleOwner(), displayStatusBar -> {
-            reLayoutAppGrid();
-        });
-        viewModel.getDisplayTopBar().observe(getViewLifecycleOwner(), displayTopBar -> {
-            reLayoutAppGrid();
-        });
+        viewModel.getDisplayStatusBar().observe(getViewLifecycleOwner(), displayStatusBar ->
+                reLayoutAppGrid()
+        );
+        viewModel.getDisplayTopBar().observe(getViewLifecycleOwner(), displayTopBar ->
+                reLayoutAppGrid()
+        );
+        viewModel.getEdgeToEdge().observe(getViewLifecycleOwner(), edgeToEdge ->
+                reLayoutAppGrid()
+        );
         viewModel.getActivityBeanMap().observe(getViewLifecycleOwner(), map -> {
             if (map != null) {
                 List<ActivityBean> list = map.get(position);
