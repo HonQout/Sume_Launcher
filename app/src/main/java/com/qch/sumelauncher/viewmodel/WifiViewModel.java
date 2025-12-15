@@ -168,8 +168,12 @@ public class WifiViewModel extends AndroidViewModel {
         return true;
     }
 
-    private void init() {
-        this.mWifiEnabled.postValue(WifiUtils.isWifiEnabled(getApplication()));
+    public void init() {
+        Context context = getApplication();
+        int signalLevel = WifiUtils.getSignalLevel(context, null);
+        this.mWifiEnabled.postValue(WifiUtils.isWifiEnabled(context));
+        this.mWifiSignalLevel.postValue(signalLevel);
+        this.mWifiIcon.postValue(getWifiIconRes(signalLevel));
     }
 
     public LiveData<Boolean> getWifiEnabled() {

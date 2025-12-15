@@ -1,8 +1,10 @@
 package com.qch.sumelauncher.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -10,16 +12,25 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.databinding.ActivitySettingsBinding;
 import com.qch.sumelauncher.utils.IntentUtils;
+import com.qch.sumelauncher.utils.UIUtils;
 
 import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
     private static final String TAG = "SettingsActivity";
     private ActivitySettingsBinding binding;
+    private final SharedPreferences.OnSharedPreferenceChangeListener listener =
+            (sharedPreferences, key) -> {
+                if (Objects.equals(key, "display_status_bar")) {
+                    boolean displayStatusBar = sharedPreferences.getBoolean(key, true);
+                    UIUtils.handleStatusBarVisibility(getWindow(), displayStatusBar);
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +40,8 @@ public class SettingsActivity extends AppCompatActivity {
         // Set view
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        binding.aSettingsMt.setNavigationOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+        binding.aSettingsMt.setNavigationOnClickListener(v ->
+                getOnBackPressedDispatcher().onBackPressed());
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
@@ -40,6 +52,25 @@ public class SettingsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        boolean displayStatusBar =
+                sharedPreferences.getBoolean("display_status_bar", true);
+        UIUtils.handleStatusBarVisibility(getWindow(), displayStatusBar);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    @Override
+    protected void onPause() {
+        Log.i(TAG, "onPause");
+        super.onPause();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(listener);
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {

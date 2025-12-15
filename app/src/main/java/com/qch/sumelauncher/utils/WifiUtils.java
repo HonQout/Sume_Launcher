@@ -75,6 +75,7 @@ public class WifiUtils {
     }
 
     public static int getSignalLevel(Context context, @Nullable NetworkCapabilities networkCapabilities) {
+        // API 30+ Impl
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (networkCapabilities != null) {
                 TransportInfo transportInfo = networkCapabilities.getTransportInfo();
@@ -83,13 +84,13 @@ public class WifiUtils {
                     return WifiUtils.calcSignalLevel(context, wifiInfo);
                 }
             }
-        } else {
-            WifiManager wifiManager = getWifiManager(context);
-            if (wifiManager != null && wifiManager.isWifiEnabled()) {
-                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-                if (wifiInfo != null) {
-                    return WifiUtils.calcSignalLevel(context, wifiInfo);
-                }
+        }
+        // more common way
+        WifiManager wifiManager = getWifiManager(context);
+        if (wifiManager != null && wifiManager.isWifiEnabled()) {
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            if (wifiInfo != null) {
+                return WifiUtils.calcSignalLevel(context, wifiInfo);
             }
         }
         return -1;

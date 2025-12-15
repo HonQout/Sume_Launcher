@@ -7,6 +7,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -171,52 +174,26 @@ public class AppGridFragment extends Fragment {
                         viewModel.getNumColumnInt()
                 )
         );
+        viewModel.getDisplayStatusBar().observe(getViewLifecycleOwner(), displayStatusBar -> {
+            reLayoutAppGrid();
+        });
         viewModel.getDisplayTopBar().observe(getViewLifecycleOwner(), displayTopBar -> {
-            GridLayoutManager layoutManager = (GridLayoutManager) binding.fAppGridRv.getLayoutManager();
-            if (layoutManager != null) {
-                layoutManager.setSpanCount(viewModel.getNumColumnInt());
-            }
-            try {
-                int decorCount = binding.fAppGridRv.getItemDecorationCount();
-                for (int i = 0; i < decorCount; i++) {
-                    binding.fAppGridRv.removeItemDecorationAt(0);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "RecyclerView doesn't have an ItemDecoration.");
-            }
-            binding.fAppGridRv.addItemDecoration(
-                    new AppItemDecoration(
-                            viewModel.getNumRowInt(),
-                            viewModel.getNumColumnInt()
-                    )
-            );
+            reLayoutAppGrid();
         });
         viewModel.getActivityBeanMap().observe(getViewLifecycleOwner(), map -> {
             if (map != null) {
                 List<ActivityBean> list = map.get(position);
                 if (list != null) {
                     appRVAdapter.setList(list);
-                    GridLayoutManager layoutManager = (GridLayoutManager) binding.fAppGridRv.getLayoutManager();
-                    if (layoutManager != null) {
-                        layoutManager.setSpanCount(viewModel.getNumColumnInt());
-                    }
-                    try {
-                        int decorCount = binding.fAppGridRv.getItemDecorationCount();
-                        for (int i = 0; i < decorCount; i++) {
-                            binding.fAppGridRv.removeItemDecorationAt(0);
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, "RecyclerView doesn't have an ItemDecoration.");
-                    }
-                    binding.fAppGridRv.addItemDecoration(
-                            new AppItemDecoration(
-                                    viewModel.getNumRowInt(),
-                                    viewModel.getNumColumnInt()
-                            )
-                    );
+                    reLayoutAppGrid();
                 }
             }
         });
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(),
+                (v, insets) -> {
+                    binding.fAppGridRv.invalidateItemDecorations();
+                    return insets;
+                });
         return binding.getRoot();
     }
 
@@ -224,5 +201,42 @@ public class AppGridFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Log.i(TAG, "Fragment #" + position + " onViewCreated");
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        Log.i(TAG, "Fragment #" + position + " onStart");
+        super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        Log.i(TAG, "Fragment #" + position + " onResume");
+        super.onResume();
+    }
+
+    private void reLayoutAppGrid() {
+        Log.i(TAG, "Prepare to re-layout app grid.");
+        GridLayoutManager layoutManager = (GridLayoutManager) binding.fAppGridRv.getLayoutManager();
+        if (layoutManager != null) {
+            layoutManager.setSpanCount(viewModel.getNumColumnInt());
+        }
+        int decorCount = binding.fAppGridRv.getItemDecorationCount();
+        try {
+            for (int i = 0; i < decorCount; i++) {
+                binding.fAppGridRv.removeItemDecorationAt(0);
+            }
+        } catch (IndexOutOfBoundsException e) {
+            Log.e(TAG, "Required index of ItemDecoration is out of bound.");
+        }
+        binding.fAppGridRv.addItemDecoration(
+                new AppItemDecoration(
+                        viewModel.getNumRowInt(),
+                        viewModel.getNumColumnInt()
+                )
+        );
+        if (!binding.fAppGridRv.isInLayout()) {
+            binding.fAppGridRv.requestLayout();
+        }
     }
 }
