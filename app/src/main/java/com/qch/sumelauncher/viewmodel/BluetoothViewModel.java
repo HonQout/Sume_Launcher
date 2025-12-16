@@ -20,12 +20,14 @@ import com.qch.sumelauncher.utils.BluetoothUtils;
 public class BluetoothViewModel extends AndroidViewModel {
     private static final String TAG = "BluetoothViewModel";
 
-    // data
-    private final MutableLiveData<Boolean> mBtEnabled = new MutableLiveData<>(false);
-    private final MutableLiveData<Boolean> mBtConnected = new MutableLiveData<>(false);
     @DrawableRes
-    private final MutableLiveData<Integer> mBtIcon
-            = new MutableLiveData<>(R.drawable.baseline_bluetooth_disabled_24);
+    private static final int iconDisabled = R.drawable.baseline_bluetooth_disabled_24;
+    @DrawableRes
+    private static final int iconEnabled = R.drawable.baseline_bluetooth_24;
+
+    private final MutableLiveData<Boolean> mBtEnabled = new MutableLiveData<>(false);
+    @DrawableRes
+    private final MutableLiveData<Integer> mBtIcon = new MutableLiveData<>(iconDisabled);
 
     // broadcast receiver
     private BroadcastReceiver btBroadcastReceiver = null;
@@ -58,24 +60,14 @@ public class BluetoothViewModel extends AndroidViewModel {
                 if (action == null) {
                     return;
                 }
-                switch (action) {
-                    case BluetoothAdapter.ACTION_STATE_CHANGED: {
-                        int btState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
-                        if (btState == BluetoothAdapter.STATE_OFF) {
-                            mBtEnabled.postValue(false);
-                        } else if (btState == BluetoothAdapter.STATE_ON) {
-                            mBtEnabled.postValue(true);
-                        }
-                        break;
-                    }
-                    case BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED: {
-                        int btConnState = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, BluetoothAdapter.STATE_DISCONNECTED);
-                        if (btConnState == BluetoothAdapter.STATE_DISCONNECTED) {
-                            mBtConnected.postValue(false);
-                        } else if (btConnState == BluetoothAdapter.STATE_ON) {
-                            mBtConnected.postValue(true);
-                        }
-                        break;
+                if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                    int btState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
+                    if (btState == BluetoothAdapter.STATE_OFF) {
+                        mBtEnabled.postValue(false);
+                        mBtIcon.postValue(iconDisabled);
+                    } else if (btState == BluetoothAdapter.STATE_ON) {
+                        mBtEnabled.postValue(true);
+                        mBtIcon.postValue(iconEnabled);
                     }
                 }
             }
@@ -92,14 +84,16 @@ public class BluetoothViewModel extends AndroidViewModel {
     }
 
     private void init() {
-        this.mBtEnabled.postValue(BluetoothUtils.isBluetoothEnabled(getApplication()));
+        boolean isEnabled = BluetoothUtils.isBluetoothEnabled(getApplication());
+        this.mBtEnabled.postValue(isEnabled);
+        this.mBtIcon.postValue(isEnabled ? iconEnabled : iconDisabled);
     }
 
     public LiveData<Boolean> getBtEnabled() {
         return mBtEnabled;
     }
 
-    public MutableLiveData<Boolean> getBtConnected() {
-        return mBtConnected;
+    public LiveData<Integer> getBtIcon() {
+        return mBtIcon;
     }
 }

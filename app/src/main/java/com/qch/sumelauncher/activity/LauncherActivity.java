@@ -22,7 +22,6 @@ import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.internal.EdgeToEdgeUtils;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.adapter.viewpager2.AppPagerAdapter;
 import com.qch.sumelauncher.databinding.ActivityMainBinding;
@@ -47,14 +46,13 @@ public class LauncherActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        // Immersive system bars
         EdgeToEdge.enable(this);
         // Set view
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        UIUtils.setViewFitsSystemWindows(binding.getRoot());
         // Handle back event
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -115,9 +113,8 @@ public class LauncherActivity extends AppCompatActivity {
         });
         bluetoothViewModel.getBtEnabled().observe(this, isEnabled ->
                 binding.aMainIv2.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
-        bluetoothViewModel.getBtConnected().observe(this, isConnected ->
-                binding.aMainIv2.setImageResource(isConnected ?
-                        R.drawable.baseline_bluetooth_connected_24 : R.drawable.baseline_bluetooth_24));
+        bluetoothViewModel.getBtIcon().observe(this, icon ->
+                binding.aMainIv2.setImageResource(icon));
         batteryViewModel.getLevel().observe(this, integer -> {
             int i = integer == null ? -1 : integer;
             binding.aMainTv3.setText(

@@ -38,12 +38,13 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Immersive system bars
         EdgeToEdge.enable(this);
         // Set view
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        UIUtils.setViewFitsSystemWindows(binding.getRoot());
+        // Initialize view
         binding.aSettingsMt.setNavigationOnClickListener(v ->
                 getOnBackPressedDispatcher().onBackPressed());
         if (savedInstanceState == null) {
