@@ -4,15 +4,6 @@
         app:iconSpaceReserved="false"
         app:title="@string/header_layout">
 
-        <ListPreference
-            app:defaultValue="5,5"
-            app:entries="@array/grid_count_entries"
-            app:entryValues="@array/grid_count_values"
-            app:iconSpaceReserved="false"
-            app:key="grid_count"
-            app:title="@string/grid_count"
-            app:useSimpleSummaryProvider="true" />
-
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:iconSpaceReserved="false"
@@ -24,6 +15,15 @@
             app:iconSpaceReserved="false"
             app:key="display_top_bar"
             app:title="@string/display_top_bar" />
+
+        <ListPreference
+            app:defaultValue="5,5"
+            app:entries="@array/grid_count_entries"
+            app:entryValues="@array/grid_count_values"
+            app:iconSpaceReserved="false"
+            app:key="grid_count"
+            app:title="@string/grid_count"
+            app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 
