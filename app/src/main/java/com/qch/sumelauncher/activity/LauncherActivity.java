@@ -47,11 +47,10 @@ public class LauncherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         // Set view
+        EdgeToEdge.enable(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         UIUtils.setViewFitsSystemWindows(binding.getRoot());
         // Handle back event
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {

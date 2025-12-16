@@ -69,6 +69,11 @@
 
         <Preference
             app:iconSpaceReserved="false"
+            app:key="requested_permissions"
+            app:title="@string/requested_permissions" />
+
+        <Preference
+            app:iconSpaceReserved="false"
             app:key="view_github_page"
             app:summary="@string/github_address"
             app:title="@string/view_github_page" />
