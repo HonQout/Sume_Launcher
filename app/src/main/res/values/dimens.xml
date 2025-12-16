@@ -5,5 +5,4 @@
     <dimen name="app_icon_size">40dp</dimen>
     <dimen name="app_label_size">12sp</dimen>
     <dimen name="bottom_icon_size">50dp</dimen>
-    <dimen name="dialog_title_size">24sp</dimen>
 </resources>

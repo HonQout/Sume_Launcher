@@ -7,6 +7,7 @@ import android.view.View;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.qch.sumelauncher.adapter.recyclerview.FilterableListAdapter;
@@ -54,5 +55,23 @@ public class PermissionActivity extends AppCompatActivity {
         });
         binding.aPermissionRv.setAdapter(adapter);
         viewModel.getRequestedPermissionBeanList().observe(this, adapter::setList);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        boolean displayStatusBar =
+                sharedPreferences.getBoolean("display_status_bar", true);
+        UIUtils.handleStatusBarVisibility(getWindow(), displayStatusBar);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(listener);
     }
 }
