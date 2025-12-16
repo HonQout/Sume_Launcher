@@ -38,11 +38,10 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         // Set view
+        EdgeToEdge.enable(this);
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         UIUtils.setViewFitsSystemWindows(binding.getRoot());
         // Initialize view
         binding.aSettingsMt.setNavigationOnClickListener(v ->
@@ -95,6 +94,9 @@ public class SettingsActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(getContext(), R.string.cannot_find_activity, Toast.LENGTH_SHORT).show();
                 }
+            } else if (Objects.equals(key, "requested_permissions")) {
+                Intent intent = new Intent(requireActivity(), PermissionActivity.class);
+                startActivity(intent);
             } else if (Objects.equals(key, "view_github_page")) {
                 IntentUtils.handleLaunchIntentResult(
                         requireContext(),

@@ -53,5 +53,9 @@
     <string name="bluetooth_icon">Bluetooth icon</string>
     <string name="request_permission">Request permission</string>
     <string name="perm_fine_location_reason">This application requires permission to access your fine location in order to display wifi signal level, wifi ssid and bluetooth connection state.\nYour location information will not be recorded or saved.\nIf you deny this permission, information mentiond above will not be displayed due to limitation of Android API.\nYou can press \"App info\" to go to Application Info page in system settings and grant this permission.</string>
+    <string name="requested_permissions">Requested permissions</string>
+    <string name="title_activity_permission">Permission</string>
+    <string name="require_following_permission">This application requires the following permission(s):</string>
+    <string name="confirm">Confirm</string>
 
 </resources>
