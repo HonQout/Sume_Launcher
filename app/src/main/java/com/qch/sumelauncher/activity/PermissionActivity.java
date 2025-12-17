@@ -40,6 +40,8 @@ public class PermissionActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         UIUtils.setViewFitsSystemWindows(binding.getRoot());
         viewModel = new ViewModelProvider(this).get(PermissionViewModel.class);
+        binding.aPermissionMt.setNavigationOnClickListener(v ->
+                getOnBackPressedDispatcher().onBackPressed());
         binding.aPermissionRv.setLayoutManager(new LinearLayoutManager(this));
         PermissionRVAdapter adapter = new PermissionRVAdapter(new ArrayList<>());
         adapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
