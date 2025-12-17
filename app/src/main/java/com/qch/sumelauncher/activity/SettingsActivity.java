@@ -36,12 +36,10 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Set view
         EdgeToEdge.enable(this);
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         UIUtils.setViewFitsSystemWindows(binding.getRoot());
-        // Initialize view
         binding.aSettingsMt.setNavigationOnClickListener(v ->
                 getOnBackPressedDispatcher().onBackPressed());
         if (savedInstanceState == null) {

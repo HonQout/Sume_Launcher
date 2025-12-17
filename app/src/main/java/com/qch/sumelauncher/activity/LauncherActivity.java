@@ -46,19 +46,16 @@ public class LauncherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Set view
         EdgeToEdge.enable(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         UIUtils.setViewFitsSystemWindows(binding.getRoot());
-        // Handle back event
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 Log.i(TAG, "Back event is intercepted.");
             }
         });
-        // Initialize view
         ViewPager2 viewPager2 = binding.aMainVp2;
         AppPagerAdapter appPagerAdapter = new AppPagerAdapter(this, 0);
         viewPager2.setAdapter(appPagerAdapter);
@@ -150,14 +147,7 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        Log.i(TAG, "onStart");
-        super.onStart();
-    }
-
-    @Override
     protected void onResume() {
-        Log.i(TAG, "onResume");
         super.onResume();
         // get shared preferences
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -185,7 +175,6 @@ public class LauncherActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        Log.i(TAG, "onPause");
         super.onPause();
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(appViewModel.spListener);
