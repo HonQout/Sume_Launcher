@@ -463,6 +463,18 @@ public class AppViewModel extends AndroidViewModel {
         return mActivityBeanMap;
     }
 
+    public void showPermFineLocationDialog(@NonNull Activity activity) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity)
+                .setTitle(R.string.request_permission)
+                .setMessage(R.string.perm_fine_location_reason)
+                .setPositiveButton(R.string.app_info, (dialog, which) ->
+                        IntentUtils.openAppDetailsPage(activity, activity.getPackageName()))
+                .setNeutralButton(R.string.deny, (dialog, which) ->
+                        MyApplication.getPreferenceDataStore().setBoolean("ask_for_perm_fine_location", false))
+                .setNegativeButton(R.string.cancel, null);
+        DialogUtils.show(builder, getAnimationBoolean());
+    }
+
     public void showUninstallSystemAppDialog(@NonNull Activity activity, String packageName) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity)
                 .setTitle(R.string.hint)

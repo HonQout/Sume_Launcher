@@ -16,14 +16,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.adapter.viewpager2.AppPagerAdapter;
 import com.qch.sumelauncher.databinding.ActivityMainBinding;
-import com.qch.sumelauncher.utils.IntentUtils;
 import com.qch.sumelauncher.utils.PermissionUtils;
 import com.qch.sumelauncher.utils.UIUtils;
 import com.qch.sumelauncher.viewmodel.AppViewModel;
@@ -153,20 +150,7 @@ public class LauncherActivity extends AppCompatActivity {
             wifiViewModel.init();
         } else if (appViewModel.getAskForPermFineLocationBoolean()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                new MaterialAlertDialogBuilder(this)
-                        .setTitle(R.string.request_permission)
-                        .setMessage(R.string.perm_fine_location_reason)
-                        .setPositiveButton(R.string.app_info, (dialog, which) ->
-                                IntentUtils.openAppDetailsPage(this, getPackageName()))
-                        .setNeutralButton(R.string.deny, (dialog, which) ->
-                                PreferenceManager
-                                        .getDefaultSharedPreferences(LauncherActivity.this)
-                                        .edit()
-                                        .putBoolean("ask_for_perm_fine_location", false)
-                                        .apply())
-
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
+                appViewModel.showPermFineLocationDialog(this);
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
             }
