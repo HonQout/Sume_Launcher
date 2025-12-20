@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.bean.permission;
+package com.qch.sumelauncher.bean;
 
 import android.content.pm.PermissionInfo;
 

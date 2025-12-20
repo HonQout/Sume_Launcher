@@ -16,13 +16,14 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.qch.sumelauncher.MyApplication;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.bean.PermissionBean;
-import com.qch.sumelauncher.bean.permission.PermissionSorted;
+import com.qch.sumelauncher.bean.PermissionSorted;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.PackageUtils;
 
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -97,7 +98,7 @@ public class PermissionViewModel extends AndroidViewModel {
     public void sortPermissionBeanList(List<PermissionBean> permissionBeanList) {
         Collator collator = Collator.getInstance(Locale.getDefault());
         if (permissionBeanList != null) {
-            permissionBeanList.sort((o1, o2) -> {
+            Collections.sort(permissionBeanList, (o1, o2) -> {
                 String name1 = o1.getName();
                 String name2 = o2.getName();
                 return collator.compare(name1, name2);

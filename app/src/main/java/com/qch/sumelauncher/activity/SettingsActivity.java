@@ -1,5 +1,6 @@
 package com.qch.sumelauncher.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -47,7 +48,11 @@ public class SettingsActivity extends AppCompatActivity {
     public void finish() {
         super.finish();
         if (!viewModel.getAnimationBoolean()) {
-            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0);
+            } else {
+                overridePendingTransition(0, 0);
+            }
         }
     }
 }

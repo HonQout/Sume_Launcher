@@ -33,12 +33,14 @@ public class WifiUtils {
 
     @Nullable
     public static NetworkCapabilities getNetworkCapabilities(Context context) {
-        ConnectivityManager connectivityManager = ConnectivityUtils.getConnectivityManager(context);
-        if (connectivityManager != null) {
-            Network network = connectivityManager.getActiveNetwork();
-            return connectivityManager.getNetworkCapabilities(network);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ConnectivityManager connectivityManager = ConnectivityUtils.getConnectivityManager(context);
+            if (connectivityManager != null) {
+                Network network = connectivityManager.getActiveNetwork();
+                return connectivityManager.getNetworkCapabilities(network);
+            }
         }
-        Log.i(TAG, "ConnectivityManager is null.");
+        Log.i(TAG, "Failed to get network capabilities");
         return null;
     }
 
