@@ -56,6 +56,11 @@
         app:iconSpaceReserved="false"
         app:title="@string/header_privacy">
 
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="requested_permissions"
+            app:title="@string/requested_permissions" />
+
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:iconSpaceReserved="false"
@@ -85,11 +90,6 @@
             app:key="version"
             app:summary="@string/version_name"
             app:title="@string/version" />
-
-        <Preference
-            app:iconSpaceReserved="false"
-            app:key="requested_permissions"
-            app:title="@string/requested_permissions" />
 
         <Preference
             app:iconSpaceReserved="false"

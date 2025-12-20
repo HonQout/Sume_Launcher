@@ -109,7 +109,7 @@
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="@dimen/bottom_icon_size"
             android:layout_height="@dimen/bottom_icon_size"
-            android:contentDescription="@string/action_settings"
+            android:contentDescription="@string/settings_icon"
             android:src="@drawable/baseline_settings_24"
             android:tint="?android:textColorPrimary" />
 
