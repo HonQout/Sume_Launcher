@@ -32,7 +32,7 @@ public class WifiViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> mWifiConnected = new MutableLiveData<>(false);
     private final MutableLiveData<Integer> mWifiSignalLevel = new MutableLiveData<>(-1);
     @DrawableRes
-    private final MutableLiveData<Integer> mWifiIcon
+    private final MutableLiveData<Integer> mWifiIconRes
             = new MutableLiveData<>(R.drawable.baseline_signal_wifi_statusbar_null_24);
 
     // broadcast receiver
@@ -109,7 +109,7 @@ public class WifiViewModel extends AndroidViewModel {
                 Log.i(TAG, "Wifi is lost.");
                 super.onLost(network);
                 mWifiConnected.postValue(false);
-                mWifiIcon.postValue(getWifiIconRes(-1));
+                mWifiIconRes.postValue(getWifiIconRes(-1));
             }
 
             @Override
@@ -119,7 +119,7 @@ public class WifiViewModel extends AndroidViewModel {
                 super.onCapabilitiesChanged(network, networkCapabilities);
                 int signalLevel = WifiUtils.getSignalLevel(context, networkCapabilities);
                 mWifiSignalLevel.postValue(signalLevel);
-                mWifiIcon.postValue(getWifiIconRes(signalLevel));
+                mWifiIconRes.postValue(getWifiIconRes(signalLevel));
             }
 
             @Override
@@ -150,10 +150,13 @@ public class WifiViewModel extends AndroidViewModel {
 
     public void init() {
         Context context = getApplication();
-        int signalLevel = WifiUtils.getSignalLevel(context, null);
-        this.mWifiEnabled.postValue(WifiUtils.isWifiEnabled(context));
-        this.mWifiSignalLevel.postValue(signalLevel);
-        this.mWifiIcon.postValue(getWifiIconRes(signalLevel));
+        boolean isWifiEnabled = WifiUtils.isWifiEnabled(context);
+        this.mWifiEnabled.postValue(isWifiEnabled);
+        if (isWifiEnabled) {
+            int signalLevel = WifiUtils.getSignalLevel(context, WifiUtils.getNetworkCapabilities(context));
+            this.mWifiSignalLevel.postValue(signalLevel);
+            this.mWifiIconRes.postValue(getWifiIconRes(signalLevel));
+        }
     }
 
     public LiveData<Boolean> getWifiEnabled() {
@@ -168,8 +171,8 @@ public class WifiViewModel extends AndroidViewModel {
         return mWifiSignalLevel;
     }
 
-    public LiveData<Integer> getWifiIcon() {
-        return mWifiIcon;
+    public LiveData<Integer> getWifiIconRes() {
+        return mWifiIconRes;
     }
 
     @DrawableRes

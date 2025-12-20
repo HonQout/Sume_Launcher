@@ -1,11 +1,11 @@
 package com.qch.sumelauncher.viewmodel;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
@@ -15,11 +15,16 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.preference.PreferenceManager;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.qch.sumelauncher.MyApplication;
+import com.qch.sumelauncher.R;
+import com.qch.sumelauncher.activity.SettingsActivity;
 import com.qch.sumelauncher.bean.ActivityBean;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.CollectionUtils;
+import com.qch.sumelauncher.utils.DialogUtils;
+import com.qch.sumelauncher.utils.IntentUtils;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -31,21 +36,21 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
+
 public class AppViewModel extends AndroidViewModel {
     private static final String TAG = "AppViewModel";
     // constant
     private static final int defNumRow = 5;
     private static final int defNumColumn = 5;
-
-    // multithread
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
     // data
     private final MutableLiveData<Boolean> mDisplayStatusBar = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayTopBar = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> mEdgeToEdge = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mAnimation = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mScrollToSwitchPage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mVolumeKeySwitchPage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mAskForPermFineLocation = new MutableLiveData<>();
     private final MutableLiveData<Integer> mNumRow = new MutableLiveData<>();
     private final MutableLiveData<Integer> mNumColumn = new MutableLiveData<>();
     private final MutableLiveData<Integer> mNumItemsPerPage = new MutableLiveData<>();
@@ -53,23 +58,10 @@ public class AppViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> mCurrentPage = new MutableLiveData<>();
     private final MutableLiveData<List<ActivityBean>> mActivityBeanList = new MutableLiveData<>();
     private final MutableLiveData<Map<Integer, List<ActivityBean>>> mActivityBeanMap = new MutableLiveData<>();
-
-    // shared preferences
-    public SharedPreferences.OnSharedPreferenceChangeListener spListener =
-            (sharedPreferences, key) -> {
-                if (Objects.equals(key, "grid_count")) {
-                    getStoredGridCount(sharedPreferences, false);
-                } else if (Objects.equals(key, "display_status_bar")) {
-                    getStoredDisplayStatusBar(sharedPreferences);
-                } else if (Objects.equals(key, "display_top_bar")) {
-                    getStoredDisplayTopBar(sharedPreferences);
-                } else if (Objects.equals(key, "scroll_to_switch_page")) {
-                    getStoredScrollToSwitchPage(sharedPreferences);
-                } else if (Objects.equals(key, "volume_key_switch_page")) {
-                    getStoredVolumeKeySwitchPage(sharedPreferences);
-                }
-            };
-
+    // multi-thread
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    // persistence
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     // broadcast receiver
     private BroadcastReceiver localeBroadcastReceiver = null;
     private BroadcastReceiver packageBroadcastReceiver = null;
@@ -79,7 +71,7 @@ public class AppViewModel extends AndroidViewModel {
         super(application);
         registerLocaleBR();
         registerPackageBR();
-        init();
+        initDisposable();
     }
 
     @Override
@@ -88,6 +80,7 @@ public class AppViewModel extends AndroidViewModel {
         unregisterLocaleBR();
         unregisterPackageBR();
         executorService.shutdown();
+        compositeDisposable.clear();
     }
 
 
@@ -102,7 +95,13 @@ public class AppViewModel extends AndroidViewModel {
         localeBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                init();
+                List<ActivityBean> list = new ArrayList<>(ApplicationUtils.getActivityBeanList(getApplication(), null));
+                sortActivityBeanList(list);
+                Log.i(TAG, "Size of ActivityBean list is " + list.size());
+                mActivityBeanList.postValue(list);
+                int numItemsPerPage = getNumItemsPerPageInt();
+                mNumPage.postValue(calcNumPage(list, numItemsPerPage));
+                mActivityBeanMap.postValue(initMap(list, numItemsPerPage));
             }
         };
 
@@ -199,73 +198,90 @@ public class AppViewModel extends AndroidViewModel {
         }
     }
 
-    public void getStoredPreferences(SharedPreferences sharedPreferences, boolean forceUpdate) {
-        getStoredDisplayStatusBar(sharedPreferences);
-        getStoredDisplayTopBar(sharedPreferences);
-        getStoredScrollToSwitchPage(sharedPreferences);
-        getStoredVolumeKeySwitchPage(sharedPreferences);
-        getStoredGridCount(sharedPreferences, forceUpdate);
-    }
-
-    public void getStoredDisplayStatusBar(SharedPreferences sharedPreferences) {
-        boolean displayStatusBar = sharedPreferences.getBoolean("display_status_bar", true);
-        mDisplayStatusBar.postValue(displayStatusBar);
-    }
-
-    public void getStoredDisplayTopBar(SharedPreferences sharedPreferences) {
-        boolean displayTopBar = sharedPreferences.getBoolean("display_top_bar", true);
-        mDisplayTopBar.postValue(displayTopBar);
-    }
-
-    public void getStoredScrollToSwitchPage(SharedPreferences sharedPreferences) {
-        boolean scrollToSwitchPage = sharedPreferences.getBoolean("scroll_to_switch_page", true);
-        mScrollToSwitchPage.postValue(scrollToSwitchPage);
-    }
-
-    public void getStoredVolumeKeySwitchPage(SharedPreferences sharedPreferences) {
-        boolean volumeKeyToSwitchPage = sharedPreferences.getBoolean("volume_key_switch_page", true);
-        mVolumeKeySwitchPage.postValue(volumeKeyToSwitchPage);
-    }
-
-    public void getStoredGridCount(SharedPreferences sharedPreferences, boolean forceUpdate) {
-        String gridCount = sharedPreferences.getString("grid_count", defNumRow + "," + defNumColumn);
-        String[] split = gridCount.split(",");
-        int actualNumRow = defNumRow;
-        int actualNumColumn = defNumColumn;
-        try {
-            actualNumRow = Integer.parseInt(split[0]);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to get stored numRow.", e);
-        }
-        try {
-            actualNumColumn = Integer.parseInt(split[1]);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to get stored numRow.", e);
-        }
-        int numItemsPerPage = actualNumRow * actualNumColumn;
-        if (forceUpdate || actualNumRow != getNumRowInt() || actualNumColumn != getNumColumnInt()) {
-            mNumRow.postValue(actualNumRow);
-            mNumColumn.postValue(actualNumColumn);
-            mNumItemsPerPage.postValue(numItemsPerPage);
-            List<ActivityBean> list = mActivityBeanList.getValue();
-            if (list == null) {
-                list = new ArrayList<>(ApplicationUtils.getActivityBeanList(getApplication(), null));
-                sortActivityBeanList(list);
-                Log.i(TAG, "Size of ActivityBean list is " + list.size());
-                mActivityBeanList.postValue(list);
-                mCurrentPage.postValue(1);
-            }
-            mNumPage.postValue(calcNumPage(list, numItemsPerPage));
-            mActivityBeanMap.postValue(initMap(list, numItemsPerPage));
-        }
-    }
-
-    private void init() {
-        Context context = getApplication();
-        executorService.execute(() -> {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            getStoredPreferences(sharedPreferences, true);
-        });
+    private void initDisposable() {
+        // display_status_bar
+        Disposable disposable1 = MyApplication.getPreferenceDataStore()
+                .getBooleanFlowable("display_status_bar", true)
+                .subscribe(
+                        mDisplayStatusBar::postValue,
+                        throwable -> Log.e(TAG, "Failed to get value of key display_status_bar", throwable)
+                );
+        compositeDisposable.add(disposable1);
+        // display_top_bar
+        Disposable disposable2 = MyApplication.getPreferenceDataStore()
+                .getBooleanFlowable("display_top_bar", true)
+                .subscribe(
+                        mDisplayTopBar::postValue,
+                        throwable -> Log.e(TAG, "Failed to get value of key display_top_bar", throwable)
+                );
+        compositeDisposable.add(disposable2);
+        // animation
+        Disposable disposable3 = MyApplication.getPreferenceDataStore()
+                .getBooleanFlowable("animation", true)
+                .subscribe(
+                        mAnimation::postValue,
+                        throwable -> Log.e(TAG, "Failed to get value of key animation", throwable)
+                );
+        compositeDisposable.add(disposable3);
+        // scroll_switch_page
+        Disposable disposable4 = MyApplication.getPreferenceDataStore()
+                .getBooleanFlowable("scroll_switch_page", true)
+                .subscribe(
+                        mScrollToSwitchPage::postValue,
+                        throwable -> Log.e(TAG, "Failed to get value of key scroll_switch_page", throwable)
+                );
+        compositeDisposable.add(disposable4);
+        // volume_key_switch_page
+        Disposable disposable5 = MyApplication.getPreferenceDataStore()
+                .getBooleanFlowable("volume_key_switch_page", true)
+                .subscribe(
+                        mVolumeKeySwitchPage::postValue,
+                        throwable -> Log.e(TAG, "Failed to get value of key volume_key_switch_page", throwable)
+                );
+        compositeDisposable.add(disposable5);
+        // ask_for_perm_fine_location
+        Disposable disposable6 = MyApplication.getPreferenceDataStore()
+                .getBooleanFlowable("ask_for_perm_fine_location", true)
+                .subscribe(
+                        mAskForPermFineLocation::postValue,
+                        throwable -> Log.e(TAG, "Failed to get value of key ask_for_perm_fine_location", throwable)
+                );
+        compositeDisposable.add(disposable6);
+        // grid_count
+        Disposable disposable7 = MyApplication.getPreferenceDataStore()
+                .getStringFlowable("grid_count", "5,5")
+                .subscribe(gridCount -> {
+                            String[] split = gridCount.split(",");
+                            int actualNumRow = defNumRow;
+                            int actualNumColumn = defNumColumn;
+                            try {
+                                actualNumRow = Integer.parseInt(split[0]);
+                            } catch (Exception e) {
+                                Log.e(TAG, "Failed to get stored numRow.", e);
+                            }
+                            try {
+                                actualNumColumn = Integer.parseInt(split[1]);
+                            } catch (Exception e) {
+                                Log.e(TAG, "Failed to get stored numRow.", e);
+                            }
+                            int numItemsPerPage = actualNumRow * actualNumColumn;
+                            mNumRow.postValue(actualNumRow);
+                            mNumColumn.postValue(actualNumColumn);
+                            mNumItemsPerPage.postValue(numItemsPerPage);
+                            List<ActivityBean> list = mActivityBeanList.getValue();
+                            if (list == null) {
+                                list = new ArrayList<>(ApplicationUtils.getActivityBeanList(getApplication(), null));
+                                sortActivityBeanList(list);
+                                Log.i(TAG, "Size of ActivityBean list is " + list.size());
+                                mActivityBeanList.postValue(list);
+                                mCurrentPage.postValue(1);
+                            }
+                            mNumPage.postValue(calcNumPage(list, numItemsPerPage));
+                            mActivityBeanMap.postValue(initMap(list, numItemsPerPage));
+                        },
+                        throwable -> Log.e(TAG, "Failed to get value of key grid_count", throwable)
+                );
+        compositeDisposable.add(disposable7);
     }
 
     private int calcNumPage(List<ActivityBean> list, int numItemPerPage) {
@@ -377,40 +393,32 @@ public class AppViewModel extends AndroidViewModel {
         return mDisplayTopBar;
     }
 
-    public LiveData<Boolean> getEdgeToEdge() {
-        return mEdgeToEdge;
+    public LiveData<Boolean> getAnimation() {
+        return mAnimation;
+    }
+
+    public boolean getAnimationBoolean() {
+        return mAnimation.getValue() == null || mAnimation.getValue();
     }
 
     public LiveData<Boolean> getScrollToSwitchPage() {
         return mScrollToSwitchPage;
     }
 
-    public LiveData<Boolean> getVolumeKeySwitchPage() {
-        return mVolumeKeySwitchPage;
-    }
-
     public boolean getVolumeKeySwitchPageBoolean() {
         return mVolumeKeySwitchPage.getValue() == null || mVolumeKeySwitchPage.getValue();
     }
 
-    public LiveData<Integer> getNumRow() {
-        return mNumRow;
+    public boolean getAskForPermFineLocationBoolean() {
+        return mAskForPermFineLocation.getValue() == null || mAskForPermFineLocation.getValue();
     }
 
     public int getNumRowInt() {
         return mNumRow.getValue() == null ? defNumRow : mNumRow.getValue();
     }
 
-    public LiveData<Integer> getNumColumn() {
-        return mNumColumn;
-    }
-
     public int getNumColumnInt() {
         return mNumColumn.getValue() == null ? defNumColumn : mNumColumn.getValue();
-    }
-
-    public LiveData<Integer> getNumItemsPerPage() {
-        return mNumItemsPerPage;
     }
 
     public int getNumItemsPerPageInt() {
@@ -453,5 +461,26 @@ public class AppViewModel extends AndroidViewModel {
 
     public LiveData<Map<Integer, List<ActivityBean>>> getActivityBeanMap() {
         return mActivityBeanMap;
+    }
+
+    public void showUninstallSystemAppDialog(@NonNull Activity activity, String packageName) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity)
+                .setTitle(R.string.hint)
+                .setMessage(R.string.insist_uninstall_system_app)
+                .setPositiveButton(R.string.uninstall, (dialog, which) ->
+                        IntentUtils.handleLaunchIntentResult(
+                                activity,
+                                IntentUtils.requireUninstallApp(activity, packageName)
+                        ))
+                .setNegativeButton(R.string.cancel, null);
+        DialogUtils.show(builder, getAnimationBoolean());
+    }
+
+    public void startSettingsActivity(@NonNull Activity activity) {
+        Intent intent = new Intent(activity, SettingsActivity.class);
+        if (!getAnimationBoolean()) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        }
+        activity.startActivity(intent);
     }
 }

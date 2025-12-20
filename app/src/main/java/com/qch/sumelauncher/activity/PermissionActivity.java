@@ -1,13 +1,11 @@
 package com.qch.sumelauncher.activity;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.qch.sumelauncher.adapter.recyclerview.FilterableListAdapter;
@@ -18,19 +16,11 @@ import com.qch.sumelauncher.utils.UIUtils;
 import com.qch.sumelauncher.viewmodel.PermissionViewModel;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class PermissionActivity extends AppCompatActivity {
     private static final String TAG = "PermissionActivity";
     private ActivityPermissionBinding binding;
     private PermissionViewModel viewModel;
-    private final SharedPreferences.OnSharedPreferenceChangeListener listener =
-            (sharedPreferences, key) -> {
-                if (Objects.equals(key, "display_status_bar")) {
-                    boolean displayStatusBar = sharedPreferences.getBoolean(key, true);
-                    UIUtils.handleStatusBarVisibility(getWindow(), displayStatusBar);
-                }
-            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +30,8 @@ public class PermissionActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         UIUtils.setViewFitsSystemWindows(binding.getRoot());
         viewModel = new ViewModelProvider(this).get(PermissionViewModel.class);
+        viewModel.getDisplayStatusBar().observe(this, b ->
+                UIUtils.handleStatusBarVisibility(getWindow(), b == null || b));
         binding.aPermissionMt.setNavigationOnClickListener(v ->
                 getOnBackPressedDispatcher().onBackPressed());
         binding.aPermissionRv.setLayoutManager(new LinearLayoutManager(this));
@@ -60,20 +52,10 @@ public class PermissionActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        SharedPreferences sharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        boolean displayStatusBar =
-                sharedPreferences.getBoolean("display_status_bar", true);
-        UIUtils.handleStatusBarVisibility(getWindow(), displayStatusBar);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(listener);
+    public void finish() {
+        super.finish();
+        if (!viewModel.getAnimationBoolean()) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0);
+        }
     }
 }

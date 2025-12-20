@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -12,8 +13,8 @@ android {
         applicationId "com.qch.sumelauncher"
         minSdk 21
         targetSdk 36
-        versionCode 2
-        versionName '1.1.0'
+        versionCode 3
+        versionName '1.1.1'
 
         ndk {
             abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
@@ -50,12 +51,17 @@ dependencies {
     implementation libs.activity
     implementation libs.appcompat
     implementation libs.constraintlayout
+    implementation libs.core.ktx
+    implementation libs.datastore.preferences
+    implementation libs.datastore.preferences.rxjava3
     implementation libs.material
     implementation libs.recyclerview
     implementation libs.glide
     implementation libs.preference
+    implementation libs.rxandroid
+    implementation libs.rxjava
     annotationProcessor(libs.compiler)
     testImplementation libs.junit
-    androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+    androidTestImplementation libs.ext.junit
 }
