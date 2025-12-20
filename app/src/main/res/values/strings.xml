@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Sume Launcher</string>
-    <string name="version_name" translatable="false">1.1.2</string>
-    <string name="action_settings">Settings</string>
+    <string name="version_name" translatable="false">1.2.0</string>
 
     <!-- Basic -->
     <string name="cancel">Cancel</string>
@@ -20,6 +19,13 @@
     <string name="prev_page">Previous page</string>
     <string name="next_page">Next page</string>
 
+    <!-- Content Description -->
+    <string name="wifi_icon">Wifi icon</string>
+    <string name="bluetooth_icon">Bluetooth icon</string>
+    <string name="battery_icon">Battery icon</string>
+    <string name="app_icon">App icon</string>
+    <string name="settings_icon">Settings</string>
+
     <!-- Hint -->
     <string name="cannot_find_package">Cannot find package.</string>
     <string name="cannot_find_activity">Cannot find activity.</string>
@@ -31,7 +37,7 @@
     <string name="insist_uninstall_system_app">"This is a system app, which is usually not recommended to uninstall. \nHowever, in some 3rd-party Android systems, this kind of apps are allowed to uninstall. \nIf you insist to uninstall this app, press \"Uninstall\". "</string>
     <string name="uninstall_app_failed">Failed to uninstall app.</string>
 
-    <!-- Preference Titles -->
+    <!-- Preference Headers -->
     <string name="header_layout">Layout</string>
     <string name="header_interaction">Interaction</string>
     <string name="header_system">System</string>
@@ -47,18 +53,12 @@
     <string name="volume_key_switch_page">Use volume key to switch page</string>
     <string name="volume_key_switch_page_summary">PageUp and PageDown key are also regarded as volume keys</string>
     <string name="set_default_app">Set default app</string>
+    <string name="requested_permissions">Requested permissions</string>
     <string name="ask_for_perm_fine_location">Ask for permission to access fine location</string>
     <string name="ask_for_perm_fine_location_summary">Allow this app to ask for permission to access fine location</string>
     <string name="version">Version</string>
-    <string name="requested_permissions">Requested permissions</string>
     <string name="view_github_page">View GitHub page</string>
     <string name="github_address" translatable="false">https://github.com/HonQout/Sume_Launcher</string>
-
-    <!-- Content Description -->
-    <string name="wifi_icon">Wifi icon</string>
-    <string name="bluetooth_icon">Bluetooth icon</string>
-    <string name="battery_icon">Battery icon</string>
-    <string name="app_icon">App icon</string>
 
     <!-- Others -->
     <string name="battery_percentage" translatable="false">%d%%</string>
