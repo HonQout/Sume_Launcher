@@ -1,8 +1,7 @@
 package com.qch.sumelauncher.activity;
 
 import android.Manifest;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -65,10 +64,7 @@ public class LauncherActivity extends AppCompatActivity {
                 appViewModel.setCurrentPage(position + 1);
             }
         });
-        binding.aMainBtnSettings.setOnClickListener(v -> {
-            Intent intent = new Intent(LauncherActivity.this, SettingsActivity.class);
-            startActivity(intent);
-        });
+        binding.aMainBtnSettings.setOnClickListener(v -> appViewModel.startSettingsActivity(this));
         binding.aMainBtnPrevPage.setOnClickListener(v -> launcherPageUp());
         binding.aMainBtnNextPage.setOnClickListener(v -> launcherPageDown());
         // Initialize viewmodel
@@ -79,6 +75,8 @@ public class LauncherActivity extends AppCompatActivity {
         bluetoothViewModel = viewModelProvider.get(BluetoothViewModel.class);
         batteryViewModel = viewModelProvider.get(BatteryViewModel.class);
         // Observe
+        appViewModel.getDisplayStatusBar().observe(this, b ->
+                UIUtils.handleStatusBarVisibility(getWindow(), b == null || b));
         appViewModel.getDisplayTopBar().observe(this, displayTopBar ->
                 binding.aMainLl1.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
         appViewModel.getScrollToSwitchPage().observe(this, scrollToSwitchPage ->
@@ -102,7 +100,7 @@ public class LauncherActivity extends AppCompatActivity {
                 ));
         wifiViewModel.getWifiEnabled().observe(this, isEnabled ->
                 binding.aMainIv1.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
-        wifiViewModel.getWifiIcon().observe(this, integer -> {
+        wifiViewModel.getWifiIconRes().observe(this, integer -> {
             int i = integer == null ? R.drawable.baseline_signal_wifi_statusbar_null_24 : integer;
             binding.aMainIv1.setImageResource(i);
         });
@@ -149,35 +147,30 @@ public class LauncherActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // get shared preferences
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        appViewModel.getStoredPreferences(sharedPreferences, false);
-        boolean displayStatusBar =
-                sharedPreferences.getBoolean("display_status_bar", true);
-        UIUtils.handleStatusBarVisibility(getWindow(), displayStatusBar);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(appViewModel.spListener);
         // check if permissions are granted
-        if (PermissionUtils.isPermissionGranted(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ||
+                PermissionUtils.isPermissionGranted(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             wifiViewModel.init();
-        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle(R.string.request_permission)
-                    .setMessage(R.string.perm_fine_location_reason)
-                    .setPositiveButton(R.string.app_info, (dialog, which) ->
-                            IntentUtils.openAppDetailsPage(LauncherActivity.this,
-                                    "com.qch.sumelauncher"))
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-    }
+        } else if (appViewModel.getAskForPermFineLocationBoolean()) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.request_permission)
+                        .setMessage(R.string.perm_fine_location_reason)
+                        .setPositiveButton(R.string.app_info, (dialog, which) ->
+                                IntentUtils.openAppDetailsPage(this, getPackageName()))
+                        .setNeutralButton(R.string.deny, (dialog, which) ->
+                                PreferenceManager
+                                        .getDefaultSharedPreferences(LauncherActivity.this)
+                                        .edit()
+                                        .putBoolean("ask_for_perm_fine_location", false)
+                                        .apply())
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(appViewModel.spListener);
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+            }
+        }
     }
 
     @Override

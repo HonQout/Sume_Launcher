@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.adapter.recyclerview.AppRVAdapter;
 import com.qch.sumelauncher.adapter.recyclerview.FilterableListAdapter;
@@ -126,16 +125,7 @@ public class AppGridFragment extends Fragment {
                                     IntentUtils.requireUninstallApp(requireContext(), item.getPackageName())
                             );
                         } else if (type == ApplicationUtils.ApplicationType.SYSTEM) {
-                            new MaterialAlertDialogBuilder(requireContext())
-                                    .setTitle(R.string.hint)
-                                    .setMessage(R.string.insist_uninstall_system_app)
-                                    .setPositiveButton(R.string.uninstall, (dialog, which) ->
-                                            IntentUtils.handleLaunchIntentResult(
-                                                    requireContext(),
-                                                    IntentUtils.requireUninstallApp(requireContext(), item.getPackageName())
-                                            ))
-                                    .setNegativeButton(R.string.cancel, null)
-                                    .show();
+                            viewModel.showUninstallSystemAppDialog(requireActivity(), item.getPackageName());
                         } else {
                             Toast.makeText(requireContext(), R.string.cannot_uninstall_app,
                                             Toast.LENGTH_SHORT)
@@ -175,10 +165,8 @@ public class AppGridFragment extends Fragment {
         viewModel.getDisplayStatusBar().observe(getViewLifecycleOwner(), displayStatusBar ->
                 reLayoutAppGrid()
         );
+
         viewModel.getDisplayTopBar().observe(getViewLifecycleOwner(), displayTopBar ->
-                reLayoutAppGrid()
-        );
-        viewModel.getEdgeToEdge().observe(getViewLifecycleOwner(), edgeToEdge ->
                 reLayoutAppGrid()
         );
         viewModel.getActivityBeanMap().observe(getViewLifecycleOwner(), map -> {

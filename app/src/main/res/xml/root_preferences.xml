@@ -34,8 +34,14 @@
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:iconSpaceReserved="false"
-            app:key="scroll_to_switch_page"
-            app:title="@string/scroll_to_switch_page" />
+            app:key="animation"
+            app:title="@string/animation" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:iconSpaceReserved="false"
+            app:key="scroll_switch_page"
+            app:title="@string/scroll_switch_page" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
@@ -43,6 +49,19 @@
             app:key="volume_key_switch_page"
             app:summary="@string/volume_key_switch_page_summary"
             app:title="@string/volume_key_switch_page" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/header_privacy">
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:iconSpaceReserved="false"
+            app:key="ask_for_perm_fine_location"
+            app:summary="@string/ask_for_perm_fine_location_summary"
+            app:title="@string/ask_for_perm_fine_location" />
 
     </PreferenceCategory>
 

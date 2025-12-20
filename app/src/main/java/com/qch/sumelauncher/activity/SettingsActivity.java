@@ -1,37 +1,22 @@
 package com.qch.sumelauncher.activity;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.databinding.ActivitySettingsBinding;
-import com.qch.sumelauncher.utils.IntentUtils;
+import com.qch.sumelauncher.fragment.SettingsFragment;
 import com.qch.sumelauncher.utils.UIUtils;
-
-import java.util.Objects;
+import com.qch.sumelauncher.viewmodel.SettingsViewModel;
 
 public class SettingsActivity extends AppCompatActivity {
     private static final String TAG = "SettingsActivity";
     private ActivitySettingsBinding binding;
-    private final SharedPreferences.OnSharedPreferenceChangeListener listener =
-            (sharedPreferences, key) -> {
-                if (Objects.equals(key, "display_status_bar")) {
-                    boolean displayStatusBar = sharedPreferences.getBoolean(key, true);
-                    UIUtils.handleStatusBarVisibility(getWindow(), displayStatusBar);
-                }
-            };
+    private SettingsViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,53 +37,17 @@ public class SettingsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        ViewModelProvider viewModelProvider = new ViewModelProvider(this);
+        viewModel = viewModelProvider.get(SettingsViewModel.class);
+        viewModel.getDisplayStatusBar().observe(this, b ->
+                UIUtils.handleStatusBarVisibility(getWindow(), b == null || b));
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        SharedPreferences sharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        boolean displayStatusBar =
-                sharedPreferences.getBoolean("display_status_bar", true);
-        UIUtils.handleStatusBarVisibility(getWindow(), displayStatusBar);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(listener);
-    }
-
-    public static class SettingsFragment extends PreferenceFragmentCompat {
-        @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            setPreferencesFromResource(R.xml.root_preferences, rootKey);
-        }
-
-        @Override
-        public boolean onPreferenceTreeClick(@NonNull Preference preference) {
-            String key = preference.getKey();
-            if (Objects.equals(key, "set_default_app")) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(getContext(), R.string.cannot_find_activity, Toast.LENGTH_SHORT).show();
-                }
-            } else if (Objects.equals(key, "requested_permissions")) {
-                Intent intent = new Intent(requireActivity(), PermissionActivity.class);
-                startActivity(intent);
-            } else if (Objects.equals(key, "view_github_page")) {
-                IntentUtils.handleLaunchIntentResult(
-                        requireContext(),
-                        IntentUtils.openNetAddress(requireContext(), getString(R.string.github_address))
-                );
-            }
-            return super.onPreferenceTreeClick(preference);
+    public void finish() {
+        super.finish();
+        if (!viewModel.getAnimationBoolean()) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0);
         }
     }
 }

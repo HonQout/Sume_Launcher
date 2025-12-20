@@ -121,13 +121,14 @@ public class IntentUtils {
         }
     }
 
-    public static LaunchIntentResult openNetAddress(Context context, String address) {
+    public static LaunchIntentResult openNetAddress(Context context, String address, int flags) {
         if (address == null || TextUtils.isEmpty(address)) {
             Log.e(TAG, "Failed to open net address because the given address is null or empty.");
             return LaunchIntentResult.URI_IS_EMPTY;
         }
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(address));
+        intent.setFlags(flags);
         try {
             context.startActivity(intent);
             return LaunchIntentResult.SUCCESS;
