@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.util.Log;
 
-import com.qch.sumelauncher.bean.permission.PermissionSorted;
+import com.qch.sumelauncher.bean.PermissionSorted;
 
 import java.util.Arrays;
 
