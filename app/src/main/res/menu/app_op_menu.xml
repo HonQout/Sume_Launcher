@@ -9,4 +9,7 @@
     <item
         android:id="@+id/app_market"
         android:title="@string/app_market" />
+    <item
+        android:id="@+id/hide"
+        android:title="@string/hide" />
 </menu>

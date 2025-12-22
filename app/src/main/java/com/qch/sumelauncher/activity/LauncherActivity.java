@@ -20,9 +20,10 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.adapter.viewpager2.AppPagerAdapter;
-import com.qch.sumelauncher.databinding.ActivityMainBinding;
+import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
 import com.qch.sumelauncher.utils.PermissionUtils;
 import com.qch.sumelauncher.utils.UIUtils;
+import com.qch.sumelauncher.viewmodel.AirplaneModeViewModel;
 import com.qch.sumelauncher.viewmodel.AppViewModel;
 import com.qch.sumelauncher.viewmodel.BatteryViewModel;
 import com.qch.sumelauncher.viewmodel.BluetoothViewModel;
@@ -31,8 +32,9 @@ import com.qch.sumelauncher.viewmodel.TimeViewModel;
 
 public class LauncherActivity extends AppCompatActivity {
     private static final String TAG = "LauncherActivity";
-    private ActivityMainBinding binding;
+    private ActivityLauncherBinding binding;
     private TimeViewModel timeViewModel;
+    private AirplaneModeViewModel airplaneModeViewModel;
     private WifiViewModel wifiViewModel;
     private BluetoothViewModel bluetoothViewModel;
     private BatteryViewModel batteryViewModel;
@@ -43,7 +45,7 @@ public class LauncherActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityLauncherBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         UIUtils.setViewFitsSystemWindows(binding.getRoot());
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -68,6 +70,7 @@ public class LauncherActivity extends AppCompatActivity {
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
         appViewModel = viewModelProvider.get(AppViewModel.class);
         timeViewModel = viewModelProvider.get(TimeViewModel.class);
+        airplaneModeViewModel = viewModelProvider.get(AirplaneModeViewModel.class);
         wifiViewModel = viewModelProvider.get(WifiViewModel.class);
         bluetoothViewModel = viewModelProvider.get(BluetoothViewModel.class);
         batteryViewModel = viewModelProvider.get(BatteryViewModel.class);
@@ -95,16 +98,18 @@ public class LauncherActivity extends AppCompatActivity {
                                         | DateUtils.FORMAT_ABBREV_WEEKDAY
                         )
                 ));
+        airplaneModeViewModel.getAirplaneModeEnabled().observe(this, isEnabled -> {
+                    binding.aMainIv1.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
+                }
+        );
         wifiViewModel.getWifiEnabled().observe(this, isEnabled ->
-                binding.aMainIv1.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
-        wifiViewModel.getWifiIconRes().observe(this, integer -> {
-            int i = integer == null ? R.drawable.baseline_signal_wifi_statusbar_null_24 : integer;
-            binding.aMainIv1.setImageResource(i);
-        });
-        bluetoothViewModel.getBtEnabled().observe(this, isEnabled ->
                 binding.aMainIv2.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
-        bluetoothViewModel.getBtIcon().observe(this, icon ->
-                binding.aMainIv2.setImageResource(icon));
+        wifiViewModel.getWifiIconRes().observe(this, integer ->
+                binding.aMainIv2.setImageResource(wifiViewModel.getWifiIconResInt()));
+        bluetoothViewModel.getBtEnabled().observe(this, isEnabled ->
+                binding.aMainIv3.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
+        bluetoothViewModel.getBtIconRes().observe(this, icon ->
+                binding.aMainIv3.setImageResource(bluetoothViewModel.getBtIconResInt()));
         batteryViewModel.getLevel().observe(this, integer -> {
             int i = integer == null ? -1 : integer;
             binding.aMainTv3.setText(
@@ -115,7 +120,7 @@ public class LauncherActivity extends AppCompatActivity {
         });
         batteryViewModel.getIcon().observe(this, integer -> {
             int i = integer == null ? R.drawable.baseline_battery_unknown_24 : integer;
-            binding.aMainIv3.setImageResource(i);
+            binding.aMainIv4.setImageResource(i);
         });
         appViewModel.getNumPage().observe(this, integer -> {
             appPagerAdapter.setNumPages(integer);

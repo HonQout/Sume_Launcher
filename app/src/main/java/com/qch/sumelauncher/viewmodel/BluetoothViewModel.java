@@ -19,23 +19,22 @@ import com.qch.sumelauncher.utils.BluetoothUtils;
 
 public class BluetoothViewModel extends AndroidViewModel {
     private static final String TAG = "BluetoothViewModel";
-
+    // static
     @DrawableRes
     private static final int iconDisabled = R.drawable.baseline_bluetooth_disabled_24;
     @DrawableRes
     private static final int iconEnabled = R.drawable.baseline_bluetooth_24;
-
+    // data
     private final MutableLiveData<Boolean> mBtEnabled = new MutableLiveData<>(false);
     @DrawableRes
-    private final MutableLiveData<Integer> mBtIcon = new MutableLiveData<>(iconDisabled);
-
+    private final MutableLiveData<Integer> mBtIconRes = new MutableLiveData<>(iconDisabled);
     // broadcast receiver
     private BroadcastReceiver btBroadcastReceiver = null;
 
     public BluetoothViewModel(@NonNull Application application) {
         super(application);
-        registerBtBR();
         init();
+        registerBtBR();
     }
 
     @Override
@@ -64,10 +63,10 @@ public class BluetoothViewModel extends AndroidViewModel {
                     int btState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
                     if (btState == BluetoothAdapter.STATE_OFF) {
                         mBtEnabled.postValue(false);
-                        mBtIcon.postValue(iconDisabled);
+                        mBtIconRes.postValue(iconDisabled);
                     } else if (btState == BluetoothAdapter.STATE_ON) {
                         mBtEnabled.postValue(true);
-                        mBtIcon.postValue(iconEnabled);
+                        mBtIconRes.postValue(iconEnabled);
                     }
                 }
             }
@@ -86,14 +85,19 @@ public class BluetoothViewModel extends AndroidViewModel {
     private void init() {
         boolean isEnabled = BluetoothUtils.isBluetoothEnabled(getApplication());
         this.mBtEnabled.postValue(isEnabled);
-        this.mBtIcon.postValue(isEnabled ? iconEnabled : iconDisabled);
+        this.mBtIconRes.postValue(isEnabled ? iconEnabled : iconDisabled);
     }
 
     public LiveData<Boolean> getBtEnabled() {
         return mBtEnabled;
     }
 
-    public LiveData<Integer> getBtIcon() {
-        return mBtIcon;
+    public LiveData<Integer> getBtIconRes() {
+        return mBtIconRes;
+    }
+
+    @DrawableRes
+    public int getBtIconResInt() {
+        return mBtIconRes.getValue() == null ? iconDisabled : mBtIconRes.getValue();
     }
 }

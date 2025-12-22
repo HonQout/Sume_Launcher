@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Sume Launcher</string>
-    <string name="version_name" translatable="false">1.2.0</string>
+    <string name="version_name" translatable="false">1.2.1</string>
 
     <!-- Basic -->
     <string name="cancel">Cancel</string>
@@ -13,11 +13,14 @@
     <string name="title_activity_permission">Permission</string>
 
     <!-- Button -->
+    <string name="prev_page">Previous page</string>
+    <string name="next_page">Next page</string>
+
+    <!-- Menu -->
     <string name="app_info">App info</string>
     <string name="uninstall">Uninstall</string>
     <string name="app_market">App market</string>
-    <string name="prev_page">Previous page</string>
-    <string name="next_page">Next page</string>
+    <string name="hide">Hide</string>
 
     <!-- Content Description -->
     <string name="wifi_icon">Wifi icon</string>
@@ -66,5 +69,6 @@
     <string name="request_permission">Request permission</string>
     <string name="perm_fine_location_reason">This application requires permission to access your fine location in order to display wifi signal level and wifi ssid.\nYour location information will not be recorded or saved.\nIf you deny this permission, information mentioned above will not be displayed due to limitation of Android API. Nevertheless, a Wi-Fi icon of 0 signal level will be displayed when Wi-Fi is enabled.\nYou can press \"App info\" to go to Application Info page in system settings and grant this permission.</string>
     <string name="require_following_permission">This application requires the following permission(s):</string>
+    <string name="airplane_mode_icon">Airplane mode icon</string>
 
 </resources>

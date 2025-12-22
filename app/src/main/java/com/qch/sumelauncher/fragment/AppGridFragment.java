@@ -138,6 +138,9 @@ public class AppGridFragment extends Fragment {
                                 IntentUtils.openAppInMarket(requireContext(), item.getPackageName())
                         );
                         return true;
+                    } else if (menuId == R.id.hide) {
+                        // TODO: implement hiding process
+                        return true;
                     } else if (menuId >= baseIndex) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
                             ShortcutInfo shortcutInfo = shortcutInfoList.get(menuId - baseIndex);
