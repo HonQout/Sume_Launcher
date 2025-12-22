@@ -47,7 +47,8 @@
             android:id="@+id/a_main_iv1"
             android:layout_width="@dimen/top_bar_icon_size"
             android:layout_height="@dimen/top_bar_icon_size"
-            android:contentDescription="@string/wifi_icon"
+            android:contentDescription="@string/airplane_mode_icon"
+            android:src="@drawable/baseline_airplanemode_active_24"
             android:tint="?android:textColorPrimary"
             android:visibility="gone" />
 
@@ -57,6 +58,18 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/a_main_iv2"
+            android:layout_width="@dimen/top_bar_icon_size"
+            android:layout_height="@dimen/top_bar_icon_size"
+            android:contentDescription="@string/wifi_icon"
+            android:tint="?android:textColorPrimary"
+            android:visibility="gone" />
+
+        <Space
+            android:layout_width="4dp"
+            android:layout_height="0dp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/a_main_iv3"
             android:layout_width="@dimen/top_bar_icon_size"
             android:layout_height="@dimen/top_bar_icon_size"
             android:contentDescription="@string/bluetooth_icon"
@@ -76,7 +89,7 @@
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/a_main_iv3"
+            android:id="@+id/a_main_iv4"
             android:layout_width="@dimen/top_bar_icon_size"
             android:layout_height="@dimen/top_bar_icon_size"
             android:contentDescription="@string/battery_icon"

@@ -13,11 +13,14 @@
     <string name="title_activity_permission">权限</string>
 
     <!-- Button -->
+    <string name="prev_page">上一页</string>
+    <string name="next_page">下一页</string>
+
+    <!-- Menu -->
     <string name="app_info">应用信息</string>
     <string name="uninstall">卸载</string>
     <string name="app_market">应用市场</string>
-    <string name="prev_page">上一页</string>
-    <string name="next_page">下一页</string>
+    <string name="airplane_mode_icon">隐藏</string>
 
     <!-- Content Description -->
     <string name="wifi_icon">Wi-Fi图标</string>
