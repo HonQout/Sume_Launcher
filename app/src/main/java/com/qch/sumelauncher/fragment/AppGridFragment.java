@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.adapter.recyclerview.AppRVAdapter;
+import com.qch.sumelauncher.adapter.recyclerview.AppLauncherRVAdapter;
 import com.qch.sumelauncher.adapter.recyclerview.FilterableListAdapter;
 import com.qch.sumelauncher.bean.ActivityBean;
 import com.qch.sumelauncher.databinding.FragmentAppGridBinding;
@@ -66,29 +66,13 @@ public class AppGridFragment extends Fragment {
         Log.i(TAG, "Fragment #" + position + " onCreateView");
         binding = FragmentAppGridBinding.inflate(inflater, container, false);
         binding.fAppGridRv.setLayoutManager(new GridLayoutManager(requireContext(), viewModel.getNumColumnInt()));
-        AppRVAdapter appRVAdapter = new AppRVAdapter(new ArrayList<>());
-        appRVAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
+        AppLauncherRVAdapter appLauncherRVAdapter = new AppLauncherRVAdapter(new ArrayList<>());
+        appLauncherRVAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
             @Override
             public void onItemClick(ActivityBean item, View view) {
-                IntentUtils.LaunchActivityResult result =
+                IntentUtils.handleLaunchActivityResult(requireContext(),
                         IntentUtils.launchActivity(requireContext(), item.getPackageName(),
-                                item.getActivityName(), true);
-                switch (result) {
-                    case NOT_EXPORTED: {
-                        Toast.makeText(requireContext(), R.string.cannot_access_unexported_activity, Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                    case REQUIRE_PERMISSION: {
-                        Toast.makeText(requireContext(), R.string.activity_requires_extra_permission, Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                    case NOT_FOUND: {
-                        Toast.makeText(requireContext(), R.string.cannot_find_activity, Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                    default:
-                        break;
-                }
+                                item.getActivityName(), true));
             }
 
             @Override
@@ -158,7 +142,7 @@ public class AppGridFragment extends Fragment {
                 return true;
             }
         });
-        binding.fAppGridRv.setAdapter(appRVAdapter);
+        binding.fAppGridRv.setAdapter(appLauncherRVAdapter);
         binding.fAppGridRv.addItemDecoration(
                 new AppItemDecoration(
                         viewModel.getNumRowInt(),
@@ -176,7 +160,7 @@ public class AppGridFragment extends Fragment {
             if (map != null) {
                 List<ActivityBean> list = map.get(position);
                 if (list != null) {
-                    appRVAdapter.setList(list);
+                    appLauncherRVAdapter.setList(list);
                     reLayoutAppGrid();
                 }
             }

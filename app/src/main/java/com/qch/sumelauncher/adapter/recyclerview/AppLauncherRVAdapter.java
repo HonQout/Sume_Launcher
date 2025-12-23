@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class AppRVAdapter extends FilterableListAdapter<ActivityBean, AppRVAdapter.ViewHolder> {
+public class AppLauncherRVAdapter extends FilterableListAdapter<ActivityBean, AppLauncherRVAdapter.ViewHolder> {
     private static final String TAG = "AppRVAdapter";
 
     public static final DiffUtil.ItemCallback<ActivityBean> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
@@ -46,8 +46,8 @@ public class AppRVAdapter extends FilterableListAdapter<ActivityBean, AppRVAdapt
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            icon = (ImageView) itemView.findViewById(R.id.item_app_icon);
-            label = (TextView) itemView.findViewById(R.id.item_app_label);
+            icon = (ImageView) itemView.findViewById(R.id.item_app_launcher_icon);
+            label = (TextView) itemView.findViewById(R.id.item_app_launcher_label);
             itemView.setOnClickListener(v -> {
                 int position = getBindingAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
@@ -74,19 +74,19 @@ public class AppRVAdapter extends FilterableListAdapter<ActivityBean, AppRVAdapt
         }
     }
 
-    public AppRVAdapter(List<ActivityBean> activityBeanList) {
+    public AppLauncherRVAdapter(List<ActivityBean> activityBeanList) {
         super(DIFF_CALLBACK, activityBeanList);
     }
 
     @NonNull
     @Override
-    public AppRVAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_app, parent, false);
+    public AppLauncherRVAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_app_launcher, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AppRVAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull AppLauncherRVAdapter.ViewHolder holder, int position) {
         Context context = holder.itemView.getContext();
         ActivityBean activityBean = getItem(position);
         Drawable defIcon = context.getPackageManager().getDefaultActivityIcon();

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/item_app_manage_icon"
+        android:layout_width="@dimen/app_icon_size"
+        android:layout_height="@dimen/app_icon_size"
+        android:contentDescription="@string/app_icon" />
+
+    <Space
+        android:layout_width="5dp"
+        android:layout_height="0dp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/item_app_manage_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAlignment="textStart"
+        android:textSize="@dimen/app_label_size" />
+
+    <Space
+        android:layout_width="5dp"
+        android:layout_height="0dp" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/item_app_manage_hide"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="@dimen/bottom_icon_size"
+        android:layout_height="@dimen/bottom_icon_size"
+        android:contentDescription="@string/hide"
+        android:src="@drawable/baseline_eye_off_24"
+        android:tint="?android:textColorPrimary" />
+
+    <Space
+        android:layout_width="5dp"
+        android:layout_height="0dp" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/item_app_manage_uninstall"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="@dimen/bottom_icon_size"
+        android:layout_height="@dimen/bottom_icon_size"
+        android:contentDescription="@string/uninstall"
+        android:src="@drawable/baseline_delete_24"
+        android:tint="?android:textColorPrimary" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>
