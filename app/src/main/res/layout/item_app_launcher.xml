@@ -6,8 +6,8 @@
     android:orientation="vertical"
     android:padding="10dp">
 
-    <ImageView
-        android:id="@+id/item_app_icon"
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/item_app_launcher_icon"
         android:layout_width="@dimen/app_icon_size"
         android:layout_height="@dimen/app_icon_size"
         android:contentDescription="@string/app_icon" />
@@ -16,8 +16,8 @@
         android:layout_width="0dp"
         android:layout_height="5dp" />
 
-    <TextView
-        android:id="@+id/item_app_label"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/item_app_launcher_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
