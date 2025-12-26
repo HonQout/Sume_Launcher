@@ -51,6 +51,7 @@ public class AppManageRVAdapter extends FilterableListAdapter<ActivityBean, AppM
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final ImageView icon;
         private final TextView label;
+        private final TextView packageName;
         private final ImageButton btnHide;
         private final ImageButton btnUninstall;
 
@@ -58,6 +59,7 @@ public class AppManageRVAdapter extends FilterableListAdapter<ActivityBean, AppM
             super(itemView);
             icon = (ImageView) itemView.findViewById(R.id.item_app_manage_icon);
             label = (TextView) itemView.findViewById(R.id.item_app_manage_label);
+            packageName = (TextView) itemView.findViewById(R.id.item_app_manage_package_name);
             btnHide = (ImageButton) itemView.findViewById(R.id.item_app_manage_hide);
             btnUninstall = (ImageButton) itemView.findViewById(R.id.item_app_manage_uninstall);
             itemView.setOnClickListener(view -> {
@@ -98,6 +100,10 @@ public class AppManageRVAdapter extends FilterableListAdapter<ActivityBean, AppM
         public TextView getLabel() {
             return label;
         }
+
+        public TextView getPackageName() {
+            return packageName;
+        }
     }
 
     public AppManageRVAdapter(List<ActivityBean> activityBeanList) {
@@ -126,6 +132,7 @@ public class AppManageRVAdapter extends FilterableListAdapter<ActivityBean, AppM
             holder.getIcon().setImageDrawable(defIcon);
         }
         holder.getLabel().setText(activityBean.getLabel());
+        holder.getPackageName().setText(activityBean.getPackageName());
     }
 
     @NonNull

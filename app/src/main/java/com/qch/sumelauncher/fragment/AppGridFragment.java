@@ -26,7 +26,7 @@ import com.qch.sumelauncher.databinding.FragmentAppGridBinding;
 import com.qch.sumelauncher.recyclerview.AppItemDecoration;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
-import com.qch.sumelauncher.viewmodel.AppViewModel;
+import com.qch.sumelauncher.viewmodel.LauncherViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class AppGridFragment extends Fragment {
     private static final String ARG_POSITION = "POSITION";
     private FragmentAppGridBinding binding;
     private int position;
-    private AppViewModel viewModel;
+    private LauncherViewModel viewModel;
 
     public AppGridFragment() {
         // Required empty public constructor
@@ -57,7 +57,7 @@ public class AppGridFragment extends Fragment {
         if (args != null) {
             position = args.getInt(ARG_POSITION);
         }
-        viewModel = new ViewModelProvider(requireActivity()).get(AppViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class AppGridFragment extends Fragment {
                              Bundle savedInstanceState) {
         Log.i(TAG, "Fragment #" + position + " onCreateView");
         binding = FragmentAppGridBinding.inflate(inflater, container, false);
-        binding.fAppGridRv.setLayoutManager(new GridLayoutManager(requireContext(), viewModel.getNumColumnInt()));
+        binding.fAppGridRv.setLayoutManager(new GridLayoutManager(requireContext(), viewModel.getNumColumnValue()));
         AppLauncherRVAdapter appLauncherRVAdapter = new AppLauncherRVAdapter(new ArrayList<>());
         appLauncherRVAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
             @Override
@@ -145,8 +145,8 @@ public class AppGridFragment extends Fragment {
         binding.fAppGridRv.setAdapter(appLauncherRVAdapter);
         binding.fAppGridRv.addItemDecoration(
                 new AppItemDecoration(
-                        viewModel.getNumRowInt(),
-                        viewModel.getNumColumnInt()
+                        viewModel.getNumRowValue(),
+                        viewModel.getNumColumnValue()
                 )
         );
         viewModel.getDisplayStatusBar().observe(getViewLifecycleOwner(), displayStatusBar ->
@@ -195,7 +195,7 @@ public class AppGridFragment extends Fragment {
         Log.i(TAG, "Prepare to re-layout app grid.");
         GridLayoutManager layoutManager = (GridLayoutManager) binding.fAppGridRv.getLayoutManager();
         if (layoutManager != null) {
-            layoutManager.setSpanCount(viewModel.getNumColumnInt());
+            layoutManager.setSpanCount(viewModel.getNumColumnValue());
         }
         int decorCount = binding.fAppGridRv.getItemDecorationCount();
         try {
@@ -207,8 +207,8 @@ public class AppGridFragment extends Fragment {
         }
         binding.fAppGridRv.addItemDecoration(
                 new AppItemDecoration(
-                        viewModel.getNumRowInt(),
-                        viewModel.getNumColumnInt()
+                        viewModel.getNumRowValue(),
+                        viewModel.getNumColumnValue()
                 )
         );
         if (!binding.fAppGridRv.isInLayout()) {

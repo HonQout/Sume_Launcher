@@ -64,11 +64,7 @@ public class SettingsViewModel extends AndroidViewModel {
         return mDisplayStatusBar;
     }
 
-    public boolean getDisplayStatusBarBoolean() {
-        return mDisplayStatusBar.getValue() == null || mDisplayStatusBar.getValue();
-    }
-
-    public boolean getAnimationBoolean() {
+    public boolean getAnimationValue() {
         return mAnimation.getValue() == null || mAnimation.getValue();
     }
 
@@ -76,7 +72,7 @@ public class SettingsViewModel extends AndroidViewModel {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            if (!getAnimationBoolean()) {
+            if (!getAnimationValue()) {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             }
             activity.startActivity(intent);
@@ -87,7 +83,7 @@ public class SettingsViewModel extends AndroidViewModel {
 
     public void startPermissionActivity(@NonNull Activity activity) {
         Intent intent = new Intent(activity, PermissionActivity.class);
-        if (!getAnimationBoolean()) {
+        if (!getAnimationValue()) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         }
         activity.startActivity(intent);
@@ -95,7 +91,7 @@ public class SettingsViewModel extends AndroidViewModel {
 
     public void openGithubPage(@NonNull Activity activity) {
         int flags = Intent.FLAG_ACTIVITY_NEW_TASK;
-        if (getAnimationBoolean()) {
+        if (getAnimationValue()) {
             flags |= Intent.FLAG_ACTIVITY_NO_ANIMATION;
         }
         IntentUtils.handleLaunchIntentResult(
