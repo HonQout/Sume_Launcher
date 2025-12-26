@@ -111,18 +111,14 @@ public class PermissionViewModel extends AndroidViewModel {
                 .setTitle(permissionBean.getLabel())
                 .setMessage(permissionBean.getDescription())
                 .setPositiveButton(R.string.confirm, (dialog, which) -> dialog.dismiss());
-        DialogUtils.show(builder, getAnimationBoolean());
+        DialogUtils.show(builder, getAnimationValue());
     }
 
     public LiveData<Boolean> getDisplayStatusBar() {
         return mDisplayStatusBar;
     }
 
-    public boolean getDisplayStatusBarBoolean() {
-        return mDisplayStatusBar.getValue() == null || mDisplayStatusBar.getValue();
-    }
-
-    public boolean getAnimationBoolean() {
+    public boolean getAnimationValue() {
         return mAnimation.getValue() == null || mAnimation.getValue();
     }
 

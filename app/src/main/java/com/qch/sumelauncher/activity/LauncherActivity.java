@@ -15,16 +15,20 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.adapter.viewpager2.AppPagerAdapter;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
+import com.qch.sumelauncher.fragment.ManageFragment;
 import com.qch.sumelauncher.utils.PermissionUtils;
 import com.qch.sumelauncher.utils.UIUtils;
 import com.qch.sumelauncher.viewmodel.AirplaneModeViewModel;
-import com.qch.sumelauncher.viewmodel.AppViewModel;
+import com.qch.sumelauncher.viewmodel.LauncherViewModel;
 import com.qch.sumelauncher.viewmodel.BatteryViewModel;
 import com.qch.sumelauncher.viewmodel.BluetoothViewModel;
 import com.qch.sumelauncher.viewmodel.WifiViewModel;
@@ -38,7 +42,7 @@ public class LauncherActivity extends AppCompatActivity {
     private WifiViewModel wifiViewModel;
     private BluetoothViewModel bluetoothViewModel;
     private BatteryViewModel batteryViewModel;
-    private AppViewModel appViewModel;
+    private LauncherViewModel launcherViewModel;
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
     @Override
@@ -54,42 +58,58 @@ public class LauncherActivity extends AppCompatActivity {
                 Log.i(TAG, "Back event is intercepted.");
             }
         });
-        ViewPager2 viewPager2 = binding.aMainVp2;
+        ViewPager2 viewPager2 = binding.aLauncherVp2;
         AppPagerAdapter appPagerAdapter = new AppPagerAdapter(this, 0);
         viewPager2.setAdapter(appPagerAdapter);
         viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-                appViewModel.setCurrentPage(position + 1);
+                launcherViewModel.setCurrentPage(position + 1);
             }
         });
-        binding.aMainBtnSettings.setOnClickListener(v -> appViewModel.startSettingsActivity(this));
-        binding.aMainBtnPrevPage.setOnClickListener(v -> launcherPageUp());
-        binding.aMainBtnNextPage.setOnClickListener(v -> launcherPageDown());
+        binding.aLauncherBtnSettings.setOnClickListener(v -> launcherViewModel.startSettingsActivity(this));
+        binding.aLauncherBtnManage.setOnClickListener(view -> {
+            LauncherViewModel.LauncherState launcherState = launcherViewModel.getLauncherStateValue();
+            switch (launcherState) {
+                case NORMAL: {
+                    launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.EDIT);
+                    break;
+                }
+                case EDIT: {
+                    launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.NORMAL);
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+        });
+        binding.aLauncherBtnPrevPage.setOnClickListener(v -> launcherPageUp());
+        binding.aLauncherBtnNextPage.setOnClickListener(v -> launcherPageDown());
         // Initialize viewmodel
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
-        appViewModel = viewModelProvider.get(AppViewModel.class);
+        launcherViewModel = viewModelProvider.get(LauncherViewModel.class);
         timeViewModel = viewModelProvider.get(TimeViewModel.class);
         airplaneModeViewModel = viewModelProvider.get(AirplaneModeViewModel.class);
         wifiViewModel = viewModelProvider.get(WifiViewModel.class);
         bluetoothViewModel = viewModelProvider.get(BluetoothViewModel.class);
         batteryViewModel = viewModelProvider.get(BatteryViewModel.class);
         // Observe
-        appViewModel.getDisplayStatusBar().observe(this, b ->
+        launcherViewModel.getDisplayStatusBar().observe(this, b ->
                 UIUtils.handleStatusBarVisibility(getWindow(), b == null || b));
-        appViewModel.getDisplayTopBar().observe(this, displayTopBar ->
-                binding.aMainLl1.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
-        appViewModel.getScrollToSwitchPage().observe(this, scrollToSwitchPage ->
-                binding.aMainVp2.setUserInputEnabled(scrollToSwitchPage));
+        launcherViewModel.getDisplayTopBar().observe(this, displayTopBar ->
+                binding.aLauncherLl1.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
+        launcherViewModel.getScrollToSwitchPage().observe(this, scrollToSwitchPage ->
+                binding.aLauncherVp2.setUserInputEnabled(scrollToSwitchPage));
         timeViewModel.getCurrentTime().observe(this, currentTime ->
-                binding.aMainTv1.setText(DateUtils.formatDateTime(
+                binding.aLauncherTv1.setText(DateUtils.formatDateTime(
                                 LauncherActivity.this,
                                 currentTime,
                                 DateUtils.FORMAT_SHOW_TIME
                         )
                 ));
         timeViewModel.getCurrentTime().observe(this, currentTime ->
-                binding.aMainTv2.setText(DateUtils.formatDateTime(
+                binding.aLauncherTv2.setText(DateUtils.formatDateTime(
                                 LauncherActivity.this,
                                 currentTime,
                                 DateUtils.FORMAT_NO_YEAR
@@ -98,21 +118,20 @@ public class LauncherActivity extends AppCompatActivity {
                                         | DateUtils.FORMAT_ABBREV_WEEKDAY
                         )
                 ));
-        airplaneModeViewModel.getAirplaneModeEnabled().observe(this, isEnabled -> {
-                    binding.aMainIv1.setVisibility(isEnabled ? View.VISIBLE : View.GONE);
-                }
+        airplaneModeViewModel.getAirplaneModeEnabled().observe(this, isEnabled ->
+                binding.aLauncherIv1.setVisibility(isEnabled ? View.VISIBLE : View.GONE)
         );
         wifiViewModel.getWifiEnabled().observe(this, isEnabled ->
-                binding.aMainIv2.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
+                binding.aLauncherIv2.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
         wifiViewModel.getWifiIconRes().observe(this, integer ->
-                binding.aMainIv2.setImageResource(wifiViewModel.getWifiIconResInt()));
+                binding.aLauncherIv2.setImageResource(wifiViewModel.getWifiIconResValue()));
         bluetoothViewModel.getBtEnabled().observe(this, isEnabled ->
-                binding.aMainIv3.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
+                binding.aLauncherIv3.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
         bluetoothViewModel.getBtIconRes().observe(this, icon ->
-                binding.aMainIv3.setImageResource(bluetoothViewModel.getBtIconResInt()));
+                binding.aLauncherIv3.setImageResource(bluetoothViewModel.getBtIconResValue()));
         batteryViewModel.getLevel().observe(this, integer -> {
             int i = integer == null ? -1 : integer;
-            binding.aMainTv3.setText(
+            binding.aLauncherTv3.setText(
                     String.format(
                             ContextCompat.getString(this, R.string.battery_percentage),
                             i
@@ -120,25 +139,49 @@ public class LauncherActivity extends AppCompatActivity {
         });
         batteryViewModel.getIcon().observe(this, integer -> {
             int i = integer == null ? R.drawable.baseline_battery_unknown_24 : integer;
-            binding.aMainIv4.setImageResource(i);
+            binding.aLauncherIv4.setImageResource(i);
         });
-        appViewModel.getNumPage().observe(this, integer -> {
+        launcherViewModel.getNumPage().observe(this, integer -> {
             appPagerAdapter.setNumPages(integer);
-            binding.aMainTv4.setText(
+            binding.aLauncherTv4.setText(
                     String.format(
                             ContextCompat.getString(this, R.string.page_text),
-                            appViewModel.getCurrentPageInt(), integer
+                            launcherViewModel.getCurrentPageValue(), integer
                     ));
         });
-        appViewModel.getCurrentPage().observe(this, integer ->
-                binding.aMainTv4.setText(
+        launcherViewModel.getCurrentPage().observe(this, integer ->
+                binding.aLauncherTv4.setText(
                         String.format(
                                 ContextCompat.getString(
                                         LauncherActivity.this,
                                         R.string.page_text
                                 ),
-                                integer, appViewModel.getNumPageInt()
+                                integer, launcherViewModel.getNumPageValue()
                         )));
+        launcherViewModel.getLauncherState().observe(this, launcherState -> {
+            Log.i(TAG, "Prepare to examine launcher state");
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            Fragment manageFragment = fragmentManager.findFragmentByTag("ManageFragment");
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            if (launcherState == LauncherViewModel.LauncherState.NORMAL) {
+                if (manageFragment != null) {
+                    Log.i(TAG, "Fragment is not null. Hide fragment.");
+                    fragmentTransaction.hide(manageFragment);
+                }
+                binding.aLauncherLl3.setVisibility(View.VISIBLE);
+            } else if (launcherState == LauncherViewModel.LauncherState.EDIT) {
+                binding.aLauncherLl3.setVisibility(View.GONE);
+                if (manageFragment == null) {
+                    Log.i(TAG, "Fragment is null. Create new instance of fragment.");
+                    manageFragment = ManageFragment.newInstance();
+                    fragmentTransaction.add(R.id.a_launcher_fl2, manageFragment, "ManageFragment");
+                } else {
+                    Log.i(TAG, "Fragment is not null. Show fragment.");
+                    fragmentTransaction.show(manageFragment);
+                }
+            }
+            fragmentTransaction.commit();
+        });
         requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             if (isGranted) {
                 wifiViewModel.init();
@@ -153,9 +196,9 @@ public class LauncherActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ||
                 PermissionUtils.isPermissionGranted(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             wifiViewModel.init();
-        } else if (appViewModel.getAskForPermFineLocationBoolean()) {
+        } else if (launcherViewModel.getAskForPermFineLocationValue()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                appViewModel.showPermFineLocationDialog(this);
+                launcherViewModel.showPermFineLocationDialog(this);
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
             }
@@ -166,14 +209,14 @@ public class LauncherActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP: {
-                if (appViewModel.getVolumeKeySwitchPageBoolean()) {
+                if (launcherViewModel.getVolumeKeySwitchPageValue()) {
                     launcherPageUp();
                     return true;
                 }
                 break;
             }
             case KeyEvent.KEYCODE_VOLUME_DOWN: {
-                if (appViewModel.getVolumeKeySwitchPageBoolean()) {
+                if (launcherViewModel.getVolumeKeySwitchPageValue()) {
                     launcherPageDown();
                     return true;
                 }
@@ -186,26 +229,26 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     public void launcherPageUp() {
-        ViewPager2 viewPager2 = binding.aMainVp2;
+        ViewPager2 viewPager2 = binding.aLauncherVp2;
         if (viewPager2.getAdapter() != null) {
             int currentItem = viewPager2.getCurrentItem();
             if (currentItem > 0) {
                 currentItem -= 1;
             }
             viewPager2.setCurrentItem(currentItem, false);
-            appViewModel.setCurrentPage(currentItem + 1);
+            launcherViewModel.setCurrentPage(currentItem + 1);
         }
     }
 
     public void launcherPageDown() {
-        ViewPager2 viewPager2 = binding.aMainVp2;
+        ViewPager2 viewPager2 = binding.aLauncherVp2;
         if (viewPager2.getAdapter() != null) {
             int currentItem = viewPager2.getCurrentItem();
             if (currentItem < viewPager2.getAdapter().getItemCount() - 1) {
                 currentItem += 1;
             }
             viewPager2.setCurrentItem(currentItem, false);
-            appViewModel.setCurrentPage(currentItem + 1);
+            launcherViewModel.setCurrentPage(currentItem + 1);
         }
     }
 }

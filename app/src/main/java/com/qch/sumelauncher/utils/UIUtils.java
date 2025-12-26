@@ -2,6 +2,7 @@ package com.qch.sumelauncher.utils;
 
 import android.os.Build;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -88,5 +89,15 @@ public class UIUtils {
             );
             windowInsetsControllerCompat.hide(WindowInsetsCompat.Type.navigationBars());
         }
+    }
+
+    public static void refreshUI(View view) {
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                refreshUI(viewGroup.getChildAt(i));
+            }
+        }
+        view.invalidate();
     }
 }

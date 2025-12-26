@@ -55,7 +55,7 @@ public class PermissionActivity extends AppCompatActivity {
     @Override
     public void finish() {
         super.finish();
-        if (!viewModel.getAnimationBoolean()) {
+        if (!viewModel.getAnimationValue()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0);
             } else {

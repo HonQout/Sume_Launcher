@@ -97,7 +97,7 @@ public class BluetoothViewModel extends AndroidViewModel {
     }
 
     @DrawableRes
-    public int getBtIconResInt() {
+    public int getBtIconResValue() {
         return mBtIconRes.getValue() == null ? iconDisabled : mBtIconRes.getValue();
     }
 }

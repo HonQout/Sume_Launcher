@@ -11,6 +11,7 @@ import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -21,6 +22,7 @@ import com.qch.sumelauncher.MyApplication;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.activity.SettingsActivity;
 import com.qch.sumelauncher.bean.ActivityBean;
+import com.qch.sumelauncher.bean.ActivityBeanStub;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.CollectionUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
@@ -39,12 +41,22 @@ import java.util.concurrent.Executors;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
-public class AppViewModel extends AndroidViewModel {
-    private static final String TAG = "AppViewModel";
+public class LauncherViewModel extends AndroidViewModel {
+    private static final String TAG = "LauncherViewModel";
     // constant
     private static final int defNumRow = 5;
     private static final int defNumColumn = 5;
+
+    public enum LauncherState {
+        NORMAL, EDIT
+    }
+
+    public enum AppListOp {
+        INIT, ADD, REMOVE, REPLACE
+    }
+
     // data
+    private final MutableLiveData<LauncherState> mLauncherState = new MutableLiveData<>(LauncherState.NORMAL);
     private final MutableLiveData<Boolean> mDisplayStatusBar = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayTopBar = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mAnimation = new MutableLiveData<>();
@@ -57,17 +69,21 @@ public class AppViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> mNumPage = new MutableLiveData<>();
     private final MutableLiveData<Integer> mCurrentPage = new MutableLiveData<>();
     private final MutableLiveData<List<ActivityBean>> mActivityBeanList = new MutableLiveData<>();
+    private final MutableLiveData<List<ActivityBeanStub>> mHiddenActivityList = new MutableLiveData<>();
     private final MutableLiveData<Map<Integer, List<ActivityBean>>> mActivityBeanMap = new MutableLiveData<>();
+
     // multi-thread
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
     // persistence
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+
     // broadcast receiver
     private BroadcastReceiver localeBroadcastReceiver = null;
     private BroadcastReceiver packageBroadcastReceiver = null;
 
 
-    public AppViewModel(@NonNull Application application) {
+    public LauncherViewModel(@NonNull Application application) {
         super(application);
         registerLocaleBR();
         registerPackageBR();
@@ -95,13 +111,7 @@ public class AppViewModel extends AndroidViewModel {
         localeBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                List<ActivityBean> list = new ArrayList<>(ApplicationUtils.getActivityBeanList(getApplication(), null));
-                sortActivityBeanList(list);
-                Log.i(TAG, "Size of ActivityBean list is " + list.size());
-                mActivityBeanList.postValue(list);
-                int numItemsPerPage = getNumItemsPerPageInt();
-                mNumPage.postValue(calcNumPage(list, numItemsPerPage));
-                mActivityBeanMap.postValue(initMap(list, numItemsPerPage));
+                updateActivityBeanList(AppListOp.INIT, null);
             }
         };
 
@@ -149,7 +159,7 @@ public class AppViewModel extends AndroidViewModel {
                             if (data != null) {
                                 packageName = data.getSchemeSpecificPart();
                                 if (packageName != null) {
-                                    addActivityBeans(packageName);
+                                    updateActivityBeanList(AppListOp.ADD, packageName);
                                 }
                             }
                         }
@@ -166,7 +176,7 @@ public class AppViewModel extends AndroidViewModel {
                             if (data != null) {
                                 packageName = data.getSchemeSpecificPart();
                                 if (packageName != null) {
-                                    removeActivityBeans(packageName);
+                                    updateActivityBeanList(AppListOp.REMOVE, packageName);
                                 }
                             }
                         }
@@ -179,7 +189,7 @@ public class AppViewModel extends AndroidViewModel {
                         if (data != null) {
                             packageName = data.getSchemeSpecificPart();
                             if (packageName != null) {
-                                replaceActivityBeans(packageName);
+                                updateActivityBeanList(AppListOp.REPLACE, packageName);
                             }
                         }
                         break;
@@ -268,16 +278,7 @@ public class AppViewModel extends AndroidViewModel {
                             mNumRow.postValue(actualNumRow);
                             mNumColumn.postValue(actualNumColumn);
                             mNumItemsPerPage.postValue(numItemsPerPage);
-                            List<ActivityBean> list = mActivityBeanList.getValue();
-                            if (list == null) {
-                                list = new ArrayList<>(ApplicationUtils.getActivityBeanList(getApplication(), null));
-                                sortActivityBeanList(list);
-                                Log.i(TAG, "Size of ActivityBean list is " + list.size());
-                                mActivityBeanList.postValue(list);
-                                mCurrentPage.postValue(1);
-                            }
-                            mNumPage.postValue(calcNumPage(list, numItemsPerPage));
-                            mActivityBeanMap.postValue(initMap(list, numItemsPerPage));
+                            updateActivityBeanList(AppListOp.INIT, null);
                         },
                         throwable -> Log.e(TAG, "Failed to get value of key grid_count", throwable)
                 );
@@ -316,73 +317,57 @@ public class AppViewModel extends AndroidViewModel {
         }
     }
 
-    private void addActivityBeans(String packageName) {
-        Context context = getApplication();
+    private void updateActivityBeanList(AppListOp op, @Nullable String packageName) {
         executorService.execute(() -> {
             List<ActivityBean> list = mActivityBeanList.getValue();
-            if (list != null) {
-                try {
-                    list.addAll(ApplicationUtils.getActivityBeanList(context, packageName));
-                } catch (Exception e) {
-                    Log.e(TAG, "Failed to add activity beans of " + packageName);
-                }
+            if (list == null || op == AppListOp.INIT) {
+                // initialize
+                list = new ArrayList<>(ApplicationUtils.getActivityBeanList(getApplication(), null));
                 sortActivityBeanList(list);
                 mActivityBeanList.postValue(list);
-                int numItemPerPage = getNumItemsPerPageInt();
-                mNumPage.postValue(calcNumPage(list, numItemPerPage));
-                mActivityBeanMap.postValue(initMap(list, numItemPerPage));
+                mCurrentPage.postValue(1);
             }
+            if (packageName != null) {
+                if (op == AppListOp.REMOVE || op == AppListOp.REPLACE) {
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            list.removeIf(item ->
+                                    Objects.equals(packageName, item.getPackageName()));
+                        } else {
+                            CollectionUtils.removeConditionally(list, item ->
+                                    Objects.equals(packageName, item.getPackageName()));
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to remove activity beans of " + packageName);
+                    }
+                }
+                if (op == AppListOp.ADD || op == AppListOp.REPLACE) {
+                    try {
+                        list.addAll(ApplicationUtils.getActivityBeanList(getApplication(), packageName));
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to add activity beans of " + packageName);
+                    }
+                    sortActivityBeanList(list);
+                }
+            } else if (op != AppListOp.INIT) {
+                Log.e(TAG, "Package name is null. Specified operation has not been executed.");
+            }
+            int numItemPerPage = getNumItemsPerPageValue();
+            mNumPage.postValue(calcNumPage(list, numItemPerPage));
+            mActivityBeanMap.postValue(initMap(list, numItemPerPage));
         });
     }
 
-    private void removeActivityBeans(String packageName) {
-        executorService.execute(() -> {
-            List<ActivityBean> list = mActivityBeanList.getValue();
-            if (list != null) {
-                try {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        list.removeIf(item -> Objects.equals(packageName, item.getPackageName()));
-                    } else {
-                        CollectionUtils.removeConditionally(list, item -> Objects.equals(packageName, item.getPackageName()));
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Failed to remove activity beans of " + packageName);
-                }
-                mActivityBeanList.postValue(list);
-                int numItemPerPage = getNumItemsPerPageInt();
-                mNumPage.postValue(calcNumPage(list, numItemPerPage));
-                mActivityBeanMap.postValue(initMap(list, numItemPerPage));
-            }
-        });
+    public void setLauncherState(LauncherState state) {
+        mLauncherState.postValue(state);
     }
 
-    private void replaceActivityBeans(String packageName) {
-        Log.i(TAG, "Prepare to replace activity beans of " + packageName);
-        Context context = getApplication();
-        executorService.execute(() -> {
-            List<ActivityBean> list = mActivityBeanList.getValue();
-            if (list != null) {
-                try {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        list.removeIf(item -> Objects.equals(packageName, item.getPackageName()));
-                    } else {
-                        CollectionUtils.removeConditionally(list, item -> Objects.equals(packageName, item.getPackageName()));
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Failed to remove activity beans of " + packageName);
-                }
-                try {
-                    list.addAll(ApplicationUtils.getActivityBeanList(context, packageName));
-                } catch (Exception e) {
-                    Log.e(TAG, "Failed to add activity beans of " + packageName);
-                }
-                sortActivityBeanList(list);
-                mActivityBeanList.postValue(list);
-                int numItemPerPage = getNumItemsPerPageInt();
-                mNumPage.postValue(calcNumPage(list, numItemPerPage));
-                mActivityBeanMap.postValue(initMap(list, numItemPerPage));
-            }
-        });
+    public LiveData<LauncherState> getLauncherState() {
+        return mLauncherState;
+    }
+
+    public LauncherState getLauncherStateValue() {
+        return mLauncherState.getValue() == null ? LauncherState.NORMAL : mLauncherState.getValue();
     }
 
     public LiveData<Boolean> getDisplayStatusBar() {
@@ -397,7 +382,7 @@ public class AppViewModel extends AndroidViewModel {
         return mAnimation;
     }
 
-    public boolean getAnimationBoolean() {
+    public boolean getAnimationValue() {
         return mAnimation.getValue() == null || mAnimation.getValue();
     }
 
@@ -405,23 +390,23 @@ public class AppViewModel extends AndroidViewModel {
         return mScrollToSwitchPage;
     }
 
-    public boolean getVolumeKeySwitchPageBoolean() {
+    public boolean getVolumeKeySwitchPageValue() {
         return mVolumeKeySwitchPage.getValue() == null || mVolumeKeySwitchPage.getValue();
     }
 
-    public boolean getAskForPermFineLocationBoolean() {
+    public boolean getAskForPermFineLocationValue() {
         return mAskForPermFineLocation.getValue() == null || mAskForPermFineLocation.getValue();
     }
 
-    public int getNumRowInt() {
+    public int getNumRowValue() {
         return mNumRow.getValue() == null ? defNumRow : mNumRow.getValue();
     }
 
-    public int getNumColumnInt() {
+    public int getNumColumnValue() {
         return mNumColumn.getValue() == null ? defNumColumn : mNumColumn.getValue();
     }
 
-    public int getNumItemsPerPageInt() {
+    public int getNumItemsPerPageValue() {
         return mNumItemsPerPage.getValue() == null ? defNumRow * defNumColumn : mNumItemsPerPage.getValue();
     }
 
@@ -429,10 +414,10 @@ public class AppViewModel extends AndroidViewModel {
         return mNumPage;
     }
 
-    public int getNumPageInt() {
+    public int getNumPageValue() {
         if (mNumPage.getValue() == null) {
             List<ActivityBean> list = mActivityBeanList.getValue();
-            int numItemsPerPageInt = getNumItemsPerPageInt();
+            int numItemsPerPageInt = getNumItemsPerPageValue();
             if (list == null) {
                 return 0;
             } else {
@@ -451,12 +436,16 @@ public class AppViewModel extends AndroidViewModel {
         return mCurrentPage;
     }
 
-    public int getCurrentPageInt() {
+    public int getCurrentPageValue() {
         return mCurrentPage.getValue() == null ? 0 : mCurrentPage.getValue();
     }
 
     public LiveData<List<ActivityBean>> getActivityBeanList() {
         return mActivityBeanList;
+    }
+
+    public List<ActivityBean> getActivityBeanListValue() {
+        return mActivityBeanList.getValue() == null ? new ArrayList<>() : mActivityBeanList.getValue();
     }
 
     public LiveData<Map<Integer, List<ActivityBean>>> getActivityBeanMap() {
@@ -472,7 +461,7 @@ public class AppViewModel extends AndroidViewModel {
                 .setNeutralButton(R.string.deny, (dialog, which) ->
                         MyApplication.getPreferenceDataStore().setBoolean("ask_for_perm_fine_location", false))
                 .setNegativeButton(R.string.cancel, null);
-        DialogUtils.show(builder, getAnimationBoolean());
+        DialogUtils.show(builder, getAnimationValue());
     }
 
     public void showUninstallSystemAppDialog(@NonNull Activity activity, String packageName) {
@@ -485,12 +474,12 @@ public class AppViewModel extends AndroidViewModel {
                                 IntentUtils.requireUninstallApp(activity, packageName)
                         ))
                 .setNegativeButton(R.string.cancel, null);
-        DialogUtils.show(builder, getAnimationBoolean());
+        DialogUtils.show(builder, getAnimationValue());
     }
 
     public void startSettingsActivity(@NonNull Activity activity) {
         Intent intent = new Intent(activity, SettingsActivity.class);
-        if (!getAnimationBoolean()) {
+        if (!getAnimationValue()) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         }
         activity.startActivity(intent);

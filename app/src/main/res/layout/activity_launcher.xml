@@ -4,10 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?android:windowBackground"
     tools:context=".activity.LauncherActivity">
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/a_main_ll1"
+        android:id="@+id/a_launcher_ll1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -19,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/a_main_tv1"
+            android:id="@+id/a_launcher_tv1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?android:textColorPrimary"
@@ -31,7 +32,7 @@
             android:layout_height="0dp" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/a_main_tv2"
+            android:id="@+id/a_launcher_tv2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?android:textColorPrimary"
@@ -44,7 +45,7 @@
             android:layout_weight="1" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/a_main_iv1"
+            android:id="@+id/a_launcher_iv1"
             android:layout_width="@dimen/top_bar_icon_size"
             android:layout_height="@dimen/top_bar_icon_size"
             android:contentDescription="@string/airplane_mode_icon"
@@ -57,7 +58,7 @@
             android:layout_height="0dp" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/a_main_iv2"
+            android:id="@+id/a_launcher_iv2"
             android:layout_width="@dimen/top_bar_icon_size"
             android:layout_height="@dimen/top_bar_icon_size"
             android:contentDescription="@string/wifi_icon"
@@ -69,7 +70,7 @@
             android:layout_height="0dp" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/a_main_iv3"
+            android:id="@+id/a_launcher_iv3"
             android:layout_width="@dimen/top_bar_icon_size"
             android:layout_height="@dimen/top_bar_icon_size"
             android:contentDescription="@string/bluetooth_icon"
@@ -81,7 +82,7 @@
             android:layout_height="0dp" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/a_main_tv3"
+            android:id="@+id/a_launcher_tv3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?android:textColorPrimary"
@@ -89,7 +90,7 @@
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/a_main_iv4"
+            android:id="@+id/a_launcher_iv4"
             android:layout_width="@dimen/top_bar_icon_size"
             android:layout_height="@dimen/top_bar_icon_size"
             android:contentDescription="@string/battery_icon"
@@ -97,17 +98,29 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/a_main_vp2"
+    <FrameLayout
+        android:id="@+id/a_launcher_fl1"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/a_main_ll2"
+        app:layout_constraintBottom_toTopOf="@id/a_launcher_ll2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/a_main_ll1" />
+        app:layout_constraintTop_toBottomOf="@id/a_launcher_ll1">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/a_launcher_vp2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/a_launcher_fl2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/a_main_ll2"
+        android:id="@+id/a_launcher_ll2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -118,7 +131,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/a_main_btn_settings"
+            android:id="@+id/a_launcher_btn_settings"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="@dimen/bottom_icon_size"
             android:layout_height="@dimen/bottom_icon_size"
@@ -126,39 +139,57 @@
             android:src="@drawable/baseline_settings_24"
             android:tint="?android:textColorPrimary" />
 
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/a_launcher_btn_manage"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="@dimen/bottom_icon_size"
+            android:layout_height="@dimen/bottom_icon_size"
+            android:contentDescription="@string/manage_icon"
+            android:src="@drawable/baseline_manage_search_24"
+            android:tint="?android:textColorPrimary" />
+
         <Space
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/a_main_tv4"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/a_launcher_ll3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/top_bar_text_size" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <Space
-            android:layout_width="8dp"
-            android:layout_height="0dp" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/a_launcher_tv4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="@dimen/top_bar_text_size" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/a_main_btn_prev_page"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="@dimen/bottom_icon_size"
-            android:layout_height="@dimen/bottom_icon_size"
-            android:contentDescription="@string/prev_page"
-            android:src="@drawable/baseline_navigate_before_24"
-            android:tint="?android:textColorPrimary" />
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="0dp" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/a_main_btn_next_page"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="@dimen/bottom_icon_size"
-            android:layout_height="@dimen/bottom_icon_size"
-            android:contentDescription="@string/next_page"
-            android:src="@drawable/baseline_navigate_next_24"
-            android:tint="?android:textColorPrimary" />
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/a_launcher_btn_prev_page"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="@dimen/bottom_icon_size"
+                android:layout_height="@dimen/bottom_icon_size"
+                android:contentDescription="@string/prev_page_icon"
+                android:src="@drawable/baseline_navigate_before_24"
+                android:tint="?android:textColorPrimary" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/a_launcher_btn_next_page"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="@dimen/bottom_icon_size"
+                android:layout_height="@dimen/bottom_icon_size"
+                android:contentDescription="@string/next_page_icon"
+                android:src="@drawable/baseline_navigate_next_24"
+                android:tint="?android:textColorPrimary" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
