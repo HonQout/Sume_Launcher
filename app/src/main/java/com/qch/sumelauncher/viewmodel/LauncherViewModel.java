@@ -31,12 +31,13 @@ import com.qch.sumelauncher.utils.IntentUtils;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -74,6 +75,10 @@ public class LauncherViewModel extends AndroidViewModel {
 
     // multi-thread
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final AtomicBoolean isUpdatingList = new AtomicBoolean(false);
+    private final Object updateListLock = new Object();
+    private final AtomicBoolean isUpdatingMap = new AtomicBoolean(false);
+    private final Object updateMapLock = new Object();
 
     // persistence
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -292,7 +297,7 @@ public class LauncherViewModel extends AndroidViewModel {
     @NonNull
     private Map<Integer, List<ActivityBean>> initMap(List<ActivityBean> list, int numItemPerPage) {
         int numPage = calcNumPage(list, numItemPerPage);
-        Map<Integer, List<ActivityBean>> map = new HashMap<>();
+        Map<Integer, List<ActivityBean>> map = new ConcurrentHashMap<>();
         for (int i = 0; i < numPage; i++) {
             int begin = i * numItemPerPage;
             if (begin >= list.size()) {
@@ -319,13 +324,14 @@ public class LauncherViewModel extends AndroidViewModel {
 
     private void updateActivityBeanList(AppListOp op, @Nullable String packageName) {
         executorService.execute(() -> {
-            List<ActivityBean> list = mActivityBeanList.getValue();
-            if (list == null || op == AppListOp.INIT) {
+            List<ActivityBean> list;
+            if (mActivityBeanList.getValue() == null || op == AppListOp.INIT) {
                 // initialize
                 list = new ArrayList<>(ApplicationUtils.getActivityBeanList(getApplication(), null));
                 sortActivityBeanList(list);
-                mActivityBeanList.postValue(list);
                 mCurrentPage.postValue(1);
+            } else {
+                list = new ArrayList<>(mActivityBeanList.getValue());
             }
             if (packageName != null) {
                 if (op == AppListOp.REMOVE || op == AppListOp.REPLACE) {
@@ -352,9 +358,27 @@ public class LauncherViewModel extends AndroidViewModel {
             } else if (op != AppListOp.INIT) {
                 Log.e(TAG, "Package name is null. Specified operation has not been executed.");
             }
+            if (isUpdatingList.compareAndSet(false, true)) {
+                try {
+                    synchronized (updateListLock) {
+                        mActivityBeanList.postValue(list);
+                    }
+                } finally {
+                    isUpdatingList.set(false);
+                }
+            }
             int numItemPerPage = getNumItemsPerPageValue();
             mNumPage.postValue(calcNumPage(list, numItemPerPage));
-            mActivityBeanMap.postValue(initMap(list, numItemPerPage));
+            Map<Integer, List<ActivityBean>> newMap = initMap(list, numItemPerPage);
+            if (isUpdatingMap.compareAndSet(false, true)) {
+                try {
+                    synchronized (updateMapLock) {
+                        mActivityBeanMap.postValue(newMap);
+                    }
+                } finally {
+                    isUpdatingMap.set(false);
+                }
+            }
         });
     }
 
