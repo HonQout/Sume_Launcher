@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -58,6 +59,9 @@ dependencies {
     implementation libs.recyclerview
     implementation libs.glide
     implementation libs.preference
+    implementation libs.room.runtime
+    ksp libs.room.compiler
+    implementation libs.room.rxjava3
     implementation libs.rxandroid
     implementation libs.rxjava
     annotationProcessor(libs.compiler)
