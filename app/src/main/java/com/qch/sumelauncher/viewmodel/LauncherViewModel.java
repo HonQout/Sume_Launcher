@@ -22,7 +22,6 @@ import com.qch.sumelauncher.MyApplication;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.activity.SettingsActivity;
 import com.qch.sumelauncher.bean.ActivityBean;
-import com.qch.sumelauncher.bean.ActivityBeanStub;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.CollectionUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
@@ -70,7 +69,6 @@ public class LauncherViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> mNumPage = new MutableLiveData<>();
     private final MutableLiveData<Integer> mCurrentPage = new MutableLiveData<>();
     private final MutableLiveData<List<ActivityBean>> mActivityBeanList = new MutableLiveData<>();
-    private final MutableLiveData<List<ActivityBeanStub>> mHiddenActivityList = new MutableLiveData<>();
     private final MutableLiveData<Map<Integer, List<ActivityBean>>> mActivityBeanMap = new MutableLiveData<>();
 
     // multi-thread
