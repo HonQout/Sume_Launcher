@@ -92,8 +92,7 @@ public class UIUtils {
     }
 
     public static void refreshUI(View view) {
-        if (view instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) view;
+        if (view instanceof ViewGroup viewGroup) {
             for (int i = 0; i < viewGroup.getChildCount(); i++) {
                 refreshUI(viewGroup.getChildAt(i));
             }

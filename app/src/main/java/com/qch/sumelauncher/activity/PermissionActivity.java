@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.qch.sumelauncher.adapter.recyclerview.FilterableListAdapter;
-import com.qch.sumelauncher.adapter.recyclerview.PermissionRVAdapter;
+import com.qch.sumelauncher.adapter.recyclerview.PermissionListRVAdapter;
 import com.qch.sumelauncher.bean.PermissionBean;
 import com.qch.sumelauncher.databinding.ActivityPermissionBinding;
 import com.qch.sumelauncher.utils.UIUtils;
@@ -36,7 +36,7 @@ public class PermissionActivity extends AppCompatActivity {
         binding.aPermissionMt.setNavigationOnClickListener(v ->
                 getOnBackPressedDispatcher().onBackPressed());
         binding.aPermissionRv.setLayoutManager(new LinearLayoutManager(this));
-        PermissionRVAdapter adapter = new PermissionRVAdapter(new ArrayList<>());
+        PermissionListRVAdapter adapter = new PermissionListRVAdapter(new ArrayList<>());
         adapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
             @Override
             public void onItemClick(PermissionBean item, View view) {

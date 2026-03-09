@@ -46,9 +46,11 @@ public class AppItemDecoration extends RecyclerView.ItemDecoration {
             // get item height
             int itemHeightPx = 0;
             if (parent.getChildCount() > 0) {
+                int paddingPx = context.getResources().getDimensionPixelSize(R.dimen.cell_padding);
+                int spacePx = context.getResources().getDimensionPixelSize(R.dimen.app_grid_space);
                 int iconSizePx = context.getResources().getDimensionPixelSize(R.dimen.app_icon_size);
                 int textSizePx = context.getResources().getDimensionPixelSize(R.dimen.app_label_size);
-                itemHeightPx = iconSizePx + textSizePx + UnitUtils.dpToPx(context, 10 * 2 + 5);
+                itemHeightPx = paddingPx * 2 + spacePx + iconSizePx + textSizePx;
             }
             if (itemHeightPx <= 0) {
                 Log.e(TAG, "Illegal item height.");

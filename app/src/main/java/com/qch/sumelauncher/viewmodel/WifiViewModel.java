@@ -26,13 +26,16 @@ import com.qch.sumelauncher.utils.WifiUtils;
 
 public class WifiViewModel extends AndroidViewModel {
     private static final String TAG = "WifiViewModel";
+    private static final int UNKNOWN_SIGNAL_LEVEL = -1; // Wi-Fi is disabled
+    private static final int DEFAULT_SIGNAL_LEVEL = 0; // Wi-Fi is enabled but not connected
+    private static final int DEFAULT_ICON_RES = 0;
+
     // data
-    private final MutableLiveData<Boolean> mWifiEnabled = new MutableLiveData<>(false);
-    private final MutableLiveData<Boolean> mWifiConnected = new MutableLiveData<>(false);
-    private final MutableLiveData<Integer> mWifiSignalLevel = new MutableLiveData<>(-1);
+    private final MutableLiveData<Boolean> mWifiEnabled = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mWifiConnected = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mWifiSignalLevel = new MutableLiveData<>();
     @DrawableRes
-    private final MutableLiveData<Integer> mWifiIconRes
-            = new MutableLiveData<>(R.drawable.baseline_signal_wifi_statusbar_null_24);
+    private final MutableLiveData<Integer> mWifiIconRes = new MutableLiveData<>();
     // broadcast receiver
     private BroadcastReceiver wifiBroadcastReceiver = null;
     // callback
@@ -40,7 +43,7 @@ public class WifiViewModel extends AndroidViewModel {
 
     public WifiViewModel(@NonNull Application application) {
         super(application);
-        init();
+        update();
         registerWifiBR();
         registerWifiCallback();
     }
@@ -50,6 +53,21 @@ public class WifiViewModel extends AndroidViewModel {
         super.onCleared();
         unregisterWifiBR();
         unregisterWifiCallback();
+    }
+
+    public void update() {
+        Context context = getApplication();
+        boolean isWifiEnabled = WifiUtils.isWifiEnabled(context);
+        this.mWifiEnabled.postValue(isWifiEnabled);
+        if (isWifiEnabled) {
+            int signalLevel = WifiUtils.getSignalLevel(context,
+                    WifiUtils.getNetworkCapabilities(context));
+            this.mWifiSignalLevel.postValue(signalLevel);
+            this.mWifiIconRes.postValue(getWifiIconResInner(signalLevel));
+        } else {
+            this.mWifiSignalLevel.postValue(UNKNOWN_SIGNAL_LEVEL);
+            this.mWifiIconRes.postValue(DEFAULT_ICON_RES);
+        }
     }
 
     private void registerWifiBR() {
@@ -63,7 +81,8 @@ public class WifiViewModel extends AndroidViewModel {
         wifiBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
+                int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
+                        WifiManager.WIFI_STATE_UNKNOWN);
                 if (wifiState == WifiManager.WIFI_STATE_DISABLED) {
                     mWifiEnabled.postValue(false);
                 } else if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
@@ -72,7 +91,8 @@ public class WifiViewModel extends AndroidViewModel {
             }
         };
 
-        ContextCompat.registerReceiver(getApplication(), wifiBroadcastReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        ContextCompat.registerReceiver(getApplication(), wifiBroadcastReceiver, filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     private void unregisterWifiBR() {
@@ -106,7 +126,7 @@ public class WifiViewModel extends AndroidViewModel {
                 Log.i(TAG, "Wifi is lost.");
                 super.onLost(network);
                 mWifiConnected.postValue(false);
-                mWifiIconRes.postValue(getWifiIconResInner(-1));
+                mWifiIconRes.postValue(getWifiIconResInner(DEFAULT_SIGNAL_LEVEL));
             }
 
             @Override
@@ -143,17 +163,6 @@ public class WifiViewModel extends AndroidViewModel {
         }
         connectivityManager.unregisterNetworkCallback(wifiCallback);
         return true;
-    }
-
-    public void init() {
-        Context context = getApplication();
-        boolean isWifiEnabled = WifiUtils.isWifiEnabled(context);
-        this.mWifiEnabled.postValue(isWifiEnabled);
-        if (isWifiEnabled) {
-            int signalLevel = WifiUtils.getSignalLevel(context, WifiUtils.getNetworkCapabilities(context));
-            this.mWifiSignalLevel.postValue(signalLevel);
-            this.mWifiIconRes.postValue(getWifiIconResInner(signalLevel));
-        }
     }
 
     public LiveData<Boolean> getWifiEnabled() {

@@ -21,7 +21,7 @@
             android:background="?android:windowBackground"
             app:navigationIcon="@drawable/baseline_arrow_back_24"
             app:navigationIconTint="?android:textColorPrimary"
-            app:title="@string/title_activity_permission"
+            app:title="@string/permission"
             app:titleTextColor="?android:textColorPrimary" />
 
     </com.google.android.material.appbar.AppBarLayout>

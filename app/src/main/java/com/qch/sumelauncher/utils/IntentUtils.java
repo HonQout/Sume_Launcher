@@ -18,12 +18,12 @@ import com.qch.sumelauncher.R;
 public class IntentUtils {
     private static final String TAG = "IntentUtils";
 
-    public enum LaunchActivityResult {
-        SUCCESS, NOT_EXPORTED, REQUIRE_PERMISSION, NOT_FOUND
-    }
-
     public enum LaunchIntentResult {
         SUCCESS, URI_IS_EMPTY, NO_MATCHING_ACTIVITY
+    }
+
+    public enum LaunchActivityResult {
+        SUCCESS, NOT_EXPORTED, REQUIRE_PERMISSION, NOT_FOUND
     }
 
     public static void handleLaunchActivityResult(@NonNull Context context,
@@ -65,7 +65,7 @@ public class IntentUtils {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             }
             try {
-                ContextCompat.startActivity(context, intent, null);
+                context.startActivity(intent, null);
                 return LaunchActivityResult.SUCCESS;
             } catch (ActivityNotFoundException e) {
                 Log.e(TAG, "Cannot find requested activity.", e);
@@ -78,8 +78,7 @@ public class IntentUtils {
                                                       @NonNull String packageName,
                                                       @NonNull String activityName,
                                                       boolean newTask) {
-        ActivityInfo activityInfo = ApplicationUtils.getActivityInfo(context, packageName,
-                activityName);
+        ActivityInfo activityInfo = ApplicationUtils.getActivityInfo(context, packageName, activityName);
         return activityInfo == null ? LaunchActivityResult.NOT_FOUND :
                 launchActivity(context, activityInfo, newTask);
     }
@@ -102,7 +101,7 @@ public class IntentUtils {
 
     public static LaunchIntentResult openAppDetailsPage(Context context, String packageName) {
         if (packageName == null || TextUtils.isEmpty(packageName)) {
-            Log.e(TAG, "Failed to launch activity because the given packageName is null or empty.");
+            Log.e(TAG, "Cannot launch activity because the given packageName is null or empty.");
             return LaunchIntentResult.URI_IS_EMPTY;
         }
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -112,14 +111,14 @@ public class IntentUtils {
             context.startActivity(intent);
             return LaunchIntentResult.SUCCESS;
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "Failed to launch Settings. Cannot find requested package.", e);
+            Log.e(TAG, "Cannot launch Settings because requested package cannot be found.", e);
             return LaunchIntentResult.NO_MATCHING_ACTIVITY;
         }
     }
 
     public static LaunchIntentResult requireUninstallApp(@NonNull Context context, String packageName) {
         if (packageName == null || TextUtils.isEmpty(packageName)) {
-            Log.e(TAG, "Failed to uninstall app because the given packageName is empty.");
+            Log.e(TAG, "Cannot uninstall app because the given packageName is empty.");
             return LaunchIntentResult.URI_IS_EMPTY;
         }
         Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
@@ -129,7 +128,7 @@ public class IntentUtils {
             context.startActivity(intent);
             return LaunchIntentResult.SUCCESS;
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "Failed to uninstall app because no activity can open this uri", e);
+            Log.e(TAG, "Cannot uninstall app because requested package cannot be found.", e);
             return LaunchIntentResult.NO_MATCHING_ACTIVITY;
         }
     }
