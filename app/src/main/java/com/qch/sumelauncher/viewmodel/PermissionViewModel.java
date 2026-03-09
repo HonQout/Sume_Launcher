@@ -8,12 +8,12 @@ import android.content.pm.PermissionInfo;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.qch.sumelauncher.MyApplication;
+import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.bean.PermissionBean;
 import com.qch.sumelauncher.bean.PermissionSorted;
@@ -107,7 +107,7 @@ public class PermissionViewModel extends AndroidViewModel {
     }
 
     public void showPermissionDetailDialog(@NonNull Activity activity, PermissionBean permissionBean) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity)
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
                 .setTitle(permissionBean.getLabel())
                 .setMessage(permissionBean.getDescription())
                 .setPositiveButton(R.string.confirm, (dialog, which) -> dialog.dismiss());

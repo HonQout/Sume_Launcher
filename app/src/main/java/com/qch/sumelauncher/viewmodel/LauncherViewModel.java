@@ -6,22 +6,29 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ShortcutInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.qch.sumelauncher.MyApplication;
+import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.activity.SettingsActivity;
 import com.qch.sumelauncher.bean.ActivityBean;
+import com.qch.sumelauncher.room.entity.LauncherIconEntity;
+import com.qch.sumelauncher.room.repository.LauncherIconRepository;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.CollectionUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
@@ -48,7 +55,7 @@ public class LauncherViewModel extends AndroidViewModel {
     private static final int defNumColumn = 5;
 
     public enum LauncherState {
-        NORMAL, EDIT
+        NORMAL, SETTINGS, SEARCH
     }
 
     public enum AppListOp {
@@ -56,6 +63,8 @@ public class LauncherViewModel extends AndroidViewModel {
     }
 
     // data
+    private LiveData<Integer> numPage;
+    private LiveData<List<LauncherIconEntity>> launcherIconList;
     private final MutableLiveData<LauncherState> mLauncherState = new MutableLiveData<>(LauncherState.NORMAL);
     private final MutableLiveData<Boolean> mDisplayStatusBar = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayTopBar = new MutableLiveData<>();
@@ -63,23 +72,24 @@ public class LauncherViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> mScrollToSwitchPage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mVolumeKeySwitchPage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mAskForPermFineLocation = new MutableLiveData<>();
+    private final MutableLiveData<String> mGridSize = new MutableLiveData<>("5,5");
     private final MutableLiveData<Integer> mNumRow = new MutableLiveData<>();
     private final MutableLiveData<Integer> mNumColumn = new MutableLiveData<>();
-    private final MutableLiveData<Integer> mNumItemsPerPage = new MutableLiveData<>();
-    private final MutableLiveData<Integer> mNumPage = new MutableLiveData<>();
     private final MutableLiveData<Integer> mCurrentPage = new MutableLiveData<>();
     private final MutableLiveData<List<ActivityBean>> mActivityBeanList = new MutableLiveData<>();
-    private final MutableLiveData<Map<Integer, List<ActivityBean>>> mActivityBeanMap = new MutableLiveData<>();
 
     // multi-thread
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private final AtomicBoolean isUpdatingList = new AtomicBoolean(false);
     private final Object updateListLock = new Object();
-    private final AtomicBoolean isUpdatingMap = new AtomicBoolean(false);
-    private final Object updateMapLock = new Object();
+    private final AtomicBoolean isUpdatingLauncherIcon = new AtomicBoolean(false);
+    private final Object updateLauncherIconLock = new Object();
+    private final AtomicBoolean isEditingMap = new AtomicBoolean(false);
+    private final Object editMapLock = new Object();
 
     // persistence
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private LauncherIconRepository repository;
 
     // broadcast receiver
     private BroadcastReceiver localeBroadcastReceiver = null;
@@ -90,6 +100,7 @@ public class LauncherViewModel extends AndroidViewModel {
         super(application);
         registerLocaleBR();
         registerPackageBR();
+        initLauncherLayout();
         initDisposable();
     }
 
@@ -211,6 +222,14 @@ public class LauncherViewModel extends AndroidViewModel {
         }
     }
 
+    private void initLauncherLayout() {
+        repository = new LauncherIconRepository(getApplication());
+        numPage = Transformations.switchMap(mGridSize, gridSize ->
+                repository.getNumPageByGridSize(gridSize));
+        launcherIconList = Transformations.switchMap(mGridSize, gridSize ->
+                repository.getItemsByGridSize(gridSize));
+    }
+
     private void initDisposable() {
         // display_status_bar
         Disposable disposable1 = MyApplication.getPreferenceDataStore()
@@ -263,8 +282,9 @@ public class LauncherViewModel extends AndroidViewModel {
         // grid_count
         Disposable disposable7 = MyApplication.getPreferenceDataStore()
                 .getStringFlowable("grid_count", "5,5")
-                .subscribe(gridCount -> {
-                            String[] split = gridCount.split(",");
+                .subscribe(gridSize -> {
+                            mGridSize.postValue(gridSize);
+                            String[] split = gridSize.split(",");
                             int actualNumRow = defNumRow;
                             int actualNumColumn = defNumColumn;
                             try {
@@ -275,12 +295,10 @@ public class LauncherViewModel extends AndroidViewModel {
                             try {
                                 actualNumColumn = Integer.parseInt(split[1]);
                             } catch (Exception e) {
-                                Log.e(TAG, "Failed to get stored numRow.", e);
+                                Log.e(TAG, "Failed to get stored numColumn.", e);
                             }
-                            int numItemsPerPage = actualNumRow * actualNumColumn;
                             mNumRow.postValue(actualNumRow);
                             mNumColumn.postValue(actualNumColumn);
-                            mNumItemsPerPage.postValue(numItemsPerPage);
                             updateActivityBeanList(AppListOp.INIT, null);
                         },
                         throwable -> Log.e(TAG, "Failed to get value of key grid_count", throwable)
@@ -288,25 +306,35 @@ public class LauncherViewModel extends AndroidViewModel {
         compositeDisposable.add(disposable7);
     }
 
-    private int calcNumPage(List<ActivityBean> list, int numItemPerPage) {
-        return (list.size() - 1) / numItemPerPage + 1;
-    }
-
-    @NonNull
-    private Map<Integer, List<ActivityBean>> initMap(List<ActivityBean> list, int numItemPerPage) {
-        int numPage = calcNumPage(list, numItemPerPage);
-        Map<Integer, List<ActivityBean>> map = new ConcurrentHashMap<>();
-        for (int i = 0; i < numPage; i++) {
-            int begin = i * numItemPerPage;
-            if (begin >= list.size()) {
-                break;
+    public LiveData<Map<Integer, List<LauncherIconEntity>>> getPagedIcons() {
+        return Transformations.map(launcherIconList, list -> {
+            Map<Integer, List<LauncherIconEntity>> pageMap = new ConcurrentHashMap<>();
+            if (list != null) {
+                for (LauncherIconEntity launcherIconEntity : list) {
+                    int numPageValue = getNumPageValue();
+                    int pageIndex = launcherIconEntity.pageIndex;
+                    String packageName = launcherIconEntity.packageName;
+                    String activityName = launcherIconEntity.activityName;
+                    if (pageIndex >= numPageValue || packageName == null || activityName == null) {
+                        repository.deleteItem(launcherIconEntity);
+                        continue;
+                    }
+                    ActivityInfo activityInfo = ApplicationUtils
+                            .getActivityInfo(getApplication(), packageName, activityName);
+                    if (activityInfo == null) {
+                        repository.deleteItem(launcherIconEntity);
+                        continue;
+                    }
+                    if (!pageMap.containsKey(launcherIconEntity.pageIndex)) {
+                        pageMap.put(launcherIconEntity.pageIndex, new ArrayList<>());
+                    }
+                    Objects.requireNonNull(pageMap.get(launcherIconEntity.pageIndex)).add(launcherIconEntity);
+                }
+            } else {
+                pageMap.put(0, new ArrayList<>());
             }
-            int end = Math.min(begin + numItemPerPage, list.size());
-            List<ActivityBean> subList = list.subList(begin, end);
-            Log.i(TAG, "Put sublist from #" + begin + " to #" + (end - 1) + " to map.");
-            map.put(i, subList);
-        }
-        return map;
+            return pageMap;
+        });
     }
 
     private void sortActivityBeanList(List<ActivityBean> list) {
@@ -332,6 +360,7 @@ public class LauncherViewModel extends AndroidViewModel {
                 list = new ArrayList<>(mActivityBeanList.getValue());
             }
             if (packageName != null) {
+                // Update ActivityBeanList
                 if (op == AppListOp.REMOVE || op == AppListOp.REPLACE) {
                     try {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -353,6 +382,13 @@ public class LauncherViewModel extends AndroidViewModel {
                     }
                     sortActivityBeanList(list);
                 }
+                // Update Database
+                if (op == AppListOp.REMOVE) {
+                    repository.deleteItemByPackageName(packageName);
+                }
+                if (op == AppListOp.REPLACE) {
+                    // TODO: Ask LauncherLayout to reload activity if package is updated
+                }
             } else if (op != AppListOp.INIT) {
                 Log.e(TAG, "Package name is null. Specified operation has not been executed.");
             }
@@ -365,18 +401,6 @@ public class LauncherViewModel extends AndroidViewModel {
                     isUpdatingList.set(false);
                 }
             }
-            int numItemPerPage = getNumItemsPerPageValue();
-            mNumPage.postValue(calcNumPage(list, numItemPerPage));
-            Map<Integer, List<ActivityBean>> newMap = initMap(list, numItemPerPage);
-            if (isUpdatingMap.compareAndSet(false, true)) {
-                try {
-                    synchronized (updateMapLock) {
-                        mActivityBeanMap.postValue(newMap);
-                    }
-                } finally {
-                    isUpdatingMap.set(false);
-                }
-            }
         });
     }
 
@@ -386,10 +410,6 @@ public class LauncherViewModel extends AndroidViewModel {
 
     public LiveData<LauncherState> getLauncherState() {
         return mLauncherState;
-    }
-
-    public LauncherState getLauncherStateValue() {
-        return mLauncherState.getValue() == null ? LauncherState.NORMAL : mLauncherState.getValue();
     }
 
     public LiveData<Boolean> getDisplayStatusBar() {
@@ -420,34 +440,26 @@ public class LauncherViewModel extends AndroidViewModel {
         return mAskForPermFineLocation.getValue() == null || mAskForPermFineLocation.getValue();
     }
 
-    public int getNumRowValue() {
-        return mNumRow.getValue() == null ? defNumRow : mNumRow.getValue();
+    public LiveData<Integer> getNumRow() {
+        return mNumRow;
+    }
+
+    public LiveData<Integer> getNumColumn() {
+        return mNumColumn;
     }
 
     public int getNumColumnValue() {
         return mNumColumn.getValue() == null ? defNumColumn : mNumColumn.getValue();
     }
 
-    public int getNumItemsPerPageValue() {
-        return mNumItemsPerPage.getValue() == null ? defNumRow * defNumColumn : mNumItemsPerPage.getValue();
-    }
-
-    public LiveData<Integer> getNumPage() {
-        return mNumPage;
-    }
-
     public int getNumPageValue() {
-        if (mNumPage.getValue() == null) {
-            List<ActivityBean> list = mActivityBeanList.getValue();
-            int numItemsPerPageInt = getNumItemsPerPageValue();
-            if (list == null) {
-                return 0;
-            } else {
-                return (list.size() - 1) / numItemsPerPageInt + 1;
+        if (numPage != null) {
+            Integer value = numPage.getValue();
+            if (value != null) {
+                return value;
             }
-        } else {
-            return mNumPage.getValue();
         }
+        return 1;
     }
 
     public void setCurrentPage(int newValue) {
@@ -459,7 +471,7 @@ public class LauncherViewModel extends AndroidViewModel {
     }
 
     public int getCurrentPageValue() {
-        return mCurrentPage.getValue() == null ? 0 : mCurrentPage.getValue();
+        return mCurrentPage.getValue() == null ? 1 : mCurrentPage.getValue();
     }
 
     public LiveData<List<ActivityBean>> getActivityBeanList() {
@@ -470,12 +482,78 @@ public class LauncherViewModel extends AndroidViewModel {
         return mActivityBeanList.getValue() == null ? new ArrayList<>() : mActivityBeanList.getValue();
     }
 
-    public LiveData<Map<Integer, List<ActivityBean>>> getActivityBeanMap() {
-        return mActivityBeanMap;
+    public LiveData<Integer> getNumPage() {
+        return numPage;
+    }
+
+    public LiveData<List<LauncherIconEntity>> getLauncherIconList() {
+        return launcherIconList;
+    }
+
+    public void showGridMenu(@NonNull Activity activity, @NonNull ActivityBean item, @NonNull View view) {
+        PopupMenu popupMenu = new PopupMenu(activity, view);
+        popupMenu.getMenuInflater().inflate(R.menu.app_op_menu, popupMenu.getMenu());
+        int baseIndex = popupMenu.getMenu().size();
+        List<ShortcutInfo> shortcutInfoList;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            shortcutInfoList = item.getShortcutInfoList();
+            for (int i = 0; i < shortcutInfoList.size(); i++) {
+                ShortcutInfo shortcutInfo = shortcutInfoList.get(i);
+                popupMenu.getMenu()
+                        .add(0, baseIndex + i, baseIndex + i, shortcutInfo.getShortLabel());
+            }
+        } else {
+            shortcutInfoList = new ArrayList<>();
+        }
+        popupMenu.setOnMenuItemClickListener(menuItem -> {
+            int menuId = menuItem.getItemId();
+            if (menuId == R.id.app_info) {
+                IntentUtils.handleLaunchIntentResult(
+                        activity,
+                        IntentUtils.openAppDetailsPage(activity, item.getPackageName())
+                );
+                return true;
+            } else if (menuId == R.id.uninstall) {
+                ApplicationUtils.ApplicationType type = ApplicationUtils.getApplicationType(
+                        activity, item.getPackageName());
+                if (type == ApplicationUtils.ApplicationType.UPDATED_SYSTEM
+                        || type == ApplicationUtils.ApplicationType.USER) {
+                    IntentUtils.handleLaunchIntentResult(
+                            activity,
+                            IntentUtils.requireUninstallApp(activity, item.getPackageName())
+                    );
+                } else if (type == ApplicationUtils.ApplicationType.SYSTEM) {
+                    showUninstallSystemAppDialog(activity, item.getPackageName());
+                } else {
+                    Toast.makeText(activity, R.string.cannot_uninstall_app,
+                                    Toast.LENGTH_SHORT)
+                            .show();
+                }
+                return true;
+            } else if (menuId == R.id.app_market) {
+                IntentUtils.handleLaunchIntentResult(
+                        activity,
+                        IntentUtils.openAppInMarket(activity, item.getPackageName())
+                );
+                return true;
+            } else if (menuId >= baseIndex) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                    ShortcutInfo shortcutInfo = shortcutInfoList.get(menuId - baseIndex);
+                    ApplicationUtils.launchAppShortcut(activity, item.getPackageName(),
+                            shortcutInfo.getId());
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        });
+        popupMenu.show();
     }
 
     public void showPermFineLocationDialog(@NonNull Activity activity) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity)
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
                 .setTitle(R.string.request_permission)
                 .setMessage(R.string.perm_fine_location_reason)
                 .setPositiveButton(R.string.app_info, (dialog, which) ->
@@ -487,7 +565,7 @@ public class LauncherViewModel extends AndroidViewModel {
     }
 
     public void showUninstallSystemAppDialog(@NonNull Activity activity, String packageName) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity)
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
                 .setTitle(R.string.hint)
                 .setMessage(R.string.insist_uninstall_system_app)
                 .setPositiveButton(R.string.uninstall, (dialog, which) ->
@@ -497,13 +575,5 @@ public class LauncherViewModel extends AndroidViewModel {
                         ))
                 .setNegativeButton(R.string.cancel, null);
         DialogUtils.show(builder, getAnimationValue());
-    }
-
-    public void startSettingsActivity(@NonNull Activity activity) {
-        Intent intent = new Intent(activity, SettingsActivity.class);
-        if (!getAnimationValue()) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        }
-        activity.startActivity(intent);
     }
 }

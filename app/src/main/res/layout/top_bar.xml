@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="10dp">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/top_bar_left_part"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/top_bar_tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="@dimen/top_bar_text_size"
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="0dp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/top_bar_tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="@dimen/top_bar_text_size"
+            android:textStyle="bold" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/top_bar_right_part"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/top_bar_iv_airplane"
+            android:layout_width="@dimen/top_bar_icon_size"
+            android:layout_height="@dimen/top_bar_icon_size"
+            android:contentDescription="@string/airplane_mode_icon"
+            android:src="@drawable/baseline_airplanemode_active_24"
+            android:tint="?android:textColorPrimary"
+            android:visibility="gone" />
+
+        <Space
+            android:layout_width="4dp"
+            android:layout_height="0dp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/top_bar_iv_wifi"
+            android:layout_width="@dimen/top_bar_icon_size"
+            android:layout_height="@dimen/top_bar_icon_size"
+            android:contentDescription="@string/wifi_icon"
+            android:tint="?android:textColorPrimary"
+            android:visibility="gone" />
+
+        <Space
+            android:layout_width="4dp"
+            android:layout_height="0dp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/top_bar_iv_bluetooth"
+            android:layout_width="@dimen/top_bar_icon_size"
+            android:layout_height="@dimen/top_bar_icon_size"
+            android:contentDescription="@string/bluetooth_icon"
+            android:tint="?android:textColorPrimary"
+            android:visibility="gone" />
+
+        <Space
+            android:layout_width="4dp"
+            android:layout_height="0dp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/top_bar_tv_battery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="@dimen/top_bar_text_size"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/top_bar_iv_battery"
+            android:layout_width="@dimen/top_bar_icon_size"
+            android:layout_height="@dimen/top_bar_icon_size"
+            android:contentDescription="@string/battery_icon"
+            android:tint="?android:textColorPrimary" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

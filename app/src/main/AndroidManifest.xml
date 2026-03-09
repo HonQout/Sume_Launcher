@@ -30,7 +30,7 @@
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
     <application
-        android:name=".MyApplication"
+        android:name=".application.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -42,13 +42,7 @@
         <activity
             android:name=".activity.PermissionActivity"
             android:exported="false"
-            android:label="@string/title_activity_permission"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.SumeLauncher" />
-        <activity
-            android:name=".activity.SettingsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_settings"
+            android:label="@string/permission"
             android:launchMode="singleTask"
             android:theme="@style/Theme.SumeLauncher" />
         <activity

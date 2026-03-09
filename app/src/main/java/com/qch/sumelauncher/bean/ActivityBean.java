@@ -1,6 +1,7 @@
 package com.qch.sumelauncher.bean;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ShortcutInfo;
 
@@ -13,7 +14,6 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ActivityBean implements Serializable {
-    private final ResolveInfo resolveInfo;
     private final String packageName;
     private final String activityName;
     private final String label;
@@ -22,16 +22,15 @@ public class ActivityBean implements Serializable {
     private final List<ShortcutInfo> shortcutInfoList;
 
     public ActivityBean(Context context, @NonNull ResolveInfo resolveInfo) {
-        this.resolveInfo = resolveInfo;
-        packageName = ApplicationUtils.getPackageName(resolveInfo);
-        activityName = ApplicationUtils.getActivityName(resolveInfo);
-        label = ApplicationUtils.getActivityLabel(context, resolveInfo);
-        iconRes = ApplicationUtils.getApplicationIconId(context, resolveInfo);
-        shortcutInfoList = ApplicationUtils.getShortcuts(context, packageName);
+        this(context, resolveInfo.activityInfo);
     }
 
-    public ResolveInfo getResolveInfo() {
-        return resolveInfo;
+    public ActivityBean(Context context, @NonNull ActivityInfo activityInfo) {
+        packageName = activityInfo.packageName;
+        activityName = activityInfo.name;
+        label = ApplicationUtils.getActivityLabel(context, activityInfo);
+        iconRes = ApplicationUtils.getActivityIconId(activityInfo);
+        shortcutInfoList = ApplicationUtils.getShortcuts(context, packageName);
     }
 
     public String getPackageName() {

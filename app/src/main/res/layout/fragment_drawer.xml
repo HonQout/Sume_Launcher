@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".fragment.DrawerFragment">
+
+    <FrameLayout
+        android:id="@+id/f_drawer_fl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="10dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/f_drawer_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/f_drawer_tg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:checkedButton="@id/f_drawer_btn_grid"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/f_drawer_btn_grid"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/grid_icon"
+                    android:text="@string/grid"
+                    app:icon="@drawable/baseline_grid_view_24"
+                    app:iconTint="?android:textColorPrimary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/f_drawer_btn_list"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/list_icon"
+                    android:text="@string/list"
+                    app:icon="@drawable/baseline_list_24"
+                    app:iconTint="?android:textColorPrimary" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/f_drawer_sv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:title="@string/search_for_items" />
+
+    </FrameLayout>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="10dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/f_drawer_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

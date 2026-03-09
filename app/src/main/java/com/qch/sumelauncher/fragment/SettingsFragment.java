@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.qch.sumelauncher.MyApplication;
+import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.persistence.PreferenceDataStoreBridge;
 import com.qch.sumelauncher.viewmodel.SettingsViewModel;

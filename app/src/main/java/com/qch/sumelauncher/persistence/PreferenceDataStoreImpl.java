@@ -41,7 +41,8 @@ public class PreferenceDataStoreImpl {
                     MutablePreferences mutablePreferences = preferences.toMutablePreferences();
                     mutablePreferences.set(preferencesKey, value);
                     return Single.just(mutablePreferences);
-                }).subscribeOn(Schedulers.io())
+                })
+                .subscribeOn(Schedulers.io())
                 .subscribe(
                         success -> {
                         },
@@ -64,7 +65,8 @@ public class PreferenceDataStoreImpl {
                     MutablePreferences mutablePreferences = preferences.toMutablePreferences();
                     mutablePreferences.set(preferencesKey, value);
                     return Single.just(mutablePreferences);
-                }).subscribeOn(Schedulers.io())
+                })
+                .subscribeOn(Schedulers.io())
                 .subscribe(
                         success -> {
                         },
@@ -87,7 +89,8 @@ public class PreferenceDataStoreImpl {
                     MutablePreferences mutablePreferences = preferences.toMutablePreferences();
                     mutablePreferences.set(preferencesKey, value);
                     return Single.just(mutablePreferences);
-                }).subscribeOn(Schedulers.io())
+                })
+                .subscribeOn(Schedulers.io())
                 .subscribe(
                         success -> {
                         },

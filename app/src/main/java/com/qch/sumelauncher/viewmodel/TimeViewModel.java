@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.text.format.DateUtils;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -13,14 +14,17 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 public class TimeViewModel extends AndroidViewModel {
+    private static final String TAG = "TimeViewModel";
     // data
-    private final MutableLiveData<Long> mCurrentTime = new MutableLiveData<>(System.currentTimeMillis());
-
+    private final MutableLiveData<Long> mCurrentTime = new MutableLiveData<>();
+    private final MutableLiveData<String> mCurrentTimeText = new MutableLiveData<>();
+    private final MutableLiveData<String> mCurrentDateText = new MutableLiveData<>();
     // broadcast receiver
     private BroadcastReceiver timeBroadcastReceiver;
 
     public TimeViewModel(@NonNull Application application) {
         super(application);
+        update();
         registerTimeBR();
     }
 
@@ -28,6 +32,24 @@ public class TimeViewModel extends AndroidViewModel {
     protected void onCleared() {
         super.onCleared();
         unRegisterTimeBR();
+    }
+
+    private void update() {
+        long currentTime = System.currentTimeMillis();
+        mCurrentTime.postValue(currentTime);
+        mCurrentTimeText.postValue(DateUtils.formatDateTime(
+                getApplication(),
+                currentTime,
+                DateUtils.FORMAT_SHOW_TIME
+        ));
+        mCurrentDateText.postValue(DateUtils.formatDateTime(
+                getApplication(),
+                currentTime,
+                DateUtils.FORMAT_NO_YEAR
+                        | DateUtils.FORMAT_SHOW_DATE
+                        | DateUtils.FORMAT_SHOW_WEEKDAY
+                        | DateUtils.FORMAT_ABBREV_WEEKDAY
+        ));
     }
 
     private void registerTimeBR() {
@@ -44,11 +66,12 @@ public class TimeViewModel extends AndroidViewModel {
         timeBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                mCurrentTime.postValue(System.currentTimeMillis());
+                update();
             }
         };
 
-        ContextCompat.registerReceiver(getApplication(), timeBroadcastReceiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        ContextCompat.registerReceiver(getApplication(), timeBroadcastReceiver, intentFilter,
+                ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     private void unRegisterTimeBR() {
@@ -60,5 +83,13 @@ public class TimeViewModel extends AndroidViewModel {
 
     public LiveData<Long> getCurrentTime() {
         return mCurrentTime;
+    }
+
+    public LiveData<String> getCurrentTimeText() {
+        return mCurrentTimeText;
+    }
+
+    public LiveData<String> getCurrentDateText() {
+        return mCurrentDateText;
     }
 }

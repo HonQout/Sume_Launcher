@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.qch.sumelauncher.fragment.AppGridFragment;
+import com.qch.sumelauncher.fragment.LauncherPageFragment;
 
 public class AppPagerAdapter extends FragmentStateAdapter {
     private static final String TAG = "AppPagerAdapter";
@@ -21,8 +21,9 @@ public class AppPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        Log.i(TAG, "Create AppGridFragment #" + position);
-        return AppGridFragment.newInstance(position);
+        Log.i(TAG, "Create Fragment #" + position);
+        //return GridFragment.newInstance(position);
+        return LauncherPageFragment.newInstance(position);
     }
 
     @Override

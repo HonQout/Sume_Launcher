@@ -35,8 +35,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     buildFeatures {
         viewBinding true
@@ -55,16 +55,18 @@ dependencies {
     implementation libs.core.ktx
     implementation libs.datastore.preferences
     implementation libs.datastore.preferences.rxjava3
-    implementation libs.material
-    implementation libs.recyclerview
     implementation libs.glide
+    implementation libs.material
+    implementation libs.navigation.fragment
+    implementation libs.navigation.ui
     implementation libs.preference
+    implementation libs.recyclerview
     implementation libs.room.runtime
-    ksp libs.room.compiler
     implementation libs.room.rxjava3
     implementation libs.rxandroid
     implementation libs.rxjava
     annotationProcessor(libs.compiler)
+    ksp libs.room.compiler
     testImplementation libs.junit
     androidTestImplementation libs.espresso.core
     androidTestImplementation libs.ext.junit

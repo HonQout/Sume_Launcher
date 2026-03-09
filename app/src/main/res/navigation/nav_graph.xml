@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph">
+
+    <fragment
+        android:id="@+id/SettingsFragment"
+        android:name="com.qch.sumelauncher.fragment.SettingsFragment"
+        android:label="@string/settings">
+
+        <action
+            android:id="@+id/action_SettingsFragment_to_PermissionFragment"
+            app:destination="@+id/PermissionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/PermissionFragment"
+        android:name="com.qch.sumelauncher.fragment.PermissionFragment"
+        android:label="@string/permission">
+
+
+    </fragment>
+</navigation>

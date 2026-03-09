@@ -8,9 +8,14 @@
     <string name="deny">拒绝</string>
     <string name="hint">提示</string>
 
-    <!-- Activity -->
-    <string name="title_activity_settings">设置</string>
-    <string name="title_activity_permission">权限</string>
+    <!-- Title -->
+    <string name="settings">设置</string>
+    <string name="app_drawer">应用抽屉</string>
+    <string name="permission">权限</string>
+
+    <!-- Button -->
+    <string name="grid">网格</string>
+    <string name="list">列表</string>
 
     <!-- Menu -->
     <string name="app_info">应用信息</string>
@@ -24,13 +29,18 @@
     <string name="bluetooth_icon">蓝牙图标</string>
     <string name="battery_icon">电池图标</string>
     <string name="app_icon">应用图标</string>
+    <string name="back_icon">返回图标</string>
     <string name="settings_icon">设置图标</string>
+    <string name="edit_icon">编辑图标</string>
     <string name="manage_icon">管理图标</string>
+    <string name="menu_icon">菜单图标</string>
     <string name="prev_page_icon">上一页图标</string>
     <string name="next_page_icon">下一页图标</string>
+    <string name="grid_icon">网格图标</string>
+    <string name="list_icon">列表图标</string>
 
     <!-- Hint -->
-    <string name="cannot_find_package">找不到包。</string>
+    <string name="cannot_find_package">找不到应用包。</string>
     <string name="cannot_find_activity">找不到活动。</string>
     <string name="cannot_access_unexported_activity">无法访问未导出的活动。</string>
     <string name="activity_requires_extra_permission">此活动需要额外的权限来启动。</string>
