@@ -18,6 +18,9 @@ import androidx.annotation.RequiresApi;
 
 public class WifiUtils {
     private static final String TAG = "WifiUtils";
+    public static final int MAX_SIGNAL_LEVEL = 2;
+    public static final int UNKNOWN_SIGNAL_LEVEL = -2; // Wi-Fi is unsupported or disabled
+    public static final int DEFAULT_SIGNAL_LEVEL = -1; // Wi-Fi is enabled but not connected
 
     public static boolean isWifiSupported(@NonNull Context context) {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI);
@@ -29,11 +32,16 @@ public class WifiUtils {
             Log.e(TAG, "Wifi is not supported.");
             return null;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return context.getSystemService(WifiManager.class);
         } else {
             return (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         }
+    }
+
+    public static boolean isWifiEnabled(@NonNull Context context) {
+        WifiManager wifiManager = getWifiManager(context);
+        return wifiManager != null && wifiManager.isWifiEnabled();
     }
 
     @Nullable
@@ -53,7 +61,7 @@ public class WifiUtils {
         return null;
     }
 
-    public static boolean isWifiEnabled(@NonNull Context context) {
+    public static boolean isWifiConnected(@NonNull Context context) {
         if (!isWifiSupported(context)) {
             Log.e(TAG, "Wifi is not supported.");
             return false;
@@ -64,14 +72,16 @@ public class WifiUtils {
     }
 
     /**
-     * Calculate the signal level of connected Wi-Fi. The max level is 3.
+     * Calculate the signal level of connected Wi-Fi. The max level is
+     * {@link WifiUtils#MAX_SIGNAL_LEVEL}.
      *
-     * @return The signal level of connected Wi-Fi, or -1 by default.
+     * @return The signal level of connected Wi-Fi, or {@link WifiUtils#UNKNOWN_SIGNAL_LEVEL} if
+     * Wi-Fi is unsupported or disabled.
      */
     public static int calcSignalLevel(@NonNull Context context, WifiInfo wifiInfo) {
         if (!isWifiSupported(context)) {
             Log.e(TAG, "Wifi is not supported.");
-            return -1;
+            return UNKNOWN_SIGNAL_LEVEL;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             return calcSignalLevelApi30(context, wifiInfo);
@@ -85,47 +95,45 @@ public class WifiUtils {
         WifiManager wifiManager = getWifiManager(context);
         if (wifiManager == null) {
             Log.e(TAG, "Wifi manager is null.");
-            return -1;
+            return UNKNOWN_SIGNAL_LEVEL;
         }
         try {
             int signalLevel = wifiManager.calculateSignalLevel(wifiInfo.getRssi());
             int maxSignalLevel = wifiManager.getMaxSignalLevel();
-            if (maxSignalLevel == 3) {
+            if (maxSignalLevel == MAX_SIGNAL_LEVEL) {
                 return signalLevel;
             } else if (maxSignalLevel <= 0) {
                 throw new Exception("System implementation of calculating max signal level is wrong.");
             } else {
-                return (int) ((float) signalLevel / maxSignalLevel * 3);
+                return (int) ((float) signalLevel / maxSignalLevel * MAX_SIGNAL_LEVEL);
             }
         } catch (Exception e) {
-            Log.e(TAG, "Failed to get wifi signal level.", e);
+            Log.e(TAG, "Cannot get wifi signal level.", e);
             return -1;
         }
     }
 
     private static int calcSignalLevelApiDef(WifiInfo wifiInfo) {
         int rssi = wifiInfo.getRssi();
-        if (rssi <= -95) {
+        if (rssi <= -100) {
             return 0;
-        } else if (rssi <= -75) {
+        } else if (rssi <= -77) {
             return 1;
-        } else if (rssi <= -55) {
-            return 2;
         } else {
-            return 3;
+            return 2;
         }
     }
 
     /**
      * Get the signal level of the network specified by the given {@link NetworkCapabilities}.
      *
-     * @return The signal level of the network, or -1 by default.
+     * @return The signal level of the network, or {@link WifiUtils#UNKNOWN_SIGNAL_LEVEL} by default.
      */
     public static int getSignalLevel(@NonNull Context context,
                                      @Nullable NetworkCapabilities networkCapabilities) {
         if (!isWifiSupported(context)) {
             Log.e(TAG, "Wifi is not supported.");
-            return -1;
+            return UNKNOWN_SIGNAL_LEVEL;
         }
         // Try using modern way on Android 11+ first
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && networkCapabilities != null) {
@@ -137,13 +145,18 @@ public class WifiUtils {
         // If requirements aren't met, try using traditional way then
         if (PermissionUtils.isPermissionGranted(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
             WifiManager wifiManager = getWifiManager(context);
-            if (wifiManager != null && wifiManager.isWifiEnabled()) {
+            if (wifiManager == null) {
+                Log.e(TAG, "WifiManager is null.");
+                return UNKNOWN_SIGNAL_LEVEL;
+            }
+            if (wifiManager.isWifiEnabled()) {
                 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
                 if (wifiInfo != null) {
                     return calcSignalLevel(context, wifiInfo);
                 }
             }
         }
-        return -1;
+        // There's no other way
+        return UNKNOWN_SIGNAL_LEVEL;
     }
 }

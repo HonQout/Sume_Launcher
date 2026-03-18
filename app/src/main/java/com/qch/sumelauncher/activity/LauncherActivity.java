@@ -93,7 +93,7 @@ public class LauncherActivity extends AppCompatActivity {
         launcherViewModel.getDisplayStatusBar().observe(this, b ->
                 UIUtils.handleStatusBarVisibility(getWindow(), b == null || b));
         launcherViewModel.getDisplayTopBar().observe(this, displayTopBar ->
-                binding.aLauncherLlTop.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
+                binding.aLauncherTopBar.getRoot().setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
         launcherViewModel.getScrollToSwitchPage().observe(this, scrollToSwitchPage ->
                 binding.aLauncherVp2.setUserInputEnabled(scrollToSwitchPage));
         timeViewModel.getCurrentTimeText().observe(this, currentTimeText -> {
@@ -119,23 +119,95 @@ public class LauncherActivity extends AppCompatActivity {
                 layoutParams.setMargins(0, 0, 0, 0);
                 imageView.setLayoutParams(layoutParams);
                 LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
-                linearLayoutCompat.addView(imageView);
+                linearLayoutCompat.addView(imageView, 0);
+                Log.i(TAG, "Added airplane mode icon.");
             } else {
                 LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
                 linearLayoutCompat.removeView(linearLayoutCompat.findViewWithTag("top_bar_airplane_mode"));
+                Log.i(TAG, "Removed airplane mode icon.");
             }
         });
-        wifiViewModel.getWifiEnabled().observe(this, isEnabled ->
-                binding.aLauncherIvWifi.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
-        wifiViewModel.getWifiIconRes().observe(this, integer ->
-                binding.aLauncherIvWifi.setImageResource(wifiViewModel.getWifiIconResValue()));
-        bluetoothViewModel.getBtEnabled().observe(this, isEnabled ->
-                binding.aLauncherIvBluetooth.setVisibility(isEnabled ? View.VISIBLE : View.GONE));
-        bluetoothViewModel.getBtIconRes().observe(this, icon ->
-                binding.aLauncherIvBluetooth.setImageResource(bluetoothViewModel.getBtIconResValue()));
+        wifiViewModel.getWifiEnabled().observe(this, isEnabled -> {
+            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
+            if (isEnabled) {
+                if (linearLayoutCompat.findViewWithTag("top_bar_wifi") != null) {
+                    Log.i(TAG, "Wifi icon already exists.");
+                    return;
+                }
+                AppCompatImageView imageView = new AppCompatImageView(LauncherActivity.this);
+                imageView.setTag("top_bar_wifi");
+                imageView.setImageResource(wifiViewModel.getWifiIconResValue());
+                imageView.setPadding(0, 0, 0, 0);
+                LinearLayoutCompat.LayoutParams layoutParams = new LinearLayoutCompat.LayoutParams(
+                        getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
+                        getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size)
+                );
+                layoutParams.setMargins(0, 0, 0, 0);
+                imageView.setLayoutParams(layoutParams);
+                linearLayoutCompat.addView(imageView, 0);
+                Log.i(TAG, "Added wifi icon.");
+            } else {
+                View view = linearLayoutCompat.findViewWithTag("top_bar_wifi");
+                if (view == null) {
+                    Log.i(TAG, "Wifi icon doesn't exist.");
+                    return;
+                }
+                linearLayoutCompat.removeView(view);
+                Log.i(TAG, "Removed wifi icon.");
+            }
+        });
+        wifiViewModel.getWifiIconRes().observe(this, integer -> {
+            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
+            View view = linearLayoutCompat.findViewWithTag("top_bar_wifi");
+            if (!(view instanceof AppCompatImageView imageView)) {
+                Log.e(TAG, "Cannot find wifi icon.");
+                return;
+            }
+            imageView.setImageResource(wifiViewModel.getWifiIconResValue());
+        });
+        bluetoothViewModel.getBtEnabled().observe(this, isEnabled -> {
+            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
+            if (isEnabled) {
+                if (linearLayoutCompat.findViewWithTag("top_bar_bluetooth") != null) {
+                    Log.i(TAG, "Bluetooth icon already exists.");
+                    return;
+                }
+                AppCompatImageView imageView = new AppCompatImageView(LauncherActivity.this);
+                imageView.setTag("top_bar_bluetooth");
+                imageView.setImageResource(bluetoothViewModel.getBtIconResValue());
+                imageView.setPadding(0, 0, 0, 0);
+                LinearLayoutCompat.LayoutParams layoutParams = new LinearLayoutCompat.LayoutParams(
+                        getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
+                        getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size)
+                );
+                layoutParams.setMargins(0, 0, 0, 0);
+                imageView.setLayoutParams(layoutParams);
+                linearLayoutCompat.addView(imageView, 0);
+                Log.i(TAG, "Added bluetooth icon.");
+            } else {
+                View view = linearLayoutCompat.findViewWithTag("top_bar_bluetooth");
+                if (view == null) {
+                    Log.i(TAG, "Bluetooth icon doesn't exist.");
+                    return;
+                }
+                linearLayoutCompat.removeView(view);
+                Log.i(TAG, "Removed bluetooth icon.");
+            }
+        });
+        bluetoothViewModel.getBtIconRes().observe(this, icon -> {
+            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
+            View view = linearLayoutCompat.findViewWithTag("top_bar_bluetooth");
+            if (!(view instanceof AppCompatImageView imageView)) {
+                Log.e(TAG, "Cannot find bluetooth icon.");
+                return;
+            }
+            imageView.setImageResource(bluetoothViewModel.getBtIconResValue());
+        });
         batteryViewModel.getLevel().observe(this, integer -> {
-            int i = integer == null ? -1 : integer;
-            binding.aLauncherTvBattery.setText(
+            int i = integer == null ? 0 : integer;
+            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
+            AppCompatTextView textView = linearLayoutCompat.findViewById(R.id.top_bar_tv_battery);
+            textView.setText(
                     String.format(
                             ContextCompat.getString(this, R.string.battery_percentage),
                             i
@@ -143,7 +215,9 @@ public class LauncherActivity extends AppCompatActivity {
         });
         batteryViewModel.getIcon().observe(this, integer -> {
             int i = integer == null ? R.drawable.baseline_battery_unknown_24 : integer;
-            binding.aLauncherIvBattery.setImageResource(i);
+            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
+            AppCompatImageView imageView = linearLayoutCompat.findViewById(R.id.top_bar_iv_battery);
+            imageView.setImageResource(i);
         });
         launcherViewModel.getNumPage().observe(this, integer -> {
             if (integer != null) {
@@ -222,7 +296,7 @@ public class LauncherActivity extends AppCompatActivity {
         // Check if permissions are granted
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ||
                 PermissionUtils.isPermissionGranted(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            wifiViewModel.update();
+            Log.i(TAG, "No need to show the dialog to ask for permission.");
         } else if (launcherViewModel.getAskForPermFineLocationValue()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 launcherViewModel.showPermFineLocationDialog(this);

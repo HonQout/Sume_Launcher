@@ -15,7 +15,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.utils.BluetoothUtils;
 
 public class BluetoothViewModel extends AndroidViewModel {
     private static final String TAG = "BluetoothViewModel";
@@ -33,7 +32,6 @@ public class BluetoothViewModel extends AndroidViewModel {
 
     public BluetoothViewModel(@NonNull Application application) {
         super(application);
-        init();
         registerBtBR();
     }
 
@@ -60,7 +58,8 @@ public class BluetoothViewModel extends AndroidViewModel {
                     return;
                 }
                 if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
-                    int btState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
+                    int btState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
+                            BluetoothAdapter.STATE_OFF);
                     if (btState == BluetoothAdapter.STATE_OFF) {
                         mBtEnabled.postValue(false);
                         mBtIconRes.postValue(iconDisabled);
@@ -72,7 +71,8 @@ public class BluetoothViewModel extends AndroidViewModel {
             }
         };
 
-        ContextCompat.registerReceiver(getApplication(), btBroadcastReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        ContextCompat.registerReceiver(getApplication(), btBroadcastReceiver, filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     private void unregisterBtBR() {
@@ -80,12 +80,6 @@ public class BluetoothViewModel extends AndroidViewModel {
             getApplication().unregisterReceiver(btBroadcastReceiver);
             btBroadcastReceiver = null;
         }
-    }
-
-    private void init() {
-        boolean isEnabled = BluetoothUtils.isBluetoothEnabled(getApplication());
-        this.mBtEnabled.postValue(isEnabled);
-        this.mBtIconRes.postValue(isEnabled ? iconEnabled : iconDisabled);
     }
 
     public LiveData<Boolean> getBtEnabled() {
