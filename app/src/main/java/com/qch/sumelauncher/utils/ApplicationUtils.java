@@ -84,7 +84,8 @@ public class ApplicationUtils {
             try {
                 return pm.getApplicationIcon(packageName);
             } catch (PackageManager.NameNotFoundException e) {
-                Log.e(TAG, "Cannot get application icon because package " + packageName + " doesn't exist.", e);
+                Log.e(TAG, "Cannot get application icon because package " + packageName
+                        + " doesn't exist.", e);
                 return pm.getDefaultActivityIcon();
             }
         }
@@ -149,7 +150,8 @@ public class ApplicationUtils {
         return Collections.emptyList();
     }
 
-    public static boolean launchAppShortcut(@NonNull Context context, String packageName, String shortcutId) {
+    public static boolean launchAppShortcut(@NonNull Context context, String packageName,
+                                            String shortcutId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             LauncherApps launcherApps =
                     (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
@@ -160,33 +162,38 @@ public class ApplicationUtils {
                     return true;
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Cannot launch shortcut " + shortcutId + " of package " + packageName + ".", e);
+                Log.e(TAG, "Cannot launch shortcut " + shortcutId + " of package "
+                        + packageName + ".", e);
             }
         }
         return false;
     }
 
     @Nullable
-    public static ActivityInfo getActivityInfo(@NonNull Context context, String packageName, String activityName) {
+    public static ActivityInfo getActivityInfo(@NonNull Context context, String packageName,
+                                               String activityName) {
         PackageManager pm = context.getPackageManager();
         if (packageName != null && activityName != null) {
             try {
                 return pm.getActivityInfo(new ComponentName(packageName, activityName), 0);
             } catch (PackageManager.NameNotFoundException e) {
-                Log.e(TAG, "Cannot get activityInfo because activity " + activityName + " of package " + packageName + " doesn't exist.", e);
+                Log.e(TAG, "Cannot get activityInfo because activity " + activityName
+                        + " of package " + packageName + " doesn't exist.", e);
             }
         }
         return null;
     }
 
     @NonNull
-    public static Drawable getActivityIcon(@NonNull Context context, String packageName, String activityName) {
+    public static Drawable getActivityIcon(@NonNull Context context, String packageName,
+                                           String activityName) {
         PackageManager pm = context.getPackageManager();
         if (packageName != null && activityName != null) {
             try {
                 return pm.getActivityIcon(new ComponentName(packageName, activityName));
             } catch (PackageManager.NameNotFoundException e) {
-                Log.e(TAG, "Cannot get activity icon because activity " + activityName + " of package " + packageName + " doesn't exist.", e);
+                Log.e(TAG, "Cannot get activity icon because activity " + activityName
+                        + " of package " + packageName + " doesn't exist.", e);
             }
         }
         return pm.getDefaultActivityIcon();
@@ -205,7 +212,8 @@ public class ApplicationUtils {
     }
 
     @DrawableRes
-    public static int getActivityIconId(@NonNull Context context, String packageName, String activityName) {
+    public static int getActivityIconId(@NonNull Context context, String packageName,
+                                        String activityName) {
         if (packageName != null && activityName != null) {
             ActivityInfo activityInfo = getActivityInfo(context, packageName, activityName);
             return getActivityIconId(activityInfo);
@@ -227,7 +235,8 @@ public class ApplicationUtils {
     }
 
     @Nullable
-    public static String getActivityLabel(@NonNull Context context, @Nullable ActivityInfo activityInfo) {
+    public static String getActivityLabel(@NonNull Context context,
+                                          @Nullable ActivityInfo activityInfo) {
         PackageManager pm = context.getPackageManager();
         return activityInfo == null ? null : activityInfo.loadLabel(pm).toString();
     }

@@ -6,15 +6,15 @@
     android:layout_height="match_parent"
     android:background="?android:attr/windowBackground"
     android:orientation="vertical"
-    android:padding="10dp"
+    android:paddingHorizontal="@dimen/content_horizontal_padding"
+    android:paddingVertical="10dp"
     tools:context=".fragment.DrawerFragment">
 
     <FrameLayout
         android:id="@+id/f_drawer_fl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="10dp">
+        android:gravity="center_vertical">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/f_drawer_ll"
