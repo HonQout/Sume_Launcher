@@ -1,4 +1,5 @@
 <resources>
+    <dimen name="content_horizontal_padding">20dp</dimen>
     <dimen name="top_bar_vertical_padding">10dp</dimen>
     <dimen name="top_bar_text_size">14sp</dimen>
     <dimen name="top_bar_icon_size">20dp</dimen>
@@ -10,10 +11,10 @@
     <dimen name="app_grid_space">2dp</dimen>
     <dimen name="app_icon_size">50dp</dimen>
     <dimen name="app_label_size">12sp</dimen>
+    <dimen name="app_label_max_width">50dp</dimen>
     <dimen name="image_icon_size">50dp</dimen>
     <dimen name="bottom_title_size">20sp</dimen>
     <dimen name="list_title_size">14sp</dimen>
     <dimen name="menu_icon_size">50dp</dimen>
     <dimen name="cell_padding">5dp</dimen>
-    <dimen name="app_label_max_width">80dp</dimen>
 </resources>

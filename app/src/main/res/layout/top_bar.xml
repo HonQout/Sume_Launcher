@@ -4,8 +4,8 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingHorizontal="20dp"
-    android:paddingVertical="10dp">
+    android:paddingHorizontal="@dimen/content_horizontal_padding"
+    android:paddingVertical="@dimen/top_bar_vertical_padding">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/top_bar_left_part"
