@@ -2,8 +2,8 @@ Sume Launcher is a launcher app designed for E-ink Readers running Android OS. I
 
 This app is dedicated to satisfy fundamental requirements while being as smooth as possible. 
 1. In regard to the common problem of performance existing among E-ink Readers, this app used ViewPager2 instead of traditional GridLayout to realize the page of apps. It is capable to collect garbage. For those devices which have a great amount of applications installed, it is able to collect the pages which are not used at the moment to ensure smoothness and low memory usage. 
-2. Some E-ink Readers provide PageUp and PageDown keys to switch pages. This app has optimized for these devices, which means that you can switch pages by using these keys.
-3. For the devices which have status_bar_height set to 0 and leading to the absence of status bar , this app provides a simple simulated status bar. You can view the status of time, date, WiFi and Bluetooth.
+2. Some E-ink Readers provide PageUp and PageDown keys to switch pages. This app is optimized for these devices, which means that you can switch pages by using these keys.
+3. For the devices which have status_bar_height set to 0 and leading to the absence of status bar, this app provides a simple simulated status bar. You can view the status of time, date, WiFi and Bluetooth.
 
 Hope this app brings you good using experience. Any feedback and suggestions in Issue are welcomed and appreciated.
 
