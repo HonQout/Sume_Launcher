@@ -8,7 +8,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,17 +44,6 @@ public class LauncherIconView extends FrameLayout {
     public LauncherIconView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         View view = LayoutInflater.from(context).inflate(R.layout.item_launcher_icon, this, true);
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        if (layoutParams != null) {
-            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
-            view.setLayoutParams(layoutParams);
-        } else {
-            view.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-            ));
-        }
         imageView = view.findViewById(R.id.item_app_grid_icon);
         textView = view.findViewById(R.id.item_app_grid_label);
         if (imageView == null) {
@@ -152,5 +140,6 @@ public class LauncherIconView extends FrameLayout {
         ActivityInfo activityInfo = ApplicationUtils.getActivityInfo(getContext(),
                 launcherIconEntity.packageName, launcherIconEntity.activityName);
         textView.setText(ApplicationUtils.getActivityLabel(getContext(), activityInfo));
+        textView.requestLayout();
     }
 }

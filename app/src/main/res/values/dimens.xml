@@ -11,7 +11,7 @@
     <dimen name="app_grid_space">2dp</dimen>
     <dimen name="app_icon_size">50dp</dimen>
     <dimen name="app_label_size">12sp</dimen>
-    <dimen name="app_label_max_width">50dp</dimen>
+    <dimen name="app_label_width">60dp</dimen>
     <dimen name="image_icon_size">50dp</dimen>
     <dimen name="bottom_title_size">20sp</dimen>
     <dimen name="list_title_size">14sp</dimen>
