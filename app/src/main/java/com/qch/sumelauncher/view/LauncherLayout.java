@@ -308,8 +308,8 @@ public class LauncherLayout extends ViewGroup {
             return -1;
         }
         // Try to get column and row
-        int col = (int) ((x - borderHorizontalPaddingPx) / (cellWidth + gridHorizontalPaddingPx));
-        int row = (int) ((y - borderVerticalPaddingPx) / (cellHeight + gridVerticalPaddingPx));
+        int col = (int) ((x - borderHorizontalPaddingPx) / cellWidth);
+        int row = (int) ((y - borderVerticalPaddingPx) / cellHeight);
         // If column or row is out of bound, return -1
         if (col >= numColumns || row >= numRows) {
             return -1;

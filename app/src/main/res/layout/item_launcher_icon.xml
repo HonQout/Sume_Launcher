@@ -19,12 +19,11 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_app_grid_label"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/app_label_width"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:ellipsize="end"
         android:gravity="center"
-        android:maxWidth="@dimen/app_label_max_width"
         android:maxLines="1"
         android:textSize="@dimen/app_label_size"
         android:textStyle="bold" />

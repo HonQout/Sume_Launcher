@@ -14,11 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.adapter.recyclerview.AppGridRVAdapter;
 import com.qch.sumelauncher.adapter.recyclerview.AppListRVAdapter;
 import com.qch.sumelauncher.adapter.recyclerview.FilterableListAdapter;
 import com.qch.sumelauncher.bean.ActivityBean;
 import com.qch.sumelauncher.databinding.FragmentDrawerBinding;
+import com.qch.sumelauncher.recyclerview.GridDecoration;
 import com.qch.sumelauncher.utils.IntentUtils;
 import com.qch.sumelauncher.viewmodel.LauncherViewModel;
 
@@ -81,6 +83,14 @@ public class DrawerFragment extends Fragment {
             }
         });
         binding.fDrawerRv.setAdapter(appGridRVAdapter);
+        int numItemDecorations = binding.fDrawerRv.getItemDecorationCount();
+        for (int i = 0; i < numItemDecorations; i++) {
+            binding.fDrawerRv.removeItemDecorationAt(0);
+        }
+        binding.fDrawerRv.addItemDecoration(new GridDecoration(
+                viewModel.getNumColumnValue(),
+                getResources().getDimensionPixelSize(R.dimen.app_grid_space)
+        ));
         binding.fDrawerSv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -119,6 +129,10 @@ public class DrawerFragment extends Fragment {
         appListRVAdapter.setOnButtonPressedListener((item, view) ->
                 viewModel.showGridMenu(requireActivity(), item, view));
         binding.fDrawerRv.setAdapter(appListRVAdapter);
+        int numItemDecorations = binding.fDrawerRv.getItemDecorationCount();
+        for (int i = 0; i < numItemDecorations; i++) {
+            binding.fDrawerRv.removeItemDecorationAt(0);
+        }
         binding.fDrawerSv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
