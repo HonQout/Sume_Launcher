@@ -15,6 +15,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.qch.sumelauncher.R;
+import com.qch.sumelauncher.utils.BluetoothUtils;
 
 public class BluetoothViewModel extends AndroidViewModel {
     private static final String TAG = "BluetoothViewModel";
@@ -32,6 +33,7 @@ public class BluetoothViewModel extends AndroidViewModel {
 
     public BluetoothViewModel(@NonNull Application application) {
         super(application);
+        init();
         registerBtBR();
     }
 
@@ -39,6 +41,13 @@ public class BluetoothViewModel extends AndroidViewModel {
     protected void onCleared() {
         super.onCleared();
         unregisterBtBR();
+    }
+
+    private void init() {
+        Context context = getApplication();
+        boolean isEnabled = BluetoothUtils.isBluetoothEnabled(context);
+        mBtEnabled.postValue(isEnabled);
+        mBtIconRes.postValue(isEnabled ? iconEnabled : iconDisabled);
     }
 
     private void registerBtBR() {
