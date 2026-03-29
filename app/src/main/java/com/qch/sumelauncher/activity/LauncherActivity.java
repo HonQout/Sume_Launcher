@@ -116,7 +116,7 @@ public class LauncherActivity extends AppCompatActivity {
                         getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
                         getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size)
                 );
-                layoutParams.setMargins(0, 0, 0, 0);
+                layoutParams.setMargins(2, 0, 2, 0);
                 imageView.setLayoutParams(layoutParams);
                 LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
                 linearLayoutCompat.addView(imageView, 0);
@@ -142,7 +142,7 @@ public class LauncherActivity extends AppCompatActivity {
                         getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
                         getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size)
                 );
-                layoutParams.setMargins(0, 0, 0, 0);
+                layoutParams.setMargins(2, 0, 2, 0);
                 imageView.setLayoutParams(layoutParams);
                 linearLayoutCompat.addView(imageView, 0);
                 Log.i(TAG, "Added wifi icon.");
@@ -180,7 +180,7 @@ public class LauncherActivity extends AppCompatActivity {
                         getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
                         getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size)
                 );
-                layoutParams.setMargins(0, 0, 0, 0);
+                layoutParams.setMargins(2, 0, 2, 0);
                 imageView.setLayoutParams(layoutParams);
                 linearLayoutCompat.addView(imageView, 0);
                 Log.i(TAG, "Added bluetooth icon.");
