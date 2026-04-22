@@ -20,6 +20,8 @@ import com.qch.sumelauncher.utils.UnitUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LauncherLayout extends ViewGroup {
@@ -45,6 +47,7 @@ public class LauncherLayout extends ViewGroup {
     private int gridHorizontalPaddingPx;
     private int gridVerticalPaddingPx;
     private List<IconEntity> iconEntityList = new ArrayList<>();
+    private Map<Integer, IconEntity> iconEntityMap = new ConcurrentHashMap<>();
     private List<LauncherIconView> viewList = new ArrayList<>();
     private final AtomicBoolean isAccessingList = new AtomicBoolean(false);
     private final Object accessListLock = new Object();
@@ -56,8 +59,15 @@ public class LauncherLayout extends ViewGroup {
         boolean onIconLongClick(@Nullable View view, IconEntity item);
     }
 
+    public interface OnBlankClickListener {
+        void onBlankClick(int x, int y);
+
+        boolean onBlankLongClick(int x, int y);
+    }
+
     // interaction
     private OnIconClickListener onIconClickListener;
+    private OnBlankClickListener onBlankClickListener;
     private int longPressTimeout;
     private Runnable longPressRunnable;
     private boolean hasPerformedLongPress = false;
@@ -173,12 +183,12 @@ public class LauncherLayout extends ViewGroup {
             try {
                 synchronized (accessListLock) {
                     for (LauncherIconView item : viewList) {
-                        IconEntity entity = item.getLauncherIconEntity();
-                        if (entity == null) {
+                        IconEntity iconEntity = item.getLauncherIconEntity();
+                        if (iconEntity == null) {
                             continue;
                         }
-                        int col = entity.getCellX();
-                        int row = entity.getCellY();
+                        int col = iconEntity.getCellX();
+                        int row = iconEntity.getCellY();
 
                         int cellLeft = borderHorizontalPaddingPx + col * cellWidth;
                         int cellTop = borderVerticalPaddingPx + row * cellHeight;
@@ -198,25 +208,25 @@ public class LauncherLayout extends ViewGroup {
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
-        int index = getItemIndexAtPosition(x, y);
-        IconEntity item = index >= 0 ? iconEntityList.get(index) : null;
-        if (index == -1 || item == null) {
-            Log.i(TAG, "Pressed item is null.");
-            return false;
+        int[] position = getItemPositionAtPosition(x, y);
+        if (position == null || position.length != 2) {
+            Log.i(TAG, "Cannot get position of pressed cell.");
+            return super.onTouchEvent(event);
         }
-        Log.i(TAG, "Pressed item #" + index + ".");
+        int col = position[0];
+        int row = position[1];
         int action = event.getActionMasked();
         switch (action) {
             case MotionEvent.ACTION_DOWN -> {
-                Log.i(TAG, "Pressed at " + item.getCellX() + "," + item.getCellY());
+                Log.i(TAG, "Pressed at " + col + "," + row);
                 hasPerformedLongPress = false;
-                startLongPressDetection(x, y, index, item);
+                startLongPressDetection(x, y, col, row);
                 setPressed(true);
                 return true;
             }
 
             case MotionEvent.ACTION_UP -> {
-                Log.i(TAG, "Released at " + item.getCellX() + "," + item.getCellY());
+                Log.i(TAG, "Released at " + col + "," + row);
                 cancelLongPressDetection();
                 setPressed(false);
                 if (!hasPerformedLongPress && onIconClickListener != null) {
@@ -287,15 +297,15 @@ public class LauncherLayout extends ViewGroup {
         }
     }
 
-    private void startLongPressDetection(float x, float y, int index, IconEntity item) {
+    private void startLongPressDetection(float x, float y, int cellX, int cellY) {
         touchedX = x;
         touchedY = y;
         longPressRunnable = () -> {
             hasPerformedLongPress = true;
             boolean handledBySystem = super.performLongClick();
             Log.i(TAG, "Long press handled by system: " + handledBySystem);
-            if (onIconClickListener != null) {
-
+            if (onBlankClickListener != null) {
+                onBlankClickListener.onBlankLongClick(cellX, cellY);
             }
         };
         postDelayed(longPressRunnable, longPressTimeout);
@@ -305,30 +315,41 @@ public class LauncherLayout extends ViewGroup {
         return removeCallbacks(longPressRunnable);
     }
 
-    public int getItemIndexAtPosition(float x, float y) {
+    @Nullable
+    public int[] getItemPositionAtPosition(float x, float y) {
         // If touching point is out of bound, return -1
         if (x < borderHorizontalPaddingPx
                 || y < borderVerticalPaddingPx
                 || x > getWidth() - borderHorizontalPaddingPx
                 || y > getHeight() - borderVerticalPaddingPx) {
-            return -1;
+            return null;
         }
         // Try to get column and row
         int col = (int) ((x - borderHorizontalPaddingPx) / cellWidth);
         int row = (int) ((y - borderVerticalPaddingPx) / cellHeight);
         // If column or row is out of bound, return -1
         if (col >= numColumns || row >= numRows) {
-            return -1;
+            return null;
         }
-        // Return the index of touched cell item
-        int index = row * numColumns + col;
-        return index < iconEntityList.size() ? index : -1;
+        // Return the position of touched cell item
+        return new int[]{col, row};
     }
 
     @Nullable
     public IconEntity getItemAtPosition(float x, float y) {
-        int index = getItemIndexAtPosition(x, y);
-        return index >= 0 ? iconEntityList.get(index) : null;
+        int[] position = getItemPositionAtPosition(x, y);
+        if (position == null || position.length != 2) {
+            return null;
+        }
+        int col = position[0];
+        int row = position[1];
+        for (int i = 0; i < iconEntityList.size(); i++) {
+            IconEntity iconEntity = iconEntityList.get(i);
+            if (iconEntity.getCellX() == col && iconEntity.getCellY() == row) {
+                return iconEntity;
+            }
+        }
+        return null;
     }
 
     public void setNumColumns(int numColumns) {
@@ -462,5 +483,9 @@ public class LauncherLayout extends ViewGroup {
 
     public void setOnIconClickListener(OnIconClickListener listener) {
         this.onIconClickListener = listener;
+    }
+
+    public void setOnBlankClickListener(OnBlankClickListener listener) {
+        this.onBlankClickListener = listener;
     }
 }

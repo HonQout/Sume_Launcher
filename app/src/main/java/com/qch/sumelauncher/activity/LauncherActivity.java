@@ -80,8 +80,10 @@ public class LauncherActivity extends AppCompatActivity {
                 launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.NORMAL));
         binding.aLauncherBtnSettings.setOnClickListener(v ->
                 launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.SETTINGS));
-        binding.aLauncherBtnSearch.setOnClickListener(v ->
-                launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.SEARCH));
+        binding.aLauncherBtnEdit.setOnClickListener(v ->
+                launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.EDIT));
+        binding.aLauncherBtnApps.setOnClickListener(v ->
+                launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.APPS));
         binding.aLauncherBtnPrevPage.setOnClickListener(v -> launcherPageUp());
         binding.aLauncherBtnNextPage.setOnClickListener(v -> launcherPageDown());
         // Initialize viewmodel
@@ -262,6 +264,10 @@ public class LauncherActivity extends AppCompatActivity {
                 binding.aLauncherVp2.setVisibility(View.VISIBLE);
                 binding.aLauncherLlAction.setVisibility(View.VISIBLE);
                 binding.aLauncherLlPage.setVisibility(View.VISIBLE);
+            } else if (launcherState == LauncherViewModel.LauncherState.EDIT) {
+                binding.aLauncherLlAction.setVisibility(View.GONE);
+                binding.aLauncherTvTitle.setText(R.string.edit);
+                binding.aLauncherLlTitle.setVisibility(View.VISIBLE);
             } else if (launcherState == LauncherViewModel.LauncherState.SETTINGS) {
                 binding.aLauncherLlAction.setVisibility(View.GONE);
                 binding.aLauncherLlPage.setVisibility(View.GONE);
@@ -273,7 +279,7 @@ public class LauncherActivity extends AppCompatActivity {
                 } else {
                     fragmentTransaction.replace(R.id.a_launcher_fcv, new SettingsFragment(), "SettingsFragment");
                 }
-            } else if (launcherState == LauncherViewModel.LauncherState.SEARCH) {
+            } else if (launcherState == LauncherViewModel.LauncherState.APPS) {
                 binding.aLauncherLlAction.setVisibility(View.GONE);
                 binding.aLauncherLlPage.setVisibility(View.GONE);
                 binding.aLauncherVp2.setVisibility(View.GONE);

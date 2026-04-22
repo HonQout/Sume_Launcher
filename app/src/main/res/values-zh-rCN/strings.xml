@@ -9,6 +9,7 @@
     <string name="hint">提示</string>
 
     <!-- Title -->
+    <string name="edit">编辑</string>
     <string name="settings">设置</string>
     <string name="app_drawer">应用抽屉</string>
     <string name="permission">权限</string>
@@ -32,7 +33,7 @@
     <string name="back_icon">返回图标</string>
     <string name="settings_icon">设置图标</string>
     <string name="edit_icon">编辑图标</string>
-    <string name="manage_icon">管理图标</string>
+    <string name="apps_icon">所有应用图标</string>
     <string name="menu_icon">菜单图标</string>
     <string name="prev_page_icon">上一页图标</string>
     <string name="next_page_icon">下一页图标</string>

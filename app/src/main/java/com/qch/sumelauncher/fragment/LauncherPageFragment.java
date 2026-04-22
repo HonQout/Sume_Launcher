@@ -106,6 +106,18 @@ public class LauncherPageFragment extends Fragment {
                     return true;
                 }
             });
+            binding.fLauncherLl.setOnBlankClickListener(new LauncherLayout.OnBlankClickListener() {
+                @Override
+                public void onBlankClick(int x, int y) {
+                    Log.i(TAG, "Clicked blank cell " + x + "," + y);
+                }
+
+                @Override
+                public boolean onBlankLongClick(int x, int y) {
+                    Log.i(TAG, "Long clicked blank cell " + x + "," + y);
+                    return false;
+                }
+            });
         });
         return binding.getRoot();
     }

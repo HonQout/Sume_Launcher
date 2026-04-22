@@ -79,7 +79,7 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <com.qch.sumelauncher.view.SingleTouchLinearLayoutCompat
             android:id="@+id/a_launcher_ll_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -105,22 +105,22 @@
                 android:tint="?android:textColorPrimary" />
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/a_launcher_btn_search"
+                android:id="@+id/a_launcher_btn_apps"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="@dimen/image_icon_size"
                 android:layout_height="@dimen/image_icon_size"
-                android:contentDescription="@string/manage_icon"
+                android:contentDescription="@string/apps_icon"
                 android:src="@drawable/baseline_apps_24"
                 android:tint="?android:textColorPrimary" />
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </com.qch.sumelauncher.view.SingleTouchLinearLayoutCompat>
 
         <Space
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <com.qch.sumelauncher.view.SingleTouchLinearLayoutCompat
             android:id="@+id/a_launcher_ll_page"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -160,7 +160,7 @@
                 android:src="@drawable/baseline_navigate_next_24"
                 android:tint="?android:textColorPrimary" />
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </com.qch.sumelauncher.view.SingleTouchLinearLayoutCompat>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
