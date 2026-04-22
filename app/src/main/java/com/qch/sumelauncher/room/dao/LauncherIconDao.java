@@ -6,46 +6,82 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
+import androidx.room.Update;
 
-import com.qch.sumelauncher.room.entity.LauncherIconEntity;
+import com.qch.sumelauncher.room.entity.IconEntity;
+import com.qch.sumelauncher.room.entity.LayoutEntity;
 
 import java.util.List;
 
 @Dao
 public interface LauncherIconDao {
-    @Query("SELECT * FROM LauncherIconEntity")
-    LiveData<List<LauncherIconEntity>> getItems();
+    // layout
+    @Query("SELECT * FROM layouts")
+    List<LayoutEntity> getAllLayouts();
 
-    @Query("SELECT * FROM LauncherIconEntity WHERE grid_size = :gridSize ORDER BY page_index ASC, cell_y ASC, cell_x ASC")
-    LiveData<List<LauncherIconEntity>> getItemsByGridSize(String gridSize);
+    @Query("SELECT * FROM layouts WHERE is_default = 1")
+    LayoutEntity getDefaultLayout();
 
-    @Query("SELECT * FROM LauncherIconEntity WHERE grid_size = :gridSize AND page_index = :pageIndex ORDER BY cell_y ASC, cell_x ASC")
-    LiveData<List<LauncherIconEntity>> getItemsByGridSizeAndPageIndex(String gridSize, int pageIndex);
-
-    @Query("SELECT COUNT(DISTINCT page_index) FROM LauncherIconEntity WHERE grid_size = :gridSize")
-    LiveData<Integer> getNumPageByGridSize(String gridSize);
+    @Query("SELECT * FROM layouts WHERE num_rows = :numRows AND num_columns = :numColumns")
+    LayoutEntity getLayoutBySize(int numRows, int numColumns);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long insertItem(LauncherIconEntity launcherIconEntity);
+    void insertLayout(LayoutEntity layoutEntity);
+
+    // icons
+    @Query("SELECT * FROM icons WHERE layout_name = :layoutName ORDER BY screen_index ASC, " +
+            "cell_y ASC, cell_x ASC")
+    LiveData<List<IconEntity>> getIconListInLayout(String layoutName);
+
+    @Query("SELECT COUNT(DISTINCT screen_index) FROM icons WHERE layout_name = :layoutName")
+    LiveData<Integer> getNumScreens(String layoutName);
+
+    @Query("SELECT * FROM icons WHERE layout_name = :layoutName AND screen_index = :screenIndex " +
+            "ORDER BY cell_y ASC, cell_x ASC")
+    LiveData<List<IconEntity>> getIconsOnScreen(String layoutName, int screenIndex);
+
+    @Query("SELECT COUNT(*) FROM icons WHERE layout_name = :layoutName " +
+            "AND screen_index = :screenIndex")
+    int getIconCountOnScreen(String layoutName, int screenIndex);
+
+    @Query("SELECT COUNT(*) FROM icons WHERE layout_name = :layoutName " +
+            "AND screen_index = :screenIndex AND cell_x = :cellX AND cell_y = :cellY")
+    int isCellOccupied(String layoutName, int screenIndex, int cellX, int cellY);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertItems(LauncherIconEntity... launcherIconEntities);
+    void insertIcon(IconEntity iconEntity);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertItemList(List<LauncherIconEntity> launcherIconEntityList);
+    void insertIconArray(IconEntity... launcherIconEntities);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertIconList(List<IconEntity> iconEntityList);
 
     @Delete
-    void deleteItem(LauncherIconEntity launcherIconEntity);
+    void deleteIcon(IconEntity iconEntity);
 
-    @Query("DELETE FROM LauncherIconEntity WHERE id = :id")
-    void deleteItemById(long id);
+    @Query("DELETE FROM icons WHERE package_name = :packageName")
+    void deleteIconsByPackage(String packageName);
 
-    @Query("DELETE FROM LauncherIconEntity WHERE package_name = :packageName")
-    void deleteItemByPackageName(String packageName);
+    @Query("DELETE FROM icons WHERE package_name = :packageName AND activity_name = :activityName")
+    void deleteIconsByActivity(String packageName, String activityName);
 
-    @Query("DELETE FROM LauncherIconEntity WHERE package_name = :packageName AND activity_name = :activityName")
-    void deleteItemByActivity(String packageName, String activityName);
+    @Query("DELETE FROM icons WHERE layout_name = :layoutName AND screen_index = :screenIndex")
+    void deleteIconsOnScreen(String layoutName, int screenIndex);
 
-    @Query("SELECT COUNT(*) FROM LauncherIconEntity WHERE grid_size = :gridSize AND page_index = :pageIndex AND cell_x = :cellX AND cell_y = :cellY")
-    int isCellOccupied(String gridSize, int pageIndex, int cellX, int cellY);
+    @Query("UPDATE icons SET screen_index = screen_index - 1 WHERE layout_name = :layoutName " +
+            "AND screen_index > :deletedScreenIndex")
+    void shiftScreenLeft(String layoutName, int deletedScreenIndex);
+
+    @Transaction
+    default void collapseAfterDeleting(IconEntity iconEntity) {
+        int count = getIconCountOnScreen(iconEntity.getLayoutName(), iconEntity.getScreenIndex());
+        if (count == 0) {
+            shiftScreenLeft(iconEntity.getLayoutName(), iconEntity.getScreenIndex());
+        }
+    }
+
+    @Update
+    void updateIcon(IconEntity iconEntity);
 }

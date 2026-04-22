@@ -12,7 +12,7 @@ import com.bumptech.glide.module.AppGlideModule;
 import com.qch.sumelauncher.bean.ActivityBean;
 import com.qch.sumelauncher.glide.modelloader.ActivityIconModelLoader;
 import com.qch.sumelauncher.glide.modelloader.LauncherIconModelLoader;
-import com.qch.sumelauncher.room.entity.LauncherIconEntity;
+import com.qch.sumelauncher.room.entity.IconEntity;
 
 @GlideModule
 public class MyAppGlideModule extends AppGlideModule {
@@ -21,6 +21,6 @@ public class MyAppGlideModule extends AppGlideModule {
                                    @NonNull Registry registry) {
         super.registerComponents(context, glide, registry);
         registry.append(ActivityBean.class, Bitmap.class, new ActivityIconModelLoader.Factory(context));
-        registry.append(LauncherIconEntity.class, Bitmap.class, new LauncherIconModelLoader.Factory(context));
+        registry.append(IconEntity.class, Bitmap.class, new LauncherIconModelLoader.Factory(context));
     }
 }

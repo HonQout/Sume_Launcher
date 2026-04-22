@@ -19,14 +19,14 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.room.entity.LauncherIconEntity;
+import com.qch.sumelauncher.room.entity.IconEntity;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 
 public class LauncherIconView extends FrameLayout {
     private static final String TAG = "LauncherIconView";
     private final ImageView imageView;
     private final TextView textView;
-    private LauncherIconEntity launcherIconEntity;
+    private IconEntity iconEntity;
     private RequestBuilder<Bitmap> requestBuilder;
 
     public LauncherIconView(@NonNull Context context) {
@@ -61,9 +61,9 @@ public class LauncherIconView extends FrameLayout {
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        if ((w > 0 && w != oldw) || (h > 0 && h != oldh)) {
+    protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+        super.onSizeChanged(width, height, oldWidth, oldHeight);
+        if ((width > 0 && width != oldWidth) || (height > 0 && height != oldHeight)) {
             cancelLoadingIcon();
             loadIcon();
             loadLabel();
@@ -73,7 +73,7 @@ public class LauncherIconView extends FrameLayout {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if (launcherIconEntity != null && getMeasuredWidth() > 0 && getMeasuredHeight() > 0) {
+        if (iconEntity != null && getMeasuredWidth() > 0 && getMeasuredHeight() > 0) {
             loadIcon();
             loadLabel();
         }
@@ -85,20 +85,21 @@ public class LauncherIconView extends FrameLayout {
         cancelLoadingIcon();
     }
 
-    public void setLauncherIconEntity(LauncherIconEntity launcherIconEntity) {
-        this.launcherIconEntity = launcherIconEntity;
-        if (getMeasuredWidth() > 0 && getMeasuredHeight() > 0) {
+    public void setLauncherIconEntity(@Nullable IconEntity iconEntity) {
+        this.iconEntity = iconEntity;
+        if (iconEntity != null && getMeasuredWidth() > 0 && getMeasuredHeight() > 0) {
             loadIcon();
             loadLabel();
         }
     }
 
-    public LauncherIconEntity getLauncherIconEntity() {
-        return launcherIconEntity;
+    @Nullable
+    public IconEntity getLauncherIconEntity() {
+        return iconEntity;
     }
 
     public void refresh() {
-        if (launcherIconEntity != null && getMeasuredWidth() > 0 && getMeasuredHeight() > 0) {
+        if (iconEntity != null && getMeasuredWidth() > 0 && getMeasuredHeight() > 0) {
             cancelLoadingIcon();
             loadIcon();
             loadLabel();
@@ -106,14 +107,14 @@ public class LauncherIconView extends FrameLayout {
     }
 
     public void loadIcon() {
-        if (launcherIconEntity == null) {
+        if (iconEntity == null) {
             return;
         }
 
         Drawable defIcon = getContext().getPackageManager().getDefaultActivityIcon();
         requestBuilder = Glide.with(this)
                 .asBitmap()
-                .load(launcherIconEntity)
+                .load(iconEntity)
                 .placeholder(defIcon)
                 .error(defIcon)
                 .diskCacheStrategy(DiskCacheStrategy.ALL);
@@ -131,14 +132,13 @@ public class LauncherIconView extends FrameLayout {
         }
     }
 
-
     public void loadLabel() {
-        if (launcherIconEntity == null) {
+        if (iconEntity == null) {
             return;
         }
 
         ActivityInfo activityInfo = ApplicationUtils.getActivityInfo(getContext(),
-                launcherIconEntity.packageName, launcherIconEntity.activityName);
+                iconEntity.getPackageName(), iconEntity.getActivityName());
         textView.setText(ApplicationUtils.getActivityLabel(getContext(), activityInfo));
         textView.requestLayout();
     }

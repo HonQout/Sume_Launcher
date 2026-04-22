@@ -1,28 +1,28 @@
 package com.qch.sumelauncher.launcher;
 
 public class CellPosition {
-    private String gridSize;
-    private int pageIndex;
+    private String layoutName;
+    private int screenIndex;
     private int cellX;
     private int cellY;
     private int spanX;
     private int spanY;
 
-    public CellPosition(String gridSize, int pageIndex, int cellX, int cellY, int spanX, int spanY) {
-        this.gridSize = gridSize;
-        this.pageIndex = pageIndex;
+    public CellPosition(String layoutName, int screenIndex, int cellX, int cellY, int spanX, int spanY) {
+        this.layoutName = layoutName;
+        this.screenIndex = screenIndex;
         this.cellX = cellX;
         this.cellY = cellY;
         this.spanX = spanX;
         this.spanY = spanY;
     }
 
-    public void setGridSize(String gridSize) {
-        this.gridSize = gridSize;
+    public void setLayoutName(String layoutName) {
+        this.layoutName = layoutName;
     }
 
-    public void setPageIndex(int pageIndex) {
-        this.pageIndex = pageIndex;
+    public void setScreenIndex(int screenIndex) {
+        this.screenIndex = screenIndex;
     }
 
     public void setCellX(int cellX) {
@@ -41,12 +41,12 @@ public class CellPosition {
         this.spanY = spanY;
     }
 
-    public String getGridSize() {
-        return gridSize;
+    public String getLayoutName() {
+        return layoutName;
     }
 
-    public int getPageIndex() {
-        return pageIndex;
+    public int getScreenIndex() {
+        return screenIndex;
     }
 
     public int getCellX() {

@@ -20,18 +20,18 @@ public class TimeViewModel extends AndroidViewModel {
     private final MutableLiveData<String> mCurrentTimeText = new MutableLiveData<>();
     private final MutableLiveData<String> mCurrentDateText = new MutableLiveData<>();
     // broadcast receiver
-    private BroadcastReceiver timeBroadcastReceiver;
+    private BroadcastReceiver broadcastReceiver;
 
     public TimeViewModel(@NonNull Application application) {
         super(application);
         update();
-        registerTimeBR();
+        registerBroadcastReceiver();
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-        unRegisterTimeBR();
+        unRegisterBroadcastReceiver();
     }
 
     private void update() {
@@ -52,8 +52,8 @@ public class TimeViewModel extends AndroidViewModel {
         ));
     }
 
-    private void registerTimeBR() {
-        if (timeBroadcastReceiver != null) {
+    private void registerBroadcastReceiver() {
+        if (broadcastReceiver != null) {
             return;
         }
 
@@ -63,21 +63,21 @@ public class TimeViewModel extends AndroidViewModel {
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
         intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
 
-        timeBroadcastReceiver = new BroadcastReceiver() {
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 update();
             }
         };
 
-        ContextCompat.registerReceiver(getApplication(), timeBroadcastReceiver, intentFilter,
+        ContextCompat.registerReceiver(getApplication(), broadcastReceiver, intentFilter,
                 ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
-    private void unRegisterTimeBR() {
-        if (timeBroadcastReceiver != null) {
-            getApplication().unregisterReceiver(timeBroadcastReceiver);
-            timeBroadcastReceiver = null;
+    private void unRegisterBroadcastReceiver() {
+        if (broadcastReceiver != null) {
+            getApplication().unregisterReceiver(broadcastReceiver);
+            broadcastReceiver = null;
         }
     }
 

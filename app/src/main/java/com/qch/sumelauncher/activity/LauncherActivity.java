@@ -11,6 +11,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
@@ -25,9 +26,12 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.adapter.viewpager2.AppPagerAdapter;
+import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
 import com.qch.sumelauncher.fragment.DrawerFragment;
 import com.qch.sumelauncher.fragment.SettingsFragment;
+import com.qch.sumelauncher.utils.DialogUtils;
+import com.qch.sumelauncher.utils.IntentUtils;
 import com.qch.sumelauncher.utils.PermissionUtils;
 import com.qch.sumelauncher.utils.UIUtils;
 import com.qch.sumelauncher.viewmodel.AirplaneModeViewModel;
@@ -219,27 +223,27 @@ public class LauncherActivity extends AppCompatActivity {
             AppCompatImageView imageView = linearLayoutCompat.findViewById(R.id.top_bar_iv_battery);
             imageView.setImageResource(i);
         });
-        launcherViewModel.getNumPage().observe(this, integer -> {
+        launcherViewModel.getNumScreen().observe(this, integer -> {
             if (integer != null) {
                 appPagerAdapter.setNumPages(integer);
                 binding.aLauncherTvPage.setText(
                         String.format(
                                 ContextCompat.getString(this, R.string.page_text),
-                                launcherViewModel.getCurrentPageValue(), integer
+                                launcherViewModel.getCurrentScreenValue(), integer
                         ));
             }
         });
-        launcherViewModel.getCurrentPage().observe(this, integer ->
+        launcherViewModel.getCurrentScreen().observe(this, integer ->
                 binding.aLauncherTvPage.setText(
                         String.format(
                                 ContextCompat.getString(
                                         LauncherActivity.this,
                                         R.string.page_text
                                 ),
-                                integer, launcherViewModel.getNumPageValue()
+                                integer, launcherViewModel.getNumScreenValue()
                         )));
         launcherViewModel.getLauncherState().observe(this, launcherState -> {
-            Log.i(TAG, "Prepare to examine launcher state");
+            Log.i(TAG, "Prepare to examine launcher state.");
             FragmentManager fragmentManager = getSupportFragmentManager();
             Fragment settingsFragment = fragmentManager.findFragmentByTag("SettingsFragment");
             Fragment appListFragment = fragmentManager.findFragmentByTag("DrawerFragment");
@@ -299,7 +303,7 @@ public class LauncherActivity extends AppCompatActivity {
             Log.i(TAG, "No need to show the dialog to ask for permission.");
         } else if (launcherViewModel.getAskForPermFineLocationValue()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                launcherViewModel.showPermFineLocationDialog(this);
+                showPermFineLocationDialog();
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
             }
@@ -351,5 +355,17 @@ public class LauncherActivity extends AppCompatActivity {
             viewPager2.setCurrentItem(currentItem, false);
             launcherViewModel.setCurrentPage(currentItem + 1);
         }
+    }
+
+    private void showPermFineLocationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(R.string.request_permission)
+                .setMessage(R.string.perm_fine_location_reason)
+                .setPositiveButton(R.string.app_info, (dialog, which) ->
+                        IntentUtils.openAppDetailsPage(this, this.getPackageName()))
+                .setNeutralButton(R.string.deny, (dialog, which) ->
+                        MyApplication.getPreferenceDataStore().setBoolean("ask_for_perm_fine_location", false))
+                .setNegativeButton(R.string.cancel, null);
+        DialogUtils.show(builder, launcherViewModel.getAnimationValue());
     }
 }

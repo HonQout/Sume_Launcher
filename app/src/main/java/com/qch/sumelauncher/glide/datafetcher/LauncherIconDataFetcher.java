@@ -9,25 +9,25 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.data.DataFetcher;
-import com.qch.sumelauncher.room.entity.LauncherIconEntity;
+import com.qch.sumelauncher.room.entity.IconEntity;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DrawableUtils;
 
 public class LauncherIconDataFetcher implements DataFetcher<Bitmap> {
-    private final Context context;
+    private final Context appContext;
     private final String packageName;
     private final String activityName;
 
-    public LauncherIconDataFetcher(Context context, LauncherIconEntity launcherIconEntity) {
-        this.context = context;
-        this.packageName = launcherIconEntity.packageName;
-        this.activityName = launcherIconEntity.activityName;
+    public LauncherIconDataFetcher(Context appContext, IconEntity iconEntity) {
+        this.appContext = appContext.getApplicationContext();
+        this.packageName = iconEntity.getPackageName();
+        this.activityName = iconEntity.getActivityName();
     }
 
     @Override
     public void loadData(@NonNull Priority priority, @NonNull DataCallback<? super Bitmap> callback) {
         try {
-            Drawable icon = ApplicationUtils.getActivityIcon(context, packageName, activityName);
+            Drawable icon = ApplicationUtils.getActivityIcon(appContext, packageName, activityName);
             Bitmap bitmap = DrawableUtils.toBitmap(icon);
             callback.onDataReady(bitmap);
         } catch (Exception e) {

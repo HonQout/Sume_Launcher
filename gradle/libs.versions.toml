@@ -1,10 +1,10 @@
 [versions]
 activity = "1.11.0"
-agp = "9.1.0"
-appcompat = "1.6.1"
+agp = "9.1.1"
+appcompat = "1.7.1"
 constraintlayout = "2.1.4"
-coreKtx = "1.15.0"
-datastore = "1.1.7"
+coreKtx = "1.16.0"
+datastore = "1.1.7" # do not update this
 espressoCore = "3.5.1"
 glide = "5.0.5"
 junit = "4.13.2"
@@ -12,7 +12,7 @@ junitVersion = "1.1.5"
 kotlin = "2.3.20"
 ksp = "2.3.3"
 material = "1.10.0"
-navigation = "2.6.0"
+navigation = "2.6.0" # do not update this
 preference = "1.2.0"
 recyclerview = "1.4.0"
 room = "2.7.2"
@@ -36,8 +36,8 @@ navigation-fragment = { group = "androidx.navigation", name = "navigation-fragme
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigation" }
 preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-rxjava3 = { group = "androidx.room", name = "room-rxjava3", version.ref = "room" }
 rxandroid = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxandroid" }
 rxjava = { group = "io.reactivex.rxjava3", name = "rxjava", version.ref = "rxjava" }

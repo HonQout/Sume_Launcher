@@ -15,10 +15,10 @@ android {
         minSdk 21
         targetSdk 36
         versionCode 4
-        versionName '1.3.0 beta4'
+        versionName '1.3.0 beta5'
 
         ndk {
-            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a'
         }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
