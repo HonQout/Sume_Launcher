@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Sume Launcher</string>
-    <string name="version_name" translatable="false">1.3.0 beta5</string>
+    <string name="version_name" translatable="false">1.3.0 beta6</string>
 
     <!-- Basic -->
     <string name="cancel">Cancel</string>
@@ -48,6 +48,7 @@
     <string name="uri_is_empty">Uri is empty.</string>
     <string name="no_matching_activity">No activity can open this link.</string>
     <string name="insist_uninstall_system_app">This is a system app, which is usually not recommended and not allowed to uninstall. \nHowever, in some 3rd-party Android systems, this kind of app is allowed to uninstall. \nIf you want to try to uninstall this app, press \"Uninstall\". This operation is not guaranteed to be successful.</string>
+    <string name="insist_uninstall_this_app">Before uninstalling Sume Launcher, please make sure that you have other launcher application installed, otherwise your device will not work properly after uninstallation.</string>
     <string name="uninstall_app_failed">Failed to uninstall app.</string>
 
     <!-- Preference Headers -->
@@ -81,6 +82,5 @@
     <string name="require_following_permission">This application requires the following permission(s):</string>
     <string name="num_items">%d item(s)</string>
     <string name="search_for_items">Search for item(s)</string>
-
 
 </resources>
