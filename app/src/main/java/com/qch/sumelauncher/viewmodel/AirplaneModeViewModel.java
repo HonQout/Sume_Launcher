@@ -20,33 +20,33 @@ public class AirplaneModeViewModel extends AndroidViewModel {
     // data
     private final MutableLiveData<Boolean> mAirplaneModeEnabled = new MutableLiveData<>();
     // broadcast receiver
-    private BroadcastReceiver amBroadcastReceiver = null;
+    private BroadcastReceiver broadcastReceiver = null;
 
     public AirplaneModeViewModel(@NonNull Application application) {
         super(application);
         update();
-        registerAMBR();
+        registerBroadcastReceiver();
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-        unregisterAMBR();
+        unregisterBroadcastReceiver();
     }
 
     public void update() {
         mAirplaneModeEnabled.postValue(ConnectivityUtils.getAirplaneModeState(getApplication()));
     }
 
-    private void registerAMBR() {
-        if (amBroadcastReceiver != null) {
+    private void registerBroadcastReceiver() {
+        if (broadcastReceiver != null) {
             return;
         }
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
 
-        amBroadcastReceiver = new BroadcastReceiver() {
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.i(TAG, "Received intent.");
@@ -55,14 +55,14 @@ public class AirplaneModeViewModel extends AndroidViewModel {
             }
         };
 
-        ContextCompat.registerReceiver(getApplication(), amBroadcastReceiver, filter,
+        ContextCompat.registerReceiver(getApplication(), broadcastReceiver, filter,
                 ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
-    private void unregisterAMBR() {
-        if (amBroadcastReceiver != null) {
-            getApplication().unregisterReceiver(amBroadcastReceiver);
-            amBroadcastReceiver = null;
+    private void unregisterBroadcastReceiver() {
+        if (broadcastReceiver != null) {
+            getApplication().unregisterReceiver(broadcastReceiver);
+            broadcastReceiver = null;
         }
     }
 

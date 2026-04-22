@@ -18,13 +18,13 @@
     <string name="list">列表</string>
 
     <!-- Menu -->
-    <string name="app_info">应用信息</string>
+    <string name="remove_icon">移除图标</string>
     <string name="uninstall">卸载</string>
+    <string name="app_info">应用信息</string>
     <string name="app_market">应用市场</string>
-    <string name="hide">隐藏</string>
-    <string name="airplane_mode_icon">飞行模式图标</string>
 
     <!-- Content Description -->
+    <string name="airplane_mode_icon">飞行模式图标</string>
     <string name="wifi_icon">无线局域网图标</string>
     <string name="bluetooth_icon">蓝牙图标</string>
     <string name="battery_icon">电池图标</string>
@@ -47,7 +47,7 @@
     <string name="cannot_uninstall_app">无法卸载此应用。</string>
     <string name="uri_is_empty">统一资源标识符为空。</string>
     <string name="no_matching_activity">没有找到可以打开链接的应用程序。</string>
-    <string name="insist_uninstall_system_app">这是一个系统应用，通常不建议卸载。\n不过，在一些第三方Android系统中，这类应用也被允许卸载。\n如果您希望尝试卸载此应用，请点击“卸载”。不保证此操作可以成功。</string>
+    <string name="insist_uninstall_system_app">这是一个系统应用，通常不建议、也不能够卸载。\n不过，在一些第三方Android系统中，这类应用也被允许卸载。\n如果您希望尝试卸载此应用，请点击“卸载”。不保证此操作可以成功。</string>
     <string name="uninstall_app_failed">卸载应用失败。</string>
 
     <!-- Preference Headers -->

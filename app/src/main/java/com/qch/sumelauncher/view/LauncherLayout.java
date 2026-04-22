@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.room.entity.LauncherIconEntity;
+import com.qch.sumelauncher.room.entity.IconEntity;
 import com.qch.sumelauncher.utils.UnitUtils;
 
 import java.util.ArrayList;
@@ -25,8 +25,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class LauncherLayout extends ViewGroup {
     private static final String TAG = "LauncherLayout";
     private static final String PARCELABLE = "PARCELABLE";
-    private static final String NUM_ROWS = "NUM_ROWS";
     private static final String NUM_COLUMNS = "NUM_COLUMNS";
+    private static final String NUM_ROWS = "NUM_ROWS";
 
     // Grid
     private int cellWidth;
@@ -38,26 +38,26 @@ public class LauncherLayout extends ViewGroup {
     private final Paint gridPaint;
 
     // Data
-    private int numRows = 5;
     private int numColumns = 5;
+    private int numRows = 5;
     private int borderHorizontalPaddingPx;
     private int borderVerticalPaddingPx;
     private int gridHorizontalPaddingPx;
     private int gridVerticalPaddingPx;
-    private List<LauncherIconEntity> entityList = new ArrayList<>();
+    private List<IconEntity> iconEntityList = new ArrayList<>();
     private List<LauncherIconView> viewList = new ArrayList<>();
     private final AtomicBoolean isAccessingList = new AtomicBoolean(false);
     private final Object accessListLock = new Object();
 
     // listener interface
-    public interface OnItemClickListener {
-        void onItemClick(LauncherIconEntity item, int position);
+    public interface OnIconClickListener {
+        void onIconClick(@Nullable View view, IconEntity item);
 
-        boolean onItemLongClick(LauncherIconEntity item, int position, float x, float y, @Nullable View view);
+        boolean onIconLongClick(@Nullable View view, IconEntity item);
     }
 
     // interaction
-    private OnItemClickListener onItemClickListener;
+    private OnIconClickListener onIconClickListener;
     private int longPressTimeout;
     private Runnable longPressRunnable;
     private boolean hasPerformedLongPress = false;
@@ -166,19 +166,19 @@ public class LauncherLayout extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if (entityList == null || entityList.isEmpty()) {
+        if (iconEntityList == null || iconEntityList.isEmpty()) {
             return;
         }
         if (isAccessingList.compareAndSet(false, true)) {
             try {
                 synchronized (accessListLock) {
                     for (LauncherIconView item : viewList) {
-                        LauncherIconEntity entity = item.getLauncherIconEntity();
+                        IconEntity entity = item.getLauncherIconEntity();
                         if (entity == null) {
                             continue;
                         }
-                        int col = entity.cellX;
-                        int row = entity.cellY;
+                        int col = entity.getCellX();
+                        int row = entity.getCellY();
 
                         int cellLeft = borderHorizontalPaddingPx + col * cellWidth;
                         int cellTop = borderVerticalPaddingPx + row * cellHeight;
@@ -199,15 +199,16 @@ public class LauncherLayout extends ViewGroup {
         float x = event.getX();
         float y = event.getY();
         int index = getItemIndexAtPosition(x, y);
-        LauncherIconEntity item = index >= 0 ? entityList.get(index) : null;
+        IconEntity item = index >= 0 ? iconEntityList.get(index) : null;
         if (index == -1 || item == null) {
             Log.i(TAG, "Pressed item is null.");
             return false;
         }
+        Log.i(TAG, "Pressed item #" + index + ".");
         int action = event.getActionMasked();
         switch (action) {
             case MotionEvent.ACTION_DOWN -> {
-                Log.i(TAG, "Pressed at " + item.cellX + "," + item.cellY);
+                Log.i(TAG, "Pressed at " + item.getCellX() + "," + item.getCellY());
                 hasPerformedLongPress = false;
                 startLongPressDetection(x, y, index, item);
                 setPressed(true);
@@ -215,11 +216,11 @@ public class LauncherLayout extends ViewGroup {
             }
 
             case MotionEvent.ACTION_UP -> {
-                Log.i(TAG, "Released at " + item.cellX + "," + item.cellY);
+                Log.i(TAG, "Released at " + item.getCellX() + "," + item.getCellY());
                 cancelLongPressDetection();
                 setPressed(false);
-                if (!hasPerformedLongPress && onItemClickListener != null) {
-                    onItemClickListener.onItemClick(item, index);
+                if (!hasPerformedLongPress && onIconClickListener != null) {
+                    performClick();
                 }
                 return true;
             }
@@ -250,6 +251,11 @@ public class LauncherLayout extends ViewGroup {
     }
 
     @Override
+    public boolean performLongClick() {
+        return super.performLongClick();
+    }
+
+    @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         // Cancel long press detection
@@ -263,16 +269,16 @@ public class LauncherLayout extends ViewGroup {
         Parcelable parcelable = super.onSaveInstanceState();
         Bundle savedState = new Bundle();
         savedState.putParcelable(PARCELABLE, parcelable);
-        savedState.putInt(NUM_ROWS, numRows);
         savedState.putInt(NUM_COLUMNS, numColumns);
+        savedState.putInt(NUM_ROWS, numRows);
         return parcelable;
     }
 
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
         if (state instanceof Bundle bundle) {
-            numRows = bundle.getInt(NUM_ROWS, 5);
             numColumns = bundle.getInt(NUM_COLUMNS, 5);
+            numRows = bundle.getInt(NUM_ROWS, 5);
             Parcelable parcelable = bundle.getParcelable(PARCELABLE);
             super.onRestoreInstanceState(parcelable);
             postInvalidate();
@@ -281,15 +287,15 @@ public class LauncherLayout extends ViewGroup {
         }
     }
 
-    private void startLongPressDetection(float x, float y, int index, LauncherIconEntity item) {
+    private void startLongPressDetection(float x, float y, int index, IconEntity item) {
         touchedX = x;
         touchedY = y;
         longPressRunnable = () -> {
             hasPerformedLongPress = true;
             boolean handledBySystem = super.performLongClick();
             Log.i(TAG, "Long press handled by system: " + handledBySystem);
-            if (onItemClickListener != null) {
-                onItemClickListener.onItemLongClick(item, index, x, y, getChildAt(index));
+            if (onIconClickListener != null) {
+
             }
         };
         postDelayed(longPressRunnable, longPressTimeout);
@@ -316,21 +322,13 @@ public class LauncherLayout extends ViewGroup {
         }
         // Return the index of touched cell item
         int index = row * numColumns + col;
-        return index < entityList.size() ? index : -1;
+        return index < iconEntityList.size() ? index : -1;
     }
 
     @Nullable
-    public LauncherIconEntity getItemAtPosition(float x, float y) {
+    public IconEntity getItemAtPosition(float x, float y) {
         int index = getItemIndexAtPosition(x, y);
-        return index >= 0 ? entityList.get(index) : null;
-    }
-
-    public void setNumRows(int numRows) {
-        if (numRows > 0 && this.numRows != numRows) {
-            this.numRows = numRows;
-            requestLayout();
-            invalidate();
-        }
+        return index >= 0 ? iconEntityList.get(index) : null;
     }
 
     public void setNumColumns(int numColumns) {
@@ -341,14 +339,22 @@ public class LauncherLayout extends ViewGroup {
         }
     }
 
-    public void setGridSize(int numRows, int numColumns) {
-        boolean valueSet = false;
+    public void setNumRows(int numRows) {
         if (numRows > 0 && this.numRows != numRows) {
             this.numRows = numRows;
-            valueSet = true;
+            requestLayout();
+            invalidate();
         }
+    }
+
+    public void setGridSize(int numColumns, int numRows) {
+        boolean valueSet = false;
         if (numColumns > 0 && this.numColumns != numColumns) {
             this.numColumns = numColumns;
+            valueSet = true;
+        }
+        if (numRows > 0 && this.numRows != numRows) {
+            this.numRows = numRows;
             valueSet = true;
         }
         if (valueSet) {
@@ -419,23 +425,28 @@ public class LauncherLayout extends ViewGroup {
         }
     }
 
-    public void setEntityList(List<LauncherIconEntity> entityList) {
+    public void setIconEntityList(List<IconEntity> iconEntityList) {
         if (isAccessingList.compareAndSet(false, true)) {
             try {
                 synchronized (accessListLock) {
-                    if (entityList == null) {
-                        this.entityList = new ArrayList<>();
-                        removeAllViews();
-                        viewList.clear();
-                        Log.i(TAG, "Cleared list through passing null to setList.");
+                    removeAllViews();
+                    viewList.clear();
+                    if (iconEntityList == null) {
+                        this.iconEntityList = new ArrayList<>();
+                        Log.i(TAG, "Cleared list through passing null to setList().");
                     } else {
-                        this.entityList = new ArrayList<>(entityList);
-                        Log.i(TAG, "Size of new list is " + entityList.size());
-                        removeAllViews();
-                        viewList.clear();
-                        for (int i = 0; i < entityList.size(); i++) {
+                        this.iconEntityList = new ArrayList<>(iconEntityList);
+                        Log.i(TAG, "Size of new list is " + iconEntityList.size());
+                        for (int i = 0; i < iconEntityList.size(); i++) {
+                            IconEntity entity = iconEntityList.get(i);
                             LauncherIconView launcherIconView = new LauncherIconView(getContext());
-                            launcherIconView.setLauncherIconEntity(entityList.get(i));
+                            launcherIconView.setLauncherIconEntity(entity);
+                            launcherIconView.setOnClickListener(v -> {
+                                onIconClickListener.onIconClick(v, entity);
+                            });
+                            launcherIconView.setOnLongClickListener(v -> {
+                                return onIconClickListener.onIconLongClick(v, entity);
+                            });
                             viewList.add(launcherIconView);
                             addView(launcherIconView);
                         }
@@ -449,7 +460,7 @@ public class LauncherLayout extends ViewGroup {
         }
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.onItemClickListener = listener;
+    public void setOnIconClickListener(OnIconClickListener listener) {
+        this.onIconClickListener = listener;
     }
 }

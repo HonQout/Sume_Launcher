@@ -29,18 +29,18 @@ public class BluetoothViewModel extends AndroidViewModel {
     @DrawableRes
     private final MutableLiveData<Integer> mBtIconRes = new MutableLiveData<>(iconDisabled);
     // broadcast receiver
-    private BroadcastReceiver btBroadcastReceiver = null;
+    private BroadcastReceiver broadcastReceiver = null;
 
     public BluetoothViewModel(@NonNull Application application) {
         super(application);
         init();
-        registerBtBR();
+        registerBroadcastReceiver();
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-        unregisterBtBR();
+        unregisterBroadcastReceiver();
     }
 
     private void init() {
@@ -50,8 +50,8 @@ public class BluetoothViewModel extends AndroidViewModel {
         mBtIconRes.postValue(isEnabled ? iconEnabled : iconDisabled);
     }
 
-    private void registerBtBR() {
-        if (btBroadcastReceiver != null) {
+    private void registerBroadcastReceiver() {
+        if (broadcastReceiver != null) {
             return;
         }
 
@@ -59,7 +59,7 @@ public class BluetoothViewModel extends AndroidViewModel {
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         filter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
 
-        btBroadcastReceiver = new BroadcastReceiver() {
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
@@ -80,14 +80,14 @@ public class BluetoothViewModel extends AndroidViewModel {
             }
         };
 
-        ContextCompat.registerReceiver(getApplication(), btBroadcastReceiver, filter,
+        ContextCompat.registerReceiver(getApplication(), broadcastReceiver, filter,
                 ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
-    private void unregisterBtBR() {
-        if (btBroadcastReceiver != null) {
-            getApplication().unregisterReceiver(btBroadcastReceiver);
-            btBroadcastReceiver = null;
+    private void unregisterBroadcastReceiver() {
+        if (broadcastReceiver != null) {
+            getApplication().unregisterReceiver(broadcastReceiver);
+            broadcastReceiver = null;
         }
     }
 

@@ -12,9 +12,9 @@ import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.load.model.ModelLoaderFactory;
 import com.bumptech.glide.load.model.MultiModelLoaderFactory;
 import com.qch.sumelauncher.glide.datafetcher.LauncherIconDataFetcher;
-import com.qch.sumelauncher.room.entity.LauncherIconEntity;
+import com.qch.sumelauncher.room.entity.IconEntity;
 
-public class LauncherIconModelLoader implements ModelLoader<LauncherIconEntity, Bitmap> {
+public class LauncherIconModelLoader implements ModelLoader<IconEntity, Bitmap> {
     private final Context context;
 
     public LauncherIconModelLoader(Context context) {
@@ -23,17 +23,17 @@ public class LauncherIconModelLoader implements ModelLoader<LauncherIconEntity, 
 
     @Nullable
     @Override
-    public LoadData<Bitmap> buildLoadData(@NonNull LauncherIconEntity launcherIconEntity, int width, int height,
+    public LoadData<Bitmap> buildLoadData(@NonNull IconEntity iconEntity, int width, int height,
                                           @NonNull Options options) {
-        return new LoadData<>(new GlideUrl(launcherIconEntity.getKey()), new LauncherIconDataFetcher(context, launcherIconEntity));
+        return new LoadData<>(new GlideUrl(iconEntity.getKey()), new LauncherIconDataFetcher(context, iconEntity));
     }
 
     @Override
-    public boolean handles(@NonNull LauncherIconEntity launcherIconEntity) {
+    public boolean handles(@NonNull IconEntity iconEntity) {
         return true;
     }
 
-    public static class Factory implements ModelLoaderFactory<LauncherIconEntity, Bitmap> {
+    public static class Factory implements ModelLoaderFactory<IconEntity, Bitmap> {
         private final Context context;
 
         public Factory(Context context) {
@@ -42,7 +42,7 @@ public class LauncherIconModelLoader implements ModelLoader<LauncherIconEntity, 
 
         @NonNull
         @Override
-        public ModelLoader<LauncherIconEntity, Bitmap> build(@NonNull MultiModelLoaderFactory multiFactory) {
+        public ModelLoader<IconEntity, Bitmap> build(@NonNull MultiModelLoaderFactory multiFactory) {
             return new LauncherIconModelLoader(context);
         }
 

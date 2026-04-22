@@ -14,12 +14,12 @@ import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DrawableUtils;
 
 public class ActivityIconDataFetcher implements DataFetcher<Bitmap> {
-    private final Context context;
+    private final Context appContext;
     private final String packageName;
     private final String activityName;
 
     public ActivityIconDataFetcher(Context context, ActivityBean activityBean) {
-        this.context = context;
+        this.appContext = context.getApplicationContext();
         this.packageName = activityBean.getPackageName();
         this.activityName = activityBean.getActivityName();
     }
@@ -27,7 +27,7 @@ public class ActivityIconDataFetcher implements DataFetcher<Bitmap> {
     @Override
     public void loadData(@NonNull Priority priority, @NonNull DataCallback<? super Bitmap> callback) {
         try {
-            Drawable icon = ApplicationUtils.getActivityIcon(context, packageName, activityName);
+            Drawable icon = ApplicationUtils.getActivityIcon(appContext, packageName, activityName);
             Bitmap bitmap = DrawableUtils.toBitmap(icon);
             callback.onDataReady(bitmap);
         } catch (Exception e) {

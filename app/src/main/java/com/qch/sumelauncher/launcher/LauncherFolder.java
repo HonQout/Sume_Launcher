@@ -4,9 +4,9 @@ import java.util.List;
 
 public class LauncherFolder extends LauncherItem {
     private String name;
-    private List<LauncherIconData> items;
+    private List<LauncherIcon> items;
 
-    public LauncherFolder(long id, CellPosition cellPosition, String name, List<LauncherIconData> items) {
+    public LauncherFolder(long id, CellPosition cellPosition, String name, List<LauncherIcon> items) {
         super(id, cellPosition);
         this.name = name;
         this.items = items;
@@ -21,7 +21,7 @@ public class LauncherFolder extends LauncherItem {
         return name;
     }
 
-    public List<LauncherIconData> getItems() {
+    public List<LauncherIcon> getItems() {
         return items;
     }
 }

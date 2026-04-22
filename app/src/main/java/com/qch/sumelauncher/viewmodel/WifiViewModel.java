@@ -26,7 +26,6 @@ import com.qch.sumelauncher.utils.WifiUtils;
 
 public class WifiViewModel extends AndroidViewModel {
     private static final String TAG = "WifiViewModel";
-
     // data
     private final MutableLiveData<Boolean> mWifiEnabled = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mWifiConnected = new MutableLiveData<>();
@@ -34,20 +33,20 @@ public class WifiViewModel extends AndroidViewModel {
     @DrawableRes
     private final MutableLiveData<Integer> mWifiIconRes = new MutableLiveData<>();
     // broadcast receiver
-    private BroadcastReceiver wifiBroadcastReceiver = null;
+    private BroadcastReceiver broadcastReceiver = null;
     // callback
     private ConnectivityManager.NetworkCallback wifiCallback;
 
     public WifiViewModel(@NonNull Application application) {
         super(application);
-        registerWifiBR();
+        registerBroadcastReceiver();
         registerWifiCallback();
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-        unregisterWifiBR();
+        unregisterBroadcastReceiver();
         unregisterWifiCallback();
     }
 
@@ -67,15 +66,15 @@ public class WifiViewModel extends AndroidViewModel {
         }
     }
 
-    private void registerWifiBR() {
-        if (wifiBroadcastReceiver != null) {
+    private void registerBroadcastReceiver() {
+        if (broadcastReceiver != null) {
             return;
         }
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
 
-        wifiBroadcastReceiver = new BroadcastReceiver() {
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
@@ -90,14 +89,14 @@ public class WifiViewModel extends AndroidViewModel {
             }
         };
 
-        ContextCompat.registerReceiver(getApplication(), wifiBroadcastReceiver, filter,
+        ContextCompat.registerReceiver(getApplication(), broadcastReceiver, filter,
                 ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
-    private void unregisterWifiBR() {
-        if (wifiBroadcastReceiver != null) {
-            getApplication().unregisterReceiver(wifiBroadcastReceiver);
-            wifiBroadcastReceiver = null;
+    private void unregisterBroadcastReceiver() {
+        if (broadcastReceiver != null) {
+            getApplication().unregisterReceiver(broadcastReceiver);
+            broadcastReceiver = null;
         }
     }
 

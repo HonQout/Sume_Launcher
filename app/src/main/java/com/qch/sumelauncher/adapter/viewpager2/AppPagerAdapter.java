@@ -22,7 +22,6 @@ public class AppPagerAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         Log.i(TAG, "Create Fragment #" + position);
-        //return GridFragment.newInstance(position);
         return LauncherPageFragment.newInstance(position);
     }
 

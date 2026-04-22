@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Sume Launcher</string>
-    <string name="version_name" translatable="false">1.3.0 beta4</string>
+    <string name="version_name" translatable="false">1.3.0 beta5</string>
 
     <!-- Basic -->
     <string name="cancel">Cancel</string>
@@ -18,10 +18,10 @@
     <string name="list">List</string>
 
     <!-- Menu -->
-    <string name="app_info">App info</string>
+    <string name="remove_icon">Remove icon</string>
     <string name="uninstall">Uninstall</string>
+    <string name="app_info">App info</string>
     <string name="app_market">App market</string>
-    <string name="hide">Hide</string>
 
     <!-- Content Description -->
     <string name="airplane_mode_icon">Airplane mode icon</string>
@@ -47,7 +47,7 @@
     <string name="cannot_uninstall_app">Cannot uninstall this app.</string>
     <string name="uri_is_empty">Uri is empty.</string>
     <string name="no_matching_activity">No activity can open this link.</string>
-    <string name="insist_uninstall_system_app">This is a system app, which is usually not recommended to uninstall. \nHowever, in some 3rd-party Android systems, this kind of app is allowed to uninstall. \nIf you want to try to uninstall this app, press \"Uninstall\". This operation is not guaranteed to be successful.</string>
+    <string name="insist_uninstall_system_app">This is a system app, which is usually not recommended and not allowed to uninstall. \nHowever, in some 3rd-party Android systems, this kind of app is allowed to uninstall. \nIf you want to try to uninstall this app, press \"Uninstall\". This operation is not guaranteed to be successful.</string>
     <string name="uninstall_app_failed">Failed to uninstall app.</string>
 
     <!-- Preference Headers -->
@@ -81,5 +81,6 @@
     <string name="require_following_permission">This application requires the following permission(s):</string>
     <string name="num_items">%d item(s)</string>
     <string name="search_for_items">Search for item(s)</string>
+
 
 </resources>

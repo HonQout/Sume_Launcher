@@ -19,37 +19,35 @@ import com.qch.sumelauncher.utils.BatteryUtils;
 
 public class BatteryViewModel extends AndroidViewModel {
     private static final String TAG = "BatteryViewModel";
-
     // data
     private final MutableLiveData<Integer> mLevel = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mIsCharging = new MutableLiveData<>();
     @DrawableRes
     private final MutableLiveData<Integer> mIcon = new MutableLiveData<>();
-
     // broadcast receiver
-    private BroadcastReceiver batteryBroadcastReceiver;
+    private BroadcastReceiver broadcastReceiver;
 
     public BatteryViewModel(@NonNull Application application) {
         super(application);
-        registerBatteryBR();
+        registerBroadcastReceiver();
         init();
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-        unregisterBatteryBR();
+        unregisterBroadcastReceiver();
     }
 
-    private void registerBatteryBR() {
-        if (batteryBroadcastReceiver != null) {
+    private void registerBroadcastReceiver() {
+        if (broadcastReceiver != null) {
             return;
         }
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
 
-        batteryBroadcastReceiver = new BroadcastReceiver() {
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
@@ -64,13 +62,14 @@ public class BatteryViewModel extends AndroidViewModel {
             }
         };
 
-        ContextCompat.registerReceiver(getApplication(), batteryBroadcastReceiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        ContextCompat.registerReceiver(getApplication(), broadcastReceiver, intentFilter,
+                ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
-    private void unregisterBatteryBR() {
-        if (batteryBroadcastReceiver != null) {
-            getApplication().unregisterReceiver(batteryBroadcastReceiver);
-            batteryBroadcastReceiver = null;
+    private void unregisterBroadcastReceiver() {
+        if (broadcastReceiver != null) {
+            getApplication().unregisterReceiver(broadcastReceiver);
+            broadcastReceiver = null;
         }
     }
 
