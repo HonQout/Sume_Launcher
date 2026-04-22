@@ -185,7 +185,9 @@ public class DrawerFragment extends Fragment {
             } else if (menuId == R.id.uninstall) {
                 ApplicationUtils.ApplicationType type = ApplicationUtils.getApplicationType(
                         requireActivity(), item.getPackageName());
-                if (type == ApplicationUtils.ApplicationType.UPDATED_SYSTEM
+                if (requireContext().getPackageName().equals(item.getPackageName())) {
+                    showUninstallThisAppDialog();
+                } else if (type == ApplicationUtils.ApplicationType.UPDATED_SYSTEM
                         || type == ApplicationUtils.ApplicationType.USER) {
                     IntentUtils.handleLaunchIntentResult(
                             requireActivity(),
@@ -228,6 +230,20 @@ public class DrawerFragment extends Fragment {
                         IntentUtils.handleLaunchIntentResult(
                                 requireContext(),
                                 IntentUtils.requireUninstallApp(requireContext(), packageName)
+                        ))
+                .setNegativeButton(R.string.cancel, null);
+        DialogUtils.show(builder, viewModel.getAnimationValue());
+    }
+
+    private void showUninstallThisAppDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity())
+                .setTitle(R.string.hint)
+                .setMessage(R.string.insist_uninstall_this_app)
+                .setPositiveButton(R.string.uninstall, (dialog, which) ->
+                        IntentUtils.handleLaunchIntentResult(
+                                requireContext(),
+                                IntentUtils.requireUninstallApp(requireContext(),
+                                        requireContext().getPackageName())
                         ))
                 .setNegativeButton(R.string.cancel, null);
         DialogUtils.show(builder, viewModel.getAnimationValue());
