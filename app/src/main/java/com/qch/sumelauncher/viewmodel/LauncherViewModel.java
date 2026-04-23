@@ -65,7 +65,7 @@ public class LauncherViewModel extends AndroidViewModel {
     private final MutableLiveData<String> mGridSize = new MutableLiveData<>("5,5");
     private final MutableLiveData<Integer> mNumRow = new MutableLiveData<>();
     private final MutableLiveData<Integer> mNumColumn = new MutableLiveData<>();
-    private final MutableLiveData<Integer> mCurrentScreen = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mCurrentScreen = new MutableLiveData<>(1);
     private final MutableLiveData<List<ActivityBean>> mActivityBeanList = new MutableLiveData<>();
 
     // multi-thread
@@ -316,7 +316,6 @@ public class LauncherViewModel extends AndroidViewModel {
                 // initialize
                 list = new ArrayList<>(ApplicationUtils.getActivityBeanList(getApplication(), null));
                 sortActivityBeanList(list);
-                mCurrentScreen.postValue(1);
             } else {
                 list = new ArrayList<>(mActivityBeanList.getValue());
             }
@@ -423,7 +422,7 @@ public class LauncherViewModel extends AndroidViewModel {
         return 1;
     }
 
-    public void setCurrentPage(int newValue) {
+    public void setCurrentScreen(int newValue) {
         mCurrentScreen.postValue(newValue);
     }
 
