@@ -102,7 +102,7 @@ public class LauncherPageFragment extends Fragment {
                         Log.e(TAG, "Cannot find corresponding view.");
                         return false;
                     }
-                    showGridMenu(view, iconEntity);
+                    showIconActionMenu(view, iconEntity);
                     return true;
                 }
             });
@@ -115,6 +115,7 @@ public class LauncherPageFragment extends Fragment {
                 @Override
                 public boolean onBlankLongClick(int x, int y) {
                     Log.i(TAG, "Long clicked blank cell " + x + "," + y);
+                    viewModel.setLauncherState(LauncherViewModel.LauncherState.EDIT);
                     return false;
                 }
             });
@@ -122,7 +123,7 @@ public class LauncherPageFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private void showGridMenu(@NonNull View view, @NonNull IconEntity iconEntity) {
+    private void showIconActionMenu(@NonNull View view, @NonNull IconEntity iconEntity) {
         ActivityInfo activityInfo = ApplicationUtils.getActivityInfo(
                 requireContext(),
                 iconEntity.getPackageName(),

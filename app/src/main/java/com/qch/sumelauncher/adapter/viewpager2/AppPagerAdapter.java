@@ -30,7 +30,7 @@ public class AppPagerAdapter extends FragmentStateAdapter {
         return numPages;
     }
 
-    public void setNumPages(int numPages) {
+    public void setNumScreen(int numPages) {
         this.numPages = numPages;
         notifyDataSetChanged();
     }

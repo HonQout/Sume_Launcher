@@ -73,7 +73,8 @@ public class LauncherActivity extends AppCompatActivity {
         viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-                launcherViewModel.setCurrentPage(position + 1);
+                Log.i(TAG, "ViewPager2 onPageSelected position " + (position + 1));
+                launcherViewModel.setCurrentScreen(position + 1);
             }
         });
         binding.aLauncherBtnBack.setOnClickListener(v ->
@@ -227,7 +228,7 @@ public class LauncherActivity extends AppCompatActivity {
         });
         launcherViewModel.getNumScreen().observe(this, integer -> {
             if (integer != null) {
-                appPagerAdapter.setNumPages(integer);
+                appPagerAdapter.setNumScreen(integer);
                 binding.aLauncherTvPage.setText(
                         String.format(
                                 ContextCompat.getString(this, R.string.page_text),
@@ -235,15 +236,15 @@ public class LauncherActivity extends AppCompatActivity {
                         ));
             }
         });
-        launcherViewModel.getCurrentScreen().observe(this, integer ->
+        launcherViewModel.getCurrentScreen().observe(this, integer -> {
+            if (integer != null) {
                 binding.aLauncherTvPage.setText(
                         String.format(
-                                ContextCompat.getString(
-                                        LauncherActivity.this,
-                                        R.string.page_text
-                                ),
+                                ContextCompat.getString(this, R.string.page_text),
                                 integer, launcherViewModel.getNumScreenValue()
-                        )));
+                        ));
+            }
+        });
         launcherViewModel.getLauncherState().observe(this, launcherState -> {
             Log.i(TAG, "Prepare to examine launcher state.");
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -345,9 +346,8 @@ public class LauncherActivity extends AppCompatActivity {
             int currentItem = viewPager2.getCurrentItem();
             if (currentItem > 0) {
                 currentItem -= 1;
+                viewPager2.setCurrentItem(currentItem, false);
             }
-            viewPager2.setCurrentItem(currentItem, false);
-            launcherViewModel.setCurrentPage(currentItem + 1);
         }
     }
 
@@ -357,9 +357,8 @@ public class LauncherActivity extends AppCompatActivity {
             int currentItem = viewPager2.getCurrentItem();
             if (currentItem < viewPager2.getAdapter().getItemCount() - 1) {
                 currentItem += 1;
+                viewPager2.setCurrentItem(currentItem, false);
             }
-            viewPager2.setCurrentItem(currentItem, false);
-            launcherViewModel.setCurrentPage(currentItem + 1);
         }
     }
 
