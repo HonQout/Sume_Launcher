@@ -116,7 +116,7 @@ public class WifiViewModel extends AndroidViewModel {
             public void onAvailable(@NonNull Network network) {
                 Log.i(TAG, "Wifi is connected.");
                 super.onAvailable(network);
-                mWifiConnected.postValue(false);
+                mWifiConnected.postValue(true);
             }
 
             @Override
