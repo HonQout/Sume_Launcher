@@ -94,22 +94,22 @@ public abstract class LauncherItemDatabase extends RoomDatabase {
         executorService.execute(() -> {
             LauncherItemDatabase database = getInstance(context);
             LayoutEntity layout44 =
-                    new LayoutEntity(LauncherIconRepository.LayoutConfig.FOUR_BY_FOUR.getConfig(),
+                    new LayoutEntity(LauncherIconRepository.LayoutConfig.FOUR_FOUR.getConfig(),
                             4, 4, false);
             database.launcherIconDao().insertLayout(layout44);
             database.launcherIconDao().insertIconList(getDefaultLauncherIconList(context, layout44));
             LayoutEntity layout45 =
-                    new LayoutEntity(LauncherIconRepository.LayoutConfig.FOUR_BY_FIVE.getConfig(),
+                    new LayoutEntity(LauncherIconRepository.LayoutConfig.FOUR_FIVE.getConfig(),
                             4, 5, false);
             database.launcherIconDao().insertLayout(layout45);
             database.launcherIconDao().insertIconList(getDefaultLauncherIconList(context, layout45));
             LayoutEntity layout54 =
-                    new LayoutEntity(LauncherIconRepository.LayoutConfig.FIVE_BY_FOUR.getConfig(),
+                    new LayoutEntity(LauncherIconRepository.LayoutConfig.FIVE_FOUR.getConfig(),
                             5, 4, false);
             database.launcherIconDao().insertLayout(layout54);
             database.launcherIconDao().insertIconList(getDefaultLauncherIconList(context, layout54));
             LayoutEntity layout55 =
-                    new LayoutEntity(LauncherIconRepository.LayoutConfig.FIVE_BY_FIVE.getConfig(),
+                    new LayoutEntity(LauncherIconRepository.LayoutConfig.FIVE_FIVE.getConfig(),
                             5, 5, true);
             database.launcherIconDao().insertLayout(layout55);
             database.launcherIconDao().insertIconList(getDefaultLauncherIconList(context, layout55));

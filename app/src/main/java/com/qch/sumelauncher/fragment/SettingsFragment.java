@@ -36,7 +36,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public boolean onPreferenceTreeClick(@NonNull Preference preference) {
         String key = preference.getKey();
-        if (Objects.equals(key, "set_default_app")) {
+        if (Objects.equals(key, "default_app")) {
             viewModel.startManageDefaultAppsSettings(requireActivity());
         } else if (Objects.equals(key, "requested_permissions")) {
             viewModel.startPermissionActivity(requireActivity());

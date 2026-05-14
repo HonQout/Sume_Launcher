@@ -1,8 +1,10 @@
 package com.qch.sumelauncher.view;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -12,17 +14,17 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.qch.sumelauncher.R;
+import com.qch.sumelauncher.launcher.Coordinate;
 import com.qch.sumelauncher.room.entity.IconEntity;
 import com.qch.sumelauncher.utils.UnitUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LauncherLayout extends ViewGroup {
     private static final String TAG = "LauncherLayout";
@@ -46,11 +48,10 @@ public class LauncherLayout extends ViewGroup {
     private int borderVerticalPaddingPx;
     private int gridHorizontalPaddingPx;
     private int gridVerticalPaddingPx;
-    private List<IconEntity> iconEntityList = new ArrayList<>();
-    private Map<Integer, IconEntity> iconEntityMap = new ConcurrentHashMap<>();
-    private List<LauncherIconView> viewList = new ArrayList<>();
-    private final AtomicBoolean isAccessingList = new AtomicBoolean(false);
-    private final Object accessListLock = new Object();
+    private boolean isEditMode = false;
+    private Drawable plusDrawable;
+    private Map<Coordinate, IconEntity> iconEntityMap = new ConcurrentHashMap<>();
+    private Map<Coordinate, LauncherIconView> iconViewMap = new ConcurrentHashMap<>();
 
     // listener interface
     public interface OnIconClickListener {
@@ -159,48 +160,40 @@ public class LauncherLayout extends ViewGroup {
         setMeasuredDimension(measuredWidth, measuredHeight);
 
         // Measure all child views
-        if (isAccessingList.compareAndSet(false, true)) {
-            try {
-                synchronized (accessListLock) {
-                    for (LauncherIconView item : viewList) {
-                        int childWidthSpec = MeasureSpec.makeMeasureSpec(cellWidth, MeasureSpec.EXACTLY);
-                        int childHeightSpec = MeasureSpec.makeMeasureSpec(cellHeight, MeasureSpec.EXACTLY);
-                        item.measure(childWidthSpec, childHeightSpec);
-                    }
-                }
-            } finally {
-                isAccessingList.set(false);
-            }
+        for (LauncherIconView item : iconViewMap.values()) {
+            int childWidthSpec = MeasureSpec.makeMeasureSpec(cellWidth, MeasureSpec.EXACTLY);
+            int childHeightSpec = MeasureSpec.makeMeasureSpec(cellHeight, MeasureSpec.EXACTLY);
+            item.measure(childWidthSpec, childHeightSpec);
         }
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if (iconEntityList == null || iconEntityList.isEmpty()) {
+        if (iconEntityMap == null || iconEntityMap.isEmpty()) {
             return;
         }
-        if (isAccessingList.compareAndSet(false, true)) {
-            try {
-                synchronized (accessListLock) {
-                    for (LauncherIconView item : viewList) {
-                        IconEntity iconEntity = item.getLauncherIconEntity();
-                        if (iconEntity == null) {
-                            continue;
-                        }
-                        int col = iconEntity.getCellX();
-                        int row = iconEntity.getCellY();
-
-                        int cellLeft = borderHorizontalPaddingPx + col * cellWidth;
-                        int cellTop = borderVerticalPaddingPx + row * cellHeight;
-                        int cellRight = cellLeft + cellWidth;
-                        int cellBottom = cellTop + cellHeight;
-
-                        item.layout(cellLeft, cellTop, cellRight, cellBottom);
-                    }
-                }
-            } finally {
-                isAccessingList.set(false);
+        for (LauncherIconView item : iconViewMap.values()) {
+            IconEntity iconEntity = item.getLauncherIconEntity();
+            if (iconEntity == null) {
+                continue;
             }
+            int col = iconEntity.getCellX();
+            int row = iconEntity.getCellY();
+
+            int cellLeft = borderHorizontalPaddingPx + col * cellWidth;
+            int cellTop = borderVerticalPaddingPx + row * cellHeight;
+            int cellRight = cellLeft + cellWidth;
+            int cellBottom = cellTop + cellHeight;
+
+            item.layout(cellLeft, cellTop, cellRight, cellBottom);
+        }
+    }
+
+    @Override
+    protected void onDraw(@NonNull Canvas canvas) {
+        super.onDraw(canvas);
+        if (isEditMode) {
+
         }
     }
 
@@ -208,13 +201,13 @@ public class LauncherLayout extends ViewGroup {
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
-        int[] position = getItemPositionAtPosition(x, y);
-        if (position == null || position.length != 2) {
+        Coordinate coordinate = getItemCoordinateAtPosition(x, y);
+        if (coordinate == null) {
             Log.i(TAG, "Cannot get position of pressed cell.");
             return super.onTouchEvent(event);
         }
-        int col = position[0];
-        int row = position[1];
+        int col = coordinate.getX();
+        int row = coordinate.getY();
         int action = event.getActionMasked();
         switch (action) {
             case MotionEvent.ACTION_DOWN -> {
@@ -316,7 +309,7 @@ public class LauncherLayout extends ViewGroup {
     }
 
     @Nullable
-    public int[] getItemPositionAtPosition(float x, float y) {
+    public Coordinate getItemCoordinateAtPosition(float x, float y) {
         // If touching point is out of bound, return -1
         if (x < borderHorizontalPaddingPx
                 || y < borderVerticalPaddingPx
@@ -332,24 +325,16 @@ public class LauncherLayout extends ViewGroup {
             return null;
         }
         // Return the position of touched cell item
-        return new int[]{col, row};
+        return new Coordinate(col, row);
     }
 
     @Nullable
     public IconEntity getItemAtPosition(float x, float y) {
-        int[] position = getItemPositionAtPosition(x, y);
-        if (position == null || position.length != 2) {
+        Coordinate coordinate = getItemCoordinateAtPosition(x, y);
+        if (coordinate == null) {
             return null;
         }
-        int col = position[0];
-        int row = position[1];
-        for (int i = 0; i < iconEntityList.size(); i++) {
-            IconEntity iconEntity = iconEntityList.get(i);
-            if (iconEntity.getCellX() == col && iconEntity.getCellY() == row) {
-                return iconEntity;
-            }
-        }
-        return null;
+        return iconEntityMap.get(coordinate);
     }
 
     public void setNumColumns(int numColumns) {
@@ -446,39 +431,37 @@ public class LauncherLayout extends ViewGroup {
         }
     }
 
+    public void setEditMode(boolean isEditMode) {
+        this.isEditMode = isEditMode;
+        invalidate();
+    }
+
     public void setIconEntityList(List<IconEntity> iconEntityList) {
-        if (isAccessingList.compareAndSet(false, true)) {
-            try {
-                synchronized (accessListLock) {
-                    removeAllViews();
-                    viewList.clear();
-                    if (iconEntityList == null) {
-                        this.iconEntityList = new ArrayList<>();
-                        Log.i(TAG, "Cleared list through passing null to setList().");
-                    } else {
-                        this.iconEntityList = new ArrayList<>(iconEntityList);
-                        Log.i(TAG, "Size of new list is " + iconEntityList.size());
-                        for (int i = 0; i < iconEntityList.size(); i++) {
-                            IconEntity entity = iconEntityList.get(i);
-                            LauncherIconView launcherIconView = new LauncherIconView(getContext());
-                            launcherIconView.setLauncherIconEntity(entity);
-                            launcherIconView.setOnClickListener(v -> {
-                                onIconClickListener.onIconClick(v, entity);
-                            });
-                            launcherIconView.setOnLongClickListener(v -> {
-                                return onIconClickListener.onIconLongClick(v, entity);
-                            });
-                            viewList.add(launcherIconView);
-                            addView(launcherIconView);
-                        }
-                    }
-                    requestLayout();
-                    postInvalidate();
-                }
-            } finally {
-                isAccessingList.set(false);
+        removeAllViews();
+        iconViewMap.clear();
+        if (iconEntityList == null) {
+            this.iconEntityMap = new ConcurrentHashMap<>();
+            Log.i(TAG, "Cleared list through passing null to setList().");
+        } else {
+            Log.i(TAG, "Size of new list is " + iconEntityList.size());
+            for (int i = 0; i < iconEntityList.size(); i++) {
+                IconEntity iconEntity = iconEntityList.get(i);
+                Coordinate coordinate = new Coordinate(iconEntity.getCellX(), iconEntity.getCellY());
+                iconEntityMap.put(coordinate, iconEntity);
+                LauncherIconView launcherIconView = new LauncherIconView(getContext());
+                launcherIconView.setLauncherIconEntity(iconEntity);
+                launcherIconView.setOnIconClickListener(v -> {
+                    onIconClickListener.onIconClick(v, iconEntity);
+                });
+                launcherIconView.setOnIconLongClickListener(v -> {
+                    return onIconClickListener.onIconLongClick(v, iconEntity);
+                });
+                iconViewMap.put(coordinate, launcherIconView);
+                addView(launcherIconView);
             }
         }
+        requestLayout();
+        postInvalidate();
     }
 
     public void setOnIconClickListener(OnIconClickListener listener) {
@@ -487,5 +470,11 @@ public class LauncherLayout extends ViewGroup {
 
     public void setOnBlankClickListener(OnBlankClickListener listener) {
         this.onBlankClickListener = listener;
+    }
+
+    public Coordinate removeIconView(IconEntity iconEntity) {
+        Coordinate coordinate = new Coordinate(iconEntity.getCellX(), iconEntity.getCellY());
+        iconViewMap.remove(coordinate);
+        return coordinate;
     }
 }

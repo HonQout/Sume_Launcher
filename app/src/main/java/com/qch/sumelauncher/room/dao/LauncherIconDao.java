@@ -83,5 +83,5 @@ public interface LauncherIconDao {
     }
 
     @Update
-    void updateIcon(IconEntity iconEntity);
+    int updateIcon(IconEntity iconEntity);
 }
