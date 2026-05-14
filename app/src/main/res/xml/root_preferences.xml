@@ -18,11 +18,11 @@
 
         <ListPreference
             app:defaultValue="5,5"
-            app:entries="@array/grid_count_entries"
-            app:entryValues="@array/grid_count_values"
+            app:entries="@array/grid_size_entries"
+            app:entryValues="@array/grid_size_values"
             app:iconSpaceReserved="false"
-            app:key="grid_count"
-            app:title="@string/grid_count"
+            app:key="grid_size"
+            app:title="@string/grid_size"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
@@ -76,8 +76,8 @@
 
         <Preference
             app:iconSpaceReserved="false"
-            app:key="set_default_app"
-            app:title="@string/set_default_app" />
+            app:key="default_app"
+            app:title="@string/default_app" />
 
     </PreferenceCategory>
 

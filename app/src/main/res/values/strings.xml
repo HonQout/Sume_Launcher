@@ -19,6 +19,7 @@
     <string name="list">List</string>
 
     <!-- Menu -->
+    <string name="move_to_new_screen">Move to new screen</string>
     <string name="remove_icon">Remove icon</string>
     <string name="uninstall">Uninstall</string>
     <string name="app_info">App info</string>
@@ -60,14 +61,14 @@
     <string name="header_about">About</string>
 
     <!-- Preference Items -->
-    <string name="grid_count">Grid count</string>
+    <string name="grid_size">Grid size</string>
     <string name="display_status_bar">Display status bar</string>
     <string name="display_top_bar">Display top bar</string>
     <string name="animation">Animation</string>
     <string name="scroll_switch_page">Scroll to switch page</string>
     <string name="volume_key_switch_page">Use volume key to switch page</string>
     <string name="volume_key_switch_page_summary">PageUp and PageDown key are also regarded as volume keys</string>
-    <string name="set_default_app">Set default app</string>
+    <string name="default_app">Default app</string>
     <string name="requested_permissions">Requested permissions</string>
     <string name="ask_for_perm_fine_location">Ask for permission to access fine location</string>
     <string name="ask_for_perm_fine_location_summary">Allow this app to ask for permission to access fine location</string>

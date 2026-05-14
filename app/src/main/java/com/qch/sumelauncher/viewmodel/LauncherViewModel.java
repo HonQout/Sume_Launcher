@@ -72,10 +72,6 @@ public class LauncherViewModel extends AndroidViewModel {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private final AtomicBoolean isUpdatingList = new AtomicBoolean(false);
     private final Object updateListLock = new Object();
-    private final AtomicBoolean isUpdatingLauncherIcon = new AtomicBoolean(false);
-    private final Object updateLauncherIconLock = new Object();
-    private final AtomicBoolean isEditingMap = new AtomicBoolean(false);
-    private final Object editMapLock = new Object();
 
     // persistence
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -271,9 +267,9 @@ public class LauncherViewModel extends AndroidViewModel {
                         throwable -> Log.e(TAG, "Cannot get value of key ask_for_perm_fine_location.", throwable)
                 );
         compositeDisposable.add(disposable6);
-        // grid_count
+        // grid_size
         Disposable disposable7 = MyApplication.getPreferenceDataStore()
-                .getStringFlowable("grid_count", "5,5")
+                .getStringFlowable("grid_size", "5,5")
                 .subscribe(gridSize -> {
                             mGridSize.postValue(gridSize);
                             String[] split = gridSize.split(",");
@@ -293,7 +289,7 @@ public class LauncherViewModel extends AndroidViewModel {
                             mNumRow.postValue(actualNumRow);
                             updateActivityBeanList(AppListOp.INIT, null);
                         },
-                        throwable -> Log.e(TAG, "Cannot get value of key grid_count.", throwable)
+                        throwable -> Log.e(TAG, "Cannot get value of key grid_size.", throwable)
                 );
         compositeDisposable.add(disposable7);
     }
@@ -448,6 +444,14 @@ public class LauncherViewModel extends AndroidViewModel {
 
     public LiveData<Integer> getNumScreen() {
         return numScreen;
+    }
+
+    public void insertIcon(@NonNull IconEntity iconEntity) {
+        repository.insertIcon(iconEntity);
+    }
+
+    public void moveIconToNewScreen(@NonNull IconEntity iconEntity) {
+        repository.moveIconToNewScreen(iconEntity);
     }
 
     public void removeIcon(@NonNull IconEntity iconEntity) {

@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
@@ -120,6 +121,9 @@ public class LauncherPageFragment extends Fragment {
                 }
             });
         });
+        viewModel.getLauncherState().observe(getViewLifecycleOwner(), launcherState -> {
+            binding.fLauncherLl.setEditMode(launcherState == LauncherViewModel.LauncherState.EDIT);
+        });
         return binding.getRoot();
     }
 
@@ -154,7 +158,11 @@ public class LauncherPageFragment extends Fragment {
         }
         popupMenu.setOnMenuItemClickListener(menuItem -> {
             int menuId = menuItem.getItemId();
-            if (menuId == R.id.remove_icon) {
+            if (menuId == R.id.move_to_new_screen) {
+                viewModel.moveIconToNewScreen(iconEntity);
+                return true;
+            } else if (menuId == R.id.remove_icon) {
+                binding.fLauncherLl.removeIconView(iconEntity);
                 viewModel.removeIcon(iconEntity);
                 return true;
             } else if (menuId == R.id.uninstall) {

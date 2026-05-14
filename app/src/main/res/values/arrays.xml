@@ -1,13 +1,13 @@
 <resources>
     <!-- Grid Count Preference -->
-    <string-array name="grid_count_entries">
+    <string-array name="grid_size_entries">
         <item>4×4</item>
         <item>4×5</item>
         <item>5×4</item>
         <item>5×5</item>
     </string-array>
 
-    <string-array name="grid_count_values">
+    <string-array name="grid_size_values">
         <item>4,4</item>
         <item>4,5</item>
         <item>5,4</item>

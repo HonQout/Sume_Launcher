@@ -142,4 +142,12 @@ public class LauncherIconView extends FrameLayout {
         textView.setText(ApplicationUtils.getActivityLabel(getContext(), activityInfo));
         textView.requestLayout();
     }
+
+    public void setOnIconClickListener(View.OnClickListener l) {
+        imageView.setOnClickListener(l);
+    }
+
+    public void setOnIconLongClickListener(View.OnLongClickListener l) {
+        imageView.setOnLongClickListener(l);
+    }
 }
