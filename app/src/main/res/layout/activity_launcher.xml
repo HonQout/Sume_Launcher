@@ -16,156 +16,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
     <FrameLayout
         android:id="@+id/a_launcher_fl"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/a_launcher_ll_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/a_launcher_top_bar">
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/a_launcher_vp2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
-        <FrameLayout
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/a_launcher_fcv"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:defaultNavHost="true"
             app:navGraph="@navigation/nav_graph" />
 
     </FrameLayout>
-
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/a_launcher_ll_bottom"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/a_launcher_ll_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/a_launcher_btn_back"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="@dimen/image_icon_size"
-                android:layout_height="@dimen/image_icon_size"
-                android:contentDescription="@string/back_icon"
-                android:src="@drawable/baseline_arrow_back_24"
-                android:tint="?android:textColorPrimary" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/a_launcher_tv_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="?android:textColorPrimary"
-                android:textSize="@dimen/bottom_title_size"
-                android:textStyle="bold" />
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <com.qch.sumelauncher.view.SingleTouchLinearLayoutCompat
-            android:id="@+id/a_launcher_ll_action"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/a_launcher_btn_settings"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="@dimen/image_icon_size"
-                android:layout_height="@dimen/image_icon_size"
-                android:contentDescription="@string/settings_icon"
-                android:src="@drawable/baseline_settings_24"
-                android:tint="?android:textColorPrimary" />
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/a_launcher_btn_edit"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="@dimen/image_icon_size"
-                android:layout_height="@dimen/image_icon_size"
-                android:contentDescription="@string/edit_icon"
-                android:src="@drawable/baseline_edit_24"
-                android:tint="?android:textColorPrimary" />
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/a_launcher_btn_apps"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="@dimen/image_icon_size"
-                android:layout_height="@dimen/image_icon_size"
-                android:contentDescription="@string/apps_icon"
-                android:src="@drawable/baseline_apps_24"
-                android:tint="?android:textColorPrimary" />
-
-        </com.qch.sumelauncher.view.SingleTouchLinearLayoutCompat>
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <com.qch.sumelauncher.view.SingleTouchLinearLayoutCompat
-            android:id="@+id/a_launcher_ll_page"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <Space
-                android:layout_width="8dp"
-                android:layout_height="0dp" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/a_launcher_tv_page"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?android:textColorPrimary"
-                android:textSize="@dimen/top_bar_text_size" />
-
-            <Space
-                android:layout_width="8dp"
-                android:layout_height="0dp" />
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/a_launcher_btn_prev_page"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="@dimen/image_icon_size"
-                android:layout_height="@dimen/image_icon_size"
-                android:contentDescription="@string/prev_page_icon"
-                android:src="@drawable/baseline_navigate_before_24"
-                android:tint="?android:textColorPrimary" />
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/a_launcher_btn_next_page"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="@dimen/image_icon_size"
-                android:layout_height="@dimen/image_icon_size"
-                android:contentDescription="@string/next_page_icon"
-                android:src="@drawable/baseline_navigate_next_24"
-                android:tint="?android:textColorPrimary" />
-
-        </com.qch.sumelauncher.view.SingleTouchLinearLayoutCompat>
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
