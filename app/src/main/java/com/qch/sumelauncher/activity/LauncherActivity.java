@@ -4,7 +4,6 @@ import android.Manifest;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
@@ -18,18 +17,13 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager2.widget.ViewPager2;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.adapter.viewpager2.AppPagerAdapter;
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
-import com.qch.sumelauncher.fragment.DrawerFragment;
-import com.qch.sumelauncher.fragment.SettingsFragment;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
 import com.qch.sumelauncher.utils.PermissionUtils;
@@ -67,26 +61,6 @@ public class LauncherActivity extends AppCompatActivity {
                 Log.i(TAG, "Back event is intercepted.");
             }
         });
-        ViewPager2 viewPager2 = binding.aLauncherVp2;
-        AppPagerAdapter appPagerAdapter = new AppPagerAdapter(this, 0);
-        viewPager2.setAdapter(appPagerAdapter);
-        viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                Log.i(TAG, "ViewPager2 onPageSelected position " + (position + 1));
-                launcherViewModel.setCurrentScreen(position + 1);
-            }
-        });
-        binding.aLauncherBtnBack.setOnClickListener(v ->
-                launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.NORMAL));
-        binding.aLauncherBtnSettings.setOnClickListener(v ->
-                launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.SETTINGS));
-        binding.aLauncherBtnEdit.setOnClickListener(v ->
-                launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.EDIT));
-        binding.aLauncherBtnApps.setOnClickListener(v ->
-                launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.APPS));
-        binding.aLauncherBtnPrevPage.setOnClickListener(v -> launcherPageUp());
-        binding.aLauncherBtnNextPage.setOnClickListener(v -> launcherPageDown());
         // Initialize viewmodel
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
         launcherViewModel = viewModelProvider.get(LauncherViewModel.class);
@@ -101,8 +75,6 @@ public class LauncherActivity extends AppCompatActivity {
                 UIUtils.handleStatusBarVisibility(getWindow(), b == null || b));
         launcherViewModel.getDisplayTopBar().observe(this, displayTopBar ->
                 binding.aLauncherTopBar.getRoot().setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
-        launcherViewModel.getScrollToSwitchPage().observe(this, scrollToSwitchPage ->
-                binding.aLauncherVp2.setUserInputEnabled(scrollToSwitchPage));
         timeViewModel.getCurrentTimeText().observe(this, currentTimeText -> {
             AppCompatTextView textView =
                     binding.aLauncherTopBar.topBarLeftPart.findViewById(R.id.top_bar_tv_time);
@@ -226,73 +198,20 @@ public class LauncherActivity extends AppCompatActivity {
             AppCompatImageView imageView = linearLayoutCompat.findViewById(R.id.top_bar_iv_battery);
             imageView.setImageResource(i);
         });
-        launcherViewModel.getNumScreen().observe(this, integer -> {
-            if (integer != null) {
-                appPagerAdapter.setNumScreen(integer);
-                binding.aLauncherTvPage.setText(
-                        String.format(
-                                ContextCompat.getString(this, R.string.page_text),
-                                launcherViewModel.getCurrentScreenValue(), integer
-                        ));
-            }
-        });
-        launcherViewModel.getCurrentScreen().observe(this, integer -> {
-            if (integer != null) {
-                binding.aLauncherTvPage.setText(
-                        String.format(
-                                ContextCompat.getString(this, R.string.page_text),
-                                integer, launcherViewModel.getNumScreenValue()
-                        ));
-            }
-        });
+
         launcherViewModel.getLauncherState().observe(this, launcherState -> {
             Log.i(TAG, "Prepare to examine launcher state.");
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            Fragment settingsFragment = fragmentManager.findFragmentByTag("SettingsFragment");
-            Fragment appListFragment = fragmentManager.findFragmentByTag("DrawerFragment");
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            NavController navController =
+                    Navigation.findNavController(LauncherActivity.this, R.id.a_launcher_fcv);
             if (launcherState == LauncherViewModel.LauncherState.NORMAL) {
-                if (settingsFragment != null) {
-                    fragmentTransaction.hide(settingsFragment);
-                    fragmentTransaction.remove(settingsFragment);
-                }
-                if (appListFragment != null) {
-                    fragmentTransaction.hide(appListFragment);
-                    fragmentTransaction.remove(appListFragment);
-                }
-                binding.aLauncherLlTitle.setVisibility(View.GONE);
-                binding.aLauncherTvTitle.setText("");
-                binding.aLauncherVp2.setVisibility(View.VISIBLE);
-                binding.aLauncherLlAction.setVisibility(View.VISIBLE);
-                binding.aLauncherLlPage.setVisibility(View.VISIBLE);
+                // TODO: Realize normal mode
             } else if (launcherState == LauncherViewModel.LauncherState.EDIT) {
-                binding.aLauncherLlAction.setVisibility(View.GONE);
-                binding.aLauncherTvTitle.setText(R.string.edit);
-                binding.aLauncherLlTitle.setVisibility(View.VISIBLE);
+                // TODO: Realize edit mode
             } else if (launcherState == LauncherViewModel.LauncherState.SETTINGS) {
-                binding.aLauncherLlAction.setVisibility(View.GONE);
-                binding.aLauncherLlPage.setVisibility(View.GONE);
-                binding.aLauncherVp2.setVisibility(View.GONE);
-                binding.aLauncherTvTitle.setText(R.string.settings);
-                binding.aLauncherLlTitle.setVisibility(View.VISIBLE);
-                if (settingsFragment == null) {
-                    fragmentTransaction.add(R.id.a_launcher_fcv, new SettingsFragment(), "SettingsFragment");
-                } else {
-                    fragmentTransaction.replace(R.id.a_launcher_fcv, new SettingsFragment(), "SettingsFragment");
-                }
+                navController.navigate(R.id.action_Launcher_to_Settings);
             } else if (launcherState == LauncherViewModel.LauncherState.APPS) {
-                binding.aLauncherLlAction.setVisibility(View.GONE);
-                binding.aLauncherLlPage.setVisibility(View.GONE);
-                binding.aLauncherVp2.setVisibility(View.GONE);
-                binding.aLauncherTvTitle.setText(R.string.app_drawer);
-                binding.aLauncherLlTitle.setVisibility(View.VISIBLE);
-                if (appListFragment == null) {
-                    fragmentTransaction.add(R.id.a_launcher_fcv, DrawerFragment.newInstance(), "DrawerFragment");
-                } else {
-                    fragmentTransaction.replace(R.id.a_launcher_fcv, DrawerFragment.newInstance(), "DrawerFragment");
-                }
+                navController.navigate(R.id.action_Launcher_to_Drawer);
             }
-            fragmentTransaction.commit();
         });
         requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             if (isGranted) {
@@ -313,51 +232,6 @@ public class LauncherActivity extends AppCompatActivity {
                 showPermFineLocationDialog();
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
-            }
-        }
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_VOLUME_UP: {
-                if (launcherViewModel.getVolumeKeySwitchPageValue()) {
-                    launcherPageUp();
-                    return true;
-                }
-                break;
-            }
-            case KeyEvent.KEYCODE_VOLUME_DOWN: {
-                if (launcherViewModel.getVolumeKeySwitchPageValue()) {
-                    launcherPageDown();
-                    return true;
-                }
-                break;
-            }
-            default:
-                break;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    public void launcherPageUp() {
-        ViewPager2 viewPager2 = binding.aLauncherVp2;
-        if (viewPager2.getAdapter() != null) {
-            int currentItem = viewPager2.getCurrentItem();
-            if (currentItem > 0) {
-                currentItem -= 1;
-                viewPager2.setCurrentItem(currentItem, false);
-            }
-        }
-    }
-
-    public void launcherPageDown() {
-        ViewPager2 viewPager2 = binding.aLauncherVp2;
-        if (viewPager2.getAdapter() != null) {
-            int currentItem = viewPager2.getCurrentItem();
-            if (currentItem < viewPager2.getAdapter().getItemCount() - 1) {
-                currentItem += 1;
-                viewPager2.setCurrentItem(currentItem, false);
             }
         }
     }
