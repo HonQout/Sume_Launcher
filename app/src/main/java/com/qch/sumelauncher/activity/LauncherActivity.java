@@ -17,6 +17,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -201,16 +202,20 @@ public class LauncherActivity extends AppCompatActivity {
 
         launcherViewModel.getLauncherState().observe(this, launcherState -> {
             Log.i(TAG, "Prepare to examine launcher state.");
-            NavController navController =
-                    Navigation.findNavController(LauncherActivity.this, R.id.a_launcher_fcv);
-            if (launcherState == LauncherViewModel.LauncherState.NORMAL) {
-                // TODO: Realize normal mode
-            } else if (launcherState == LauncherViewModel.LauncherState.EDIT) {
-                // TODO: Realize edit mode
-            } else if (launcherState == LauncherViewModel.LauncherState.SETTINGS) {
-                navController.navigate(R.id.action_Launcher_to_Settings);
-            } else if (launcherState == LauncherViewModel.LauncherState.APPS) {
-                navController.navigate(R.id.action_Launcher_to_Drawer);
+            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
+                binding.aLauncherFcv.post(() -> {
+                    NavController navController =
+                            Navigation.findNavController(LauncherActivity.this, R.id.a_launcher_fcv);
+                    if (launcherState == LauncherViewModel.LauncherState.NORMAL) {
+                        // TODO: Realize normal mode
+                    } else if (launcherState == LauncherViewModel.LauncherState.EDIT) {
+                        // TODO: Realize edit mode
+                    } else if (launcherState == LauncherViewModel.LauncherState.SETTINGS) {
+                        navController.navigate(R.id.action_Launcher_to_Settings);
+                    } else if (launcherState == LauncherViewModel.LauncherState.APPS) {
+                        navController.navigate(R.id.action_Launcher_to_Drawer);
+                    }
+                });
             }
         });
         requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {

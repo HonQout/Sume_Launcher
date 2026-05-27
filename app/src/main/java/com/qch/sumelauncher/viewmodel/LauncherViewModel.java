@@ -65,7 +65,7 @@ public class LauncherViewModel extends AndroidViewModel {
     private final MutableLiveData<String> mGridSize = new MutableLiveData<>("5,5");
     private final MutableLiveData<Integer> mNumRow = new MutableLiveData<>();
     private final MutableLiveData<Integer> mNumColumn = new MutableLiveData<>();
-    private final MutableLiveData<Integer> mCurrentScreen = new MutableLiveData<>(1);
+    private final MutableLiveData<Integer> mCurrentScreenIndex = new MutableLiveData<>();
     private final MutableLiveData<List<ActivityBean>> mActivityBeanList = new MutableLiveData<>();
 
     // multi-thread
@@ -418,16 +418,17 @@ public class LauncherViewModel extends AndroidViewModel {
         return 1;
     }
 
-    public void setCurrentScreen(int newValue) {
-        mCurrentScreen.postValue(newValue);
+    public void setCurrentScreenIndex(int newValue) {
+        Log.i(TAG, "Current screen index set to " + newValue);
+        mCurrentScreenIndex.postValue(newValue);
     }
 
-    public LiveData<Integer> getCurrentScreen() {
-        return mCurrentScreen;
+    public LiveData<Integer> getCurrentScreenIndex() {
+        return mCurrentScreenIndex;
     }
 
-    public int getCurrentScreenValue() {
-        return mCurrentScreen.getValue() == null ? 1 : mCurrentScreen.getValue();
+    public int getCurrentScreenIndexValue() {
+        return mCurrentScreenIndex.getValue() == null ? 0 : mCurrentScreenIndex.getValue();
     }
 
     public LiveData<List<ActivityBean>> getActivityBeanList() {

@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.adapter.viewpager2.AppPagerAdapter;
+import com.qch.sumelauncher.adapter.viewpager2.LauncherPagerAdapter;
 import com.qch.sumelauncher.databinding.FragmentLauncherBinding;
 import com.qch.sumelauncher.viewmodel.LauncherViewModel;
 
@@ -38,21 +38,45 @@ public class LauncherFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.i(TAG, "onCreateView");
         binding = FragmentLauncherBinding.inflate(inflater, container, false);
-        AppPagerAdapter appPagerAdapter = new AppPagerAdapter(requireActivity(), 0);
-        binding.fLauncherVp2.setAdapter(appPagerAdapter);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.i(TAG, "onViewCreated");
+        super.onViewCreated(view, savedInstanceState);
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
+        // Initialize ViewPager2
+        LauncherPagerAdapter launcherPagerAdapter = new LauncherPagerAdapter(getChildFragmentManager(), getLifecycle());
+        binding.fLauncherVp2.setAdapter(launcherPagerAdapter);
+        // Restore index of current page
+        if (viewModel.getCurrentScreenIndexValue() != 0) {
+            Log.i(TAG, "Saved current screen index = " + viewModel.getCurrentScreenIndexValue());
+            binding.fLauncherVp2.post(() ->
+                    binding.fLauncherVp2.setCurrentItem(viewModel.getCurrentScreenIndexValue(), false));
+        }
+        // Save index of current page
         binding.fLauncherVp2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-                Log.i(TAG, "ViewPager2 onPageSelected position " + (position + 1));
-                viewModel.setCurrentScreen(position + 1);
+                Log.i(TAG, "ViewPager2 onPageSelected position #" + (position + 1));
+                viewModel.setCurrentScreenIndex(position);
+                binding.fLauncherTvPage.setText(
+                        String.format(
+                                ContextCompat.getString(requireContext(), R.string.page_text),
+                                position + 1,
+                                viewModel.getNumScreenValue()
+                        ));
             }
         });
         binding.fLauncherBtnSettings.setOnClickListener(v ->
@@ -67,33 +91,20 @@ public class LauncherFragment extends Fragment {
                 binding.fLauncherVp2.setUserInputEnabled(scrollToSwitchPage));
         viewModel.getNumScreen().observe(getViewLifecycleOwner(), integer -> {
             if (integer != null) {
-                appPagerAdapter.setNumScreen(integer);
+                launcherPagerAdapter.setScreenCount(integer);
                 binding.fLauncherTvPage.setText(
                         String.format(
                                 ContextCompat.getString(requireContext(), R.string.page_text),
-                                viewModel.getCurrentScreenValue(), integer
-                        ));
+                                viewModel.getCurrentScreenIndexValue() + 1,
+                                integer
+                        )
+                );
             }
         });
-        viewModel.getCurrentScreen().observe(getViewLifecycleOwner(), integer -> {
-            if (integer != null) {
-                binding.fLauncherTvPage.setText(
-                        String.format(
-                                ContextCompat.getString(requireContext(), R.string.page_text),
-                                integer, viewModel.getNumScreenValue()
-                        ));
-            }
-        });
-        return binding.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        // Set key listener
         View rootView = binding.getRoot();
         rootView.setFocusableInTouchMode(true);
         rootView.requestFocus();
-
         rootView.setOnKeyListener((v, keyCode, event) -> {
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                 switch (keyCode) {
@@ -119,6 +130,13 @@ public class LauncherFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDestroyView() {
+        Log.i(TAG, "onDestroyView");
+        super.onDestroyView();
+        binding = null;
+    }
+
     public void launcherPageUp() {
         ViewPager2 viewPager2 = binding.fLauncherVp2;
         if (viewPager2.getAdapter() != null) {
@@ -134,7 +152,7 @@ public class LauncherFragment extends Fragment {
         ViewPager2 viewPager2 = binding.fLauncherVp2;
         if (viewPager2.getAdapter() != null) {
             int currentItem = viewPager2.getCurrentItem();
-            if (currentItem < viewPager2.getAdapter().getItemCount() - 1) {
+            if (currentItem < viewModel.getNumScreenValue() - 1) {
                 currentItem += 1;
                 viewPager2.setCurrentItem(currentItem, false);
             }
