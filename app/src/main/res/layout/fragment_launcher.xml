@@ -26,34 +26,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/f_launcher_ll_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/f_launcher_btn_back"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="@dimen/image_icon_size"
-                android:layout_height="@dimen/image_icon_size"
-                android:contentDescription="@string/back_icon"
-                android:src="@drawable/baseline_arrow_back_24"
-                android:tint="?android:textColorPrimary" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/f_launcher_tv_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="?android:textColorPrimary"
-                android:textSize="@dimen/bottom_title_size"
-                android:textStyle="bold" />
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
         <com.qch.sumelauncher.view.SingleTouchLinearLayoutCompat
             android:id="@+id/f_launcher_ll_action"
             android:layout_width="wrap_content"

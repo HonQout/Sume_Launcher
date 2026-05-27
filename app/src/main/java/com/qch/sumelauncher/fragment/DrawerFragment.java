@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,14 +57,22 @@ public class DrawerFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.i(TAG, "onCreateView");
         binding = FragmentDrawerBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
         binding.fDrawerBtnGrid.setOnClickListener(v -> setGridRVAdapter());
         binding.fDrawerBtnList.setOnClickListener(v -> setListRVAdapter());
         binding.fDrawerSv.setOnSearchClickListener(v ->
@@ -72,13 +81,11 @@ public class DrawerFragment extends Fragment {
             binding.fDrawerLl.setVisibility(View.VISIBLE);
             return false;
         });
+        binding.fDrawerBtnBack.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(v);
+            navController.popBackStack();
+        });
         setGridRVAdapter();
-        return binding.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {

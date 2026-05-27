@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:attr/windowBackground"
-    android:orientation="vertical"
-    android:paddingHorizontal="@dimen/content_horizontal_padding"
-    android:paddingVertical="10dp"
     tools:context=".fragment.DrawerFragment">
 
     <FrameLayout
         android:id="@+id/f_drawer_fl"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/f_drawer_ll"
@@ -65,13 +66,46 @@
 
     </FrameLayout>
 
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="10dp" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/f_drawer_rv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/f_drawer_ll_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/f_drawer_fl" />
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/f_drawer_ll_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/f_drawer_btn_back"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="@dimen/image_icon_size"
+            android:layout_height="@dimen/image_icon_size"
+            android:contentDescription="@string/back_icon"
+            android:src="@drawable/baseline_arrow_back_24"
+            android:tint="?android:textColorPrimary" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/f_drawer_tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_drawer"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="@dimen/bottom_title_size"
+            android:textStyle="bold" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

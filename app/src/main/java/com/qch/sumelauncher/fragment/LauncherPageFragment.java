@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
@@ -53,12 +52,12 @@ public class LauncherPageFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG, "LauncherPageFragment #" + position + " onCreate");
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
             position = args.getInt(ARG_POSITION);
         }
-        viewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
     }
 
     @Override
@@ -66,6 +65,14 @@ public class LauncherPageFragment extends Fragment {
                              Bundle savedInstanceState) {
         Log.i(TAG, "LauncherPageFragment #" + position + " onCreateView");
         binding = FragmentLauncherPageBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.i(TAG, "LauncherPageFragment #" + position + " onViewCreated");
+        super.onViewCreated(view, savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
         viewModel.getNumRow().observe(getViewLifecycleOwner(), integer -> {
             if (integer != null) {
                 binding.fLauncherLl.setNumRows(integer);
@@ -124,7 +131,6 @@ public class LauncherPageFragment extends Fragment {
         viewModel.getLauncherState().observe(getViewLifecycleOwner(), launcherState -> {
             binding.fLauncherLl.setEditMode(launcherState == LauncherViewModel.LauncherState.EDIT);
         });
-        return binding.getRoot();
     }
 
     private void showIconActionMenu(@NonNull View view, @NonNull IconEntity iconEntity) {
