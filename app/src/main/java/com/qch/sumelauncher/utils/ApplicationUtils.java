@@ -36,56 +36,53 @@ public class ApplicationUtils {
 
     @Nullable
     public static PackageInfo getPackageInfo(@NonNull Context context, String packageName) {
-        PackageManager pm = context.getPackageManager();
-        if (packageName == null || TextUtils.isEmpty(packageName)) {
-            Log.e(TAG, "Cannot get packageInfo because the given packageName is null or empty.");
+        if (TextUtils.isEmpty(packageName)) {
+            Log.e(TAG, "Cannot get packageInfo. The given packageName is null or empty.");
             return null;
-        } else {
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    return pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0));
-                } else {
-                    return pm.getPackageInfo(packageName, 0);
-                }
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.e(TAG, "Cannot get packageInfo because package " + packageName + " doesn't exist.", e);
-                return null;
+        }
+        PackageManager pm = context.getPackageManager();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                return pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0));
+            } else {
+                return pm.getPackageInfo(packageName, 0);
             }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Cannot get packageInfo. Package " + packageName + " doesn't exist.", e);
+            return null;
         }
     }
 
     @Nullable
     public static ApplicationInfo getApplicationInfo(@NonNull Context context, String packageName) {
-        PackageManager pm = context.getPackageManager();
-        if (packageName == null || TextUtils.isEmpty(packageName)) {
-            Log.e(TAG, "Cannot get applicationInfo because the given packageName is null or empty.");
+        if (TextUtils.isEmpty(packageName)) {
+            Log.e(TAG, "Cannot get applicationInfo. The given packageName is null or empty.");
             return null;
-        } else {
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    return pm.getApplicationInfo(packageName, PackageManager.ApplicationInfoFlags.of(0));
-                } else {
-                    return pm.getApplicationInfo(packageName, 0);
-                }
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.e(TAG, "Cannot get packageInfo because package " + packageName + " doesn't exist.", e);
-                return null;
+        }
+        PackageManager pm = context.getPackageManager();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                return pm.getApplicationInfo(packageName, PackageManager.ApplicationInfoFlags.of(0));
+            } else {
+                return pm.getApplicationInfo(packageName, 0);
             }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Cannot get applicationInfo. Package " + packageName + " doesn't exist.", e);
+            return null;
         }
     }
 
     @NonNull
     public static Drawable getApplicationIcon(@NonNull Context context, String packageName) {
         PackageManager pm = context.getPackageManager();
-        if (packageName == null || TextUtils.isEmpty(packageName)) {
-            Log.e(TAG, "Cannot get application icon because the given packageName is null or empty.");
+        if (TextUtils.isEmpty(packageName)) {
+            Log.e(TAG, "Cannot get application icon. The given packageName is null or empty.");
             return pm.getDefaultActivityIcon();
         } else {
             try {
                 return pm.getApplicationIcon(packageName);
             } catch (PackageManager.NameNotFoundException e) {
-                Log.e(TAG, "Cannot get application icon because package " + packageName
-                        + " doesn't exist.", e);
+                Log.e(TAG, "Cannot get application icon. Package " + packageName + " doesn't exist.", e);
                 return pm.getDefaultActivityIcon();
             }
         }
@@ -102,11 +99,11 @@ public class ApplicationUtils {
 
     @Nullable
     public static String getApplicationLabel(@NonNull Context context, String packageName) {
-        PackageManager pm = context.getPackageManager();
         PackageInfo packageInfo = getPackageInfo(context, packageName);
         if (packageInfo != null) {
             ApplicationInfo applicationInfo = packageInfo.applicationInfo;
             if (applicationInfo != null) {
+                PackageManager pm = context.getPackageManager();
                 return applicationInfo.loadLabel(pm).toString();
             }
         }
@@ -153,6 +150,14 @@ public class ApplicationUtils {
     public static boolean launchAppShortcut(@NonNull Context context, String packageName,
                                             String shortcutId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            if (TextUtils.isEmpty(packageName)) {
+                Log.e(TAG, "Cannot launch shortcut. The given packageName is null.");
+                return false;
+            }
+            if (TextUtils.isEmpty(shortcutId)) {
+                Log.e(TAG, "Cannot launch shortcut. The given shortcutId is null.");
+                return false;
+            }
             LauncherApps launcherApps =
                     (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
             try {
@@ -172,14 +177,20 @@ public class ApplicationUtils {
     @Nullable
     public static ActivityInfo getActivityInfo(@NonNull Context context, String packageName,
                                                String activityName) {
+        if (TextUtils.isEmpty(packageName)) {
+            Log.e(TAG, "Cannot get activityInfo. The given packageName is empty.");
+            return null;
+        }
+        if (TextUtils.isEmpty(activityName)) {
+            Log.e(TAG, "Cannot get activityInfo. The given activityName is empty.");
+            return null;
+        }
         PackageManager pm = context.getPackageManager();
-        if (packageName != null && activityName != null) {
-            try {
-                return pm.getActivityInfo(new ComponentName(packageName, activityName), 0);
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.e(TAG, "Cannot get activityInfo because activity " + activityName
-                        + " of package " + packageName + " doesn't exist.", e);
-            }
+        try {
+            return pm.getActivityInfo(new ComponentName(packageName, activityName), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Cannot get activityInfo. Activity " + activityName + " of package "
+                    + packageName + " doesn't exist.", e);
         }
         return null;
     }
@@ -188,13 +199,19 @@ public class ApplicationUtils {
     public static Drawable getActivityIcon(@NonNull Context context, String packageName,
                                            String activityName) {
         PackageManager pm = context.getPackageManager();
-        if (packageName != null && activityName != null) {
-            try {
-                return pm.getActivityIcon(new ComponentName(packageName, activityName));
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.e(TAG, "Cannot get activity icon because activity " + activityName
-                        + " of package " + packageName + " doesn't exist.", e);
-            }
+        if (TextUtils.isEmpty(packageName)) {
+            Log.e(TAG, "Cannot get activity icon. The given packageName is empty.");
+            return pm.getDefaultActivityIcon();
+        }
+        if (TextUtils.isEmpty(activityName)) {
+            Log.e(TAG, "Cannot get activity icon. The given activityName is empty.");
+            return pm.getDefaultActivityIcon();
+        }
+        try {
+            return pm.getActivityIcon(new ComponentName(packageName, activityName));
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Cannot get activity icon. Activity " + activityName + " of package "
+                    + packageName + " doesn't exist.", e);
         }
         return pm.getDefaultActivityIcon();
     }
@@ -202,13 +219,17 @@ public class ApplicationUtils {
     @NonNull
     public static Drawable getActivityIcon(@NonNull Context context, ActivityInfo activityInfo) {
         if (activityInfo != null) {
-            String packageName = activityInfo.packageName;
-            String activityName = activityInfo.name;
-            if (packageName != null && activityName != null) {
-                return getActivityIcon(context, packageName, activityName);
-            }
+            return getActivityIcon(context, activityInfo.packageName, activityInfo.name);
         }
         return context.getPackageManager().getDefaultActivityIcon();
+    }
+
+    @DrawableRes
+    public static int getActivityIconId(ActivityInfo activityInfo) {
+        if (activityInfo != null) {
+            return activityInfo.icon;
+        }
+        return 0;
     }
 
     @DrawableRes
@@ -217,14 +238,6 @@ public class ApplicationUtils {
         if (packageName != null && activityName != null) {
             ActivityInfo activityInfo = getActivityInfo(context, packageName, activityName);
             return getActivityIconId(activityInfo);
-        }
-        return 0;
-    }
-
-    @DrawableRes
-    public static int getActivityIconId(ActivityInfo activityInfo) {
-        if (activityInfo != null) {
-            return activityInfo.icon;
         }
         return 0;
     }
@@ -242,11 +255,7 @@ public class ApplicationUtils {
     }
 
     public static List<ResolveInfo> getIntentActivityList(Context context) {
-        PackageManager pm = context.getPackageManager();
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        return pm.queryIntentActivities(intent, 0);
+        return getIntentActivityList(context, null);
     }
 
     /**
@@ -270,6 +279,14 @@ public class ApplicationUtils {
     public static ResolveInfo getIntentActivity(Context context,
                                                 String packageName,
                                                 String activityName) {
+        if (TextUtils.isEmpty(packageName)) {
+            Log.e(TAG, "Cannot get intent activity. The given packageName is empty.");
+            return null;
+        }
+        if (TextUtils.isEmpty(activityName)) {
+            Log.e(TAG, "Cannot get intent activity. The given activityName is empty.");
+            return null;
+        }
         List<ResolveInfo> intentActivities = getIntentActivityList(context, packageName);
         for (ResolveInfo resolveInfo : intentActivities) {
             if (Objects.equals(getActivityName(resolveInfo), activityName)) {

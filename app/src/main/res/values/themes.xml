@@ -14,4 +14,11 @@
         <item name="android:thumb">@drawable/custom_switch_thumb</item>
         <item name="android:switchMinWidth">40dp</item>
     </style>
+
+    <style name="CustomButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_transparent_border_button</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
 </resources>

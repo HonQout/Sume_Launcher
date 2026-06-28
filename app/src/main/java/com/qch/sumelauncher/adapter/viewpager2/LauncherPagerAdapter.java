@@ -1,5 +1,6 @@
 package com.qch.sumelauncher.adapter.viewpager2;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,7 @@ public class LauncherPagerAdapter extends FragmentStateAdapter {
         return LauncherPageFragment.newInstance(position);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setScreenCount(int screenCount) {
         this.mScreenCount = screenCount;
         notifyDataSetChanged();

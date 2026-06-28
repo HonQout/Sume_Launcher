@@ -1,10 +1,9 @@
-package com.qch.sumelauncher.fragment;
+package com.qch.sumelauncher.drawer;
 
 import android.content.pm.ShortcutInfo;
 import android.os.Build;
 import android.os.Bundle;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -12,12 +11,10 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,12 +22,10 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.adapter.recyclerview.AppGridRVAdapter;
-import com.qch.sumelauncher.adapter.recyclerview.AppListRVAdapter;
 import com.qch.sumelauncher.adapter.recyclerview.FilterableListAdapter;
+import com.qch.sumelauncher.adapter.recyclerview.ListDrawerRVAdapter;
 import com.qch.sumelauncher.bean.ActivityBean;
-import com.qch.sumelauncher.databinding.FragmentDrawerBinding;
-import com.qch.sumelauncher.recyclerview.GridDecoration;
+import com.qch.sumelauncher.databinding.FragmentListDrawerBinding;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
@@ -39,17 +34,20 @@ import com.qch.sumelauncher.viewmodel.LauncherViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrawerFragment extends Fragment {
-    private static final String TAG = "DrawerFragment";
-    private FragmentDrawerBinding binding;
+public class ListDrawerFragment extends Fragment {
+    private static final String TAG = "ListDrawerFragment";
+    private static final String KEY_LINEAR_LAYOUT_STATE = "LINEAR_LAYOUT_STATE";
+    private FragmentListDrawerBinding binding;
     private LauncherViewModel viewModel;
+    private LinearLayoutManager linearLayoutManager;
+    private ListDrawerRVAdapter listDrawerRVAdapter;
 
-    public DrawerFragment() {
+    public ListDrawerFragment() {
         // Required empty public constructor
     }
 
-    public static DrawerFragment newInstance() {
-        DrawerFragment fragment = new DrawerFragment();
+    public static ListDrawerFragment newInstance() {
+        ListDrawerFragment fragment = new ListDrawerFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -65,87 +63,21 @@ public class DrawerFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView");
-        binding = FragmentDrawerBinding.inflate(inflater, container, false);
+        binding = FragmentListDrawerBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.i(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
+        // Initialize view model
         viewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
-        binding.fDrawerBtnGrid.setOnClickListener(v -> setGridRVAdapter());
-        binding.fDrawerBtnList.setOnClickListener(v -> setListRVAdapter());
-        binding.fDrawerSv.setOnSearchClickListener(v ->
-                binding.fDrawerLl.setVisibility(View.GONE));
-        binding.fDrawerSv.setOnCloseListener(() -> {
-            binding.fDrawerLl.setVisibility(View.VISIBLE);
-            return false;
-        });
-        binding.fDrawerBtnBack.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(v);
-            navController.popBackStack();
-        });
-        setGridRVAdapter();
-        OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                NavController navController = Navigation.findNavController(view);
-                navController.popBackStack();
-            }
-        };
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), onBackPressedCallback);
-    }
-
-    private void setGridRVAdapter() {
-        binding.fDrawerRv.setLayoutManager(new GridLayoutManager(requireActivity(),
-                viewModel.getNumColumnValue()));
-        AppGridRVAdapter appGridRVAdapter = new AppGridRVAdapter(new ArrayList<>());
-        appGridRVAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
-            @Override
-            public void onItemClick(ActivityBean item, View view) {
-                IntentUtils.handleLaunchActivityResult(requireActivity(),
-                        IntentUtils.launchActivity(requireActivity(),
-                                item.getPackageName(), item.getActivityName(), true));
-            }
-
-            @Override
-            public boolean onItemLongClick(ActivityBean item, View view) {
-                showGridMenu(view, item);
-                return true;
-            }
-        });
-        binding.fDrawerRv.setAdapter(appGridRVAdapter);
-        int numItemDecorations = binding.fDrawerRv.getItemDecorationCount();
-        for (int i = 0; i < numItemDecorations; i++) {
-            binding.fDrawerRv.removeItemDecorationAt(0);
-        }
-        binding.fDrawerRv.addItemDecoration(new GridDecoration(
-                viewModel.getNumColumnValue(),
-                getResources().getDimensionPixelSize(R.dimen.app_grid_space)
-        ));
-        binding.fDrawerSv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                AppGridRVAdapter adapter = (AppGridRVAdapter) binding.fDrawerRv.getAdapter();
-                if (adapter != null) {
-                    adapter.getFilter().filter(newText);
-                }
-                return true;
-            }
-        });
-        viewModel.getActivityBeanList().observe(getViewLifecycleOwner(), appGridRVAdapter::setList);
-    }
-
-    private void setListRVAdapter() {
-        binding.fDrawerRv.setLayoutManager(new LinearLayoutManager(requireActivity(),
-                RecyclerView.VERTICAL, false));
-        AppListRVAdapter appListRVAdapter = new AppListRVAdapter(new ArrayList<>());
-        appListRVAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
+        // Initialize layout manager
+        linearLayoutManager = new LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false);
+        // Initialize adapter of recycler view
+        listDrawerRVAdapter = new ListDrawerRVAdapter(new ArrayList<>());
+        listDrawerRVAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
             @Override
             public void onItemClick(ActivityBean item, View view) {
                 IntentUtils.handleLaunchActivityResult(requireActivity(),
@@ -158,14 +90,26 @@ public class DrawerFragment extends Fragment {
                 return false;
             }
         });
-        appListRVAdapter.setOnButtonPressedListener((item, view) ->
-                showGridMenu(view, item));
-        binding.fDrawerRv.setAdapter(appListRVAdapter);
-        int numItemDecorations = binding.fDrawerRv.getItemDecorationCount();
-        for (int i = 0; i < numItemDecorations; i++) {
-            binding.fDrawerRv.removeItemDecorationAt(0);
+        listDrawerRVAdapter.setOnButtonPressedListener(this::showGridMenu);
+        // Restore state of layout manager
+        if (savedInstanceState == null) {
+            binding.fListDrawerRv.setLayoutManager(linearLayoutManager);
+            binding.fListDrawerRv.setAdapter(listDrawerRVAdapter);
+        } else {
+            Parcelable linearLayoutState = savedInstanceState.getParcelable(KEY_LINEAR_LAYOUT_STATE);
+            if (linearLayoutState != null) {
+                linearLayoutManager.onRestoreInstanceState(linearLayoutState);
+            }
         }
-        binding.fDrawerSv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        viewModel.getActivityBeanList().observe(getViewLifecycleOwner(), listDrawerRVAdapter::setList);
+        // Initialize view
+        binding.fListDrawerSv.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                binding.fListBtnQuit.setVisibility(View.VISIBLE);
+            }
+        });
+        binding.fListDrawerSv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -173,14 +117,27 @@ public class DrawerFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                AppListRVAdapter adapter = (AppListRVAdapter) binding.fDrawerRv.getAdapter();
+                ListDrawerRVAdapter adapter = (ListDrawerRVAdapter) binding.fListDrawerRv.getAdapter();
                 if (adapter != null) {
                     adapter.getFilter().filter(newText);
                 }
                 return true;
             }
         });
-        viewModel.getActivityBeanList().observe(getViewLifecycleOwner(), appListRVAdapter::setList);
+        binding.fListBtnQuit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.fListDrawerSv.clearFocus();
+                binding.fListBtnQuit.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.i(TAG, "onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(KEY_LINEAR_LAYOUT_STATE, linearLayoutManager.onSaveInstanceState());
     }
 
     private void showGridMenu(@NonNull View view, @NonNull ActivityBean item) {

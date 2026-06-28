@@ -183,11 +183,15 @@ public class WifiViewModel extends AndroidViewModel {
 
     @DrawableRes
     private int getWifiIconResInternal(int signalLevel) {
-        return switch (signalLevel) {
-            case 0 -> R.drawable.baseline_wifi_1_bar_24;
-            case 1 -> R.drawable.baseline_wifi_2_bar_24;
-            case 2 -> R.drawable.baseline_wifi_3_bar_24;
-            default -> R.drawable.baseline_wifi_null_24;
-        };
+        switch (signalLevel) {
+            case 0:
+                return R.drawable.baseline_wifi_1_bar_24;
+            case 1:
+                return R.drawable.baseline_wifi_2_bar_24;
+            case 2:
+                return R.drawable.baseline_wifi_3_bar_24;
+            default:
+                return R.drawable.baseline_wifi_null_24;
+        }
     }
 }

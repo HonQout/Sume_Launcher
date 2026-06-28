@@ -323,7 +323,7 @@ public class LauncherViewModel extends AndroidViewModel {
                             list.removeIf(item ->
                                     Objects.equals(packageName, item.getPackageName()));
                         } else {
-                            CollectionUtils.removeConditionally(list, item ->
+                            CollectionUtils.removeByCondition(list, item ->
                                     Objects.equals(packageName, item.getPackageName()));
                         }
                     } catch (Exception e) {

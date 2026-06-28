@@ -17,6 +17,7 @@
     <!-- Button -->
     <string name="grid">Grid</string>
     <string name="list">List</string>
+    <string name="quit">Quit</string>
 
     <!-- Menu -->
     <string name="move_to_new_screen">Move to new screen</string>

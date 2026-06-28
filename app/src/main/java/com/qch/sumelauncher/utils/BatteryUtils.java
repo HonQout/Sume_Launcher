@@ -1,9 +1,11 @@
 package com.qch.sumelauncher.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
+import android.os.Build;
 
 public class BatteryUtils {
     private static final String TAG = "BatteryUtils";
@@ -12,9 +14,22 @@ public class BatteryUtils {
         UNKNOWN, AC, DOCK, USB, WIRELESS
     }
 
+    @SuppressLint("ObsoleteSdkInt")
+    public static BatteryManager getBatteryManager(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return context.getSystemService(BatteryManager.class);
+        } else {
+            return (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
+        }
+    }
+
     public static int getBatteryLevel(Context context) {
-        BatteryManager batteryManager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
-        return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+        BatteryManager batteryManager = getBatteryManager(context);
+        if (batteryManager != null) {
+            return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+        } else {
+            return -1;
+        }
     }
 
     public static Intent getBatteryChangedIntent(Context context) {
