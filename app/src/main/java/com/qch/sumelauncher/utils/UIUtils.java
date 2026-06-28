@@ -1,5 +1,6 @@
 package com.qch.sumelauncher.utils;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ public class UIUtils {
         }
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     private static void handleStatusBarVisibilityApi16(@NonNull Window window, boolean visible) {
         if (!visible) {
@@ -92,7 +94,8 @@ public class UIUtils {
     }
 
     public static void refreshUI(View view) {
-        if (view instanceof ViewGroup viewGroup) {
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
             for (int i = 0; i < viewGroup.getChildCount(); i++) {
                 refreshUI(viewGroup.getChildAt(i));
             }

@@ -19,6 +19,7 @@
     <string name="list">列表</string>
 
     <!-- Menu -->
+    <string name="quit">退出</string>
     <string name="move_to_new_screen">移动到新页面</string>
     <string name="remove_icon">移除图标</string>
     <string name="uninstall">卸载</string>

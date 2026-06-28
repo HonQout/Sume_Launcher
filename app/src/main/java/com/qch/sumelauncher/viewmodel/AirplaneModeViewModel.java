@@ -35,7 +35,7 @@ public class AirplaneModeViewModel extends AndroidViewModel {
     }
 
     public void update() {
-        mAirplaneModeEnabled.postValue(ConnectivityUtils.getAirplaneModeState(getApplication()));
+        mAirplaneModeEnabled.postValue(ConnectivityUtils.isAirplaneModeEnabled(getApplication()));
     }
 
     private void registerBroadcastReceiver() {

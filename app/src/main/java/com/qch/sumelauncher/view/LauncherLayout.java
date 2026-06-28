@@ -134,25 +134,25 @@ public class LauncherLayout extends ViewGroup {
         measuredHeight = contentHeight + 2 * borderVerticalPaddingPx;
 
         switch (widthMode) {
-            case MeasureSpec.EXACTLY -> {
+            case MeasureSpec.EXACTLY: {
                 measuredWidth = widthSize;
             }
-            case MeasureSpec.AT_MOST -> {
+            case MeasureSpec.AT_MOST: {
                 measuredWidth = Math.min(measuredWidth, widthSize);
             }
-            case MeasureSpec.UNSPECIFIED -> {
+            case MeasureSpec.UNSPECIFIED: {
 
             }
         }
 
         switch (heightMode) {
-            case MeasureSpec.EXACTLY -> {
+            case MeasureSpec.EXACTLY: {
                 measuredHeight = heightSize;
             }
-            case MeasureSpec.AT_MOST -> {
+            case MeasureSpec.AT_MOST: {
                 measuredHeight = Math.min(measuredHeight, heightSize);
             }
-            case MeasureSpec.UNSPECIFIED -> {
+            case MeasureSpec.UNSPECIFIED: {
 
             }
         }
@@ -210,7 +210,7 @@ public class LauncherLayout extends ViewGroup {
         int row = coordinate.getY();
         int action = event.getActionMasked();
         switch (action) {
-            case MotionEvent.ACTION_DOWN -> {
+            case MotionEvent.ACTION_DOWN: {
                 Log.i(TAG, "Pressed at " + col + "," + row);
                 hasPerformedLongPress = false;
                 startLongPressDetection(x, y, col, row);
@@ -218,7 +218,7 @@ public class LauncherLayout extends ViewGroup {
                 return true;
             }
 
-            case MotionEvent.ACTION_UP -> {
+            case MotionEvent.ACTION_UP: {
                 Log.i(TAG, "Released at " + col + "," + row);
                 cancelLongPressDetection();
                 setPressed(false);
@@ -228,7 +228,7 @@ public class LauncherLayout extends ViewGroup {
                 return true;
             }
 
-            case MotionEvent.ACTION_MOVE -> {
+            case MotionEvent.ACTION_MOVE: {
                 float dx = Math.abs(event.getX() - touchedX);
                 float dy = Math.abs(event.getY() - touchedY);
                 if (dx > touchSlop || dy > touchSlop) {
@@ -238,7 +238,7 @@ public class LauncherLayout extends ViewGroup {
                 return true;
             }
 
-            case MotionEvent.ACTION_CANCEL -> {
+            case MotionEvent.ACTION_CANCEL: {
                 cancelLongPressDetection();
                 setPressed(false);
                 hasPerformedLongPress = false;
@@ -279,7 +279,8 @@ public class LauncherLayout extends ViewGroup {
 
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
-        if (state instanceof Bundle bundle) {
+        if (state instanceof Bundle) {
+            Bundle bundle = (Bundle) state;
             numColumns = bundle.getInt(NUM_COLUMNS, 5);
             numRows = bundle.getInt(NUM_ROWS, 5);
             Parcelable parcelable = bundle.getParcelable(PARCELABLE);

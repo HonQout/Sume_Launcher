@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.color.MaterialColors;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
@@ -91,6 +92,9 @@ public class LauncherActivity extends AppCompatActivity {
                 AppCompatImageView imageView = new AppCompatImageView(LauncherActivity.this);
                 imageView.setTag("top_bar_airplane_mode");
                 imageView.setImageResource(R.drawable.baseline_airplanemode_active_24);
+                imageView.setColorFilter(
+                        MaterialColors.getColor(imageView, com.google.android.material.R.attr.colorOnSurface)
+                );
                 imageView.setPadding(0, 0, 0, 0);
                 LinearLayoutCompat.LayoutParams layoutParams = new LinearLayoutCompat.LayoutParams(
                         getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
@@ -117,6 +121,9 @@ public class LauncherActivity extends AppCompatActivity {
                 AppCompatImageView imageView = new AppCompatImageView(LauncherActivity.this);
                 imageView.setTag("top_bar_wifi");
                 imageView.setImageResource(wifiViewModel.getWifiIconResValue());
+                imageView.setColorFilter(
+                        MaterialColors.getColor(imageView, com.google.android.material.R.attr.colorOnSurface)
+                );
                 imageView.setPadding(0, 0, 0, 0);
                 LinearLayoutCompat.LayoutParams layoutParams = new LinearLayoutCompat.LayoutParams(
                         getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
@@ -139,10 +146,11 @@ public class LauncherActivity extends AppCompatActivity {
         wifiViewModel.getWifiIconRes().observe(this, integer -> {
             LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
             View view = linearLayoutCompat.findViewWithTag("top_bar_wifi");
-            if (!(view instanceof AppCompatImageView imageView)) {
+            if (!(view instanceof AppCompatImageView)) {
                 Log.e(TAG, "Cannot find wifi icon.");
                 return;
             }
+            AppCompatImageView imageView = (AppCompatImageView) view;
             imageView.setImageResource(wifiViewModel.getWifiIconResValue());
         });
         bluetoothViewModel.getBtEnabled().observe(this, isEnabled -> {
@@ -155,6 +163,9 @@ public class LauncherActivity extends AppCompatActivity {
                 AppCompatImageView imageView = new AppCompatImageView(LauncherActivity.this);
                 imageView.setTag("top_bar_bluetooth");
                 imageView.setImageResource(bluetoothViewModel.getBtIconResValue());
+                imageView.setColorFilter(
+                        MaterialColors.getColor(imageView, com.google.android.material.R.attr.colorOnSurface)
+                );
                 imageView.setPadding(0, 0, 0, 0);
                 LinearLayoutCompat.LayoutParams layoutParams = new LinearLayoutCompat.LayoutParams(
                         getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
@@ -177,10 +188,11 @@ public class LauncherActivity extends AppCompatActivity {
         bluetoothViewModel.getBtIconRes().observe(this, icon -> {
             LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
             View view = linearLayoutCompat.findViewWithTag("top_bar_bluetooth");
-            if (!(view instanceof AppCompatImageView imageView)) {
+            if (!(view instanceof AppCompatImageView)) {
                 Log.e(TAG, "Cannot find bluetooth icon.");
                 return;
             }
+            AppCompatImageView imageView = (AppCompatImageView) view;
             imageView.setImageResource(bluetoothViewModel.getBtIconResValue());
         });
         batteryViewModel.getLevel().observe(this, integer -> {
@@ -207,12 +219,23 @@ public class LauncherActivity extends AppCompatActivity {
                     NavController navController =
                             Navigation.findNavController(LauncherActivity.this, R.id.a_launcher_fcv);
                     if (launcherState == LauncherViewModel.LauncherState.NORMAL) {
+                        Log.i(TAG, "Launcher state is NORMAL. Saved instance state is "
+                                + (savedInstanceState == null));
                         // TODO: Realize normal mode
                     } else if (launcherState == LauncherViewModel.LauncherState.EDIT) {
+                        Log.i(TAG, "Launcher state is EDIT. Saved instance state is "
+                                + (savedInstanceState == null));
                         // TODO: Realize edit mode
                     } else if (launcherState == LauncherViewModel.LauncherState.SETTINGS) {
-                        navController.navigate(R.id.action_Launcher_to_Settings);
+                        Log.i(TAG, "Launcher state is SETTINGS. Saved instance state is "
+                                + (savedInstanceState == null));
+                        if (savedInstanceState == null) {
+                            // Force navigate to Settings page only if this activity is built the first time
+                            navController.navigate(R.id.action_Launcher_to_Settings);
+                        }
                     } else if (launcherState == LauncherViewModel.LauncherState.APPS) {
+                        Log.i(TAG, "Launcher state is APPS. Saved instance state is "
+                                + (savedInstanceState == null));
                         navController.navigate(R.id.action_Launcher_to_Drawer);
                     }
                 });

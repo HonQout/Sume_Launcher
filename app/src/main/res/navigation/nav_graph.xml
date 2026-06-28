@@ -24,7 +24,7 @@
 
     <fragment
         android:id="@+id/DrawerFragment"
-        android:name="com.qch.sumelauncher.fragment.DrawerFragment"
+        android:name="com.qch.sumelauncher.drawer.DrawerFragment"
         android:label="" />
 
     <fragment

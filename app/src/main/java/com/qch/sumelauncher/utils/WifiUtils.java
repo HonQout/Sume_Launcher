@@ -1,6 +1,7 @@
 package com.qch.sumelauncher.utils;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -44,6 +45,7 @@ public class WifiUtils {
         return wifiManager != null && wifiManager.isWifiEnabled();
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     @Nullable
     public static NetworkCapabilities getNetworkCapabilities(@NonNull Context context) {
         if (!isWifiSupported(context)) {
@@ -57,7 +59,7 @@ public class WifiUtils {
                 return connectivityManager.getNetworkCapabilities(network);
             }
         }
-        Log.i(TAG, "Cannot get network capabilities");
+        Log.e(TAG, "Cannot get network capabilities.");
         return null;
     }
 
@@ -79,8 +81,8 @@ public class WifiUtils {
      * Wi-Fi is unsupported or disabled.
      */
     public static int calcSignalLevel(@NonNull Context context, WifiInfo wifiInfo) {
-        if (!isWifiSupported(context)) {
-            Log.e(TAG, "Wifi is not supported.");
+        if (!isWifiConnected(context)) {
+            Log.e(TAG, "Wifi is not connected.");
             return UNKNOWN_SIGNAL_LEVEL;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -109,7 +111,7 @@ public class WifiUtils {
             }
         } catch (Exception e) {
             Log.e(TAG, "Cannot get wifi signal level.", e);
-            return -1;
+            return DEFAULT_SIGNAL_LEVEL;
         }
     }
 
@@ -138,7 +140,8 @@ public class WifiUtils {
         // Try using modern way on Android 11+ first
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && networkCapabilities != null) {
             TransportInfo transportInfo = networkCapabilities.getTransportInfo();
-            if (transportInfo instanceof WifiInfo wifiInfo) {
+            if (transportInfo instanceof WifiInfo) {
+                WifiInfo wifiInfo = (WifiInfo) transportInfo;
                 return calcSignalLevel(context, wifiInfo);
             }
         }

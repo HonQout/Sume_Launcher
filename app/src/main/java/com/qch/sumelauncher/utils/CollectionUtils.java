@@ -10,7 +10,7 @@ public class CollectionUtils {
         boolean shouldRemove(T item);
     }
 
-    public static <T> boolean removeConditionally(@NonNull List<T> list, RemoveCallback<T> callback) {
+    public static <T> boolean removeByCondition(@NonNull List<T> list, RemoveCallback<T> callback) {
         Iterator<T> iterator = list.iterator();
         while (iterator.hasNext()) {
             if (callback.shouldRemove(iterator.next())) {

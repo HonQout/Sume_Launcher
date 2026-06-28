@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:attr/windowBackground"
-    tools:context=".fragment.DrawerFragment">
+    tools:context=".drawer.DrawerFragment">
 
     <FrameLayout
         android:id="@+id/f_drawer_fl"
@@ -21,7 +21,7 @@
             android:id="@+id/f_drawer_ll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
+            android:layout_gravity="center"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -57,21 +57,12 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/f_drawer_sv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical"
-            android:title="@string/search_for_items" />
-
     </FrameLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/f_drawer_rv"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/f_drawer_vp2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="20dp"
         app:layout_constraintBottom_toTopOf="@+id/f_drawer_ll_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

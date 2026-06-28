@@ -4,15 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,8 +24,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class AppGridRVAdapter extends FilterableListAdapter<ActivityBean, AppGridRVAdapter.ViewHolder> {
-    private static final String TAG = "AppRVAdapter";
+public class ListDrawerRVAdapter extends FilterableListAdapter<ActivityBean, ListDrawerRVAdapter.ViewHolder> {
+    private static final String TAG = "ListDrawerRVAdapter";
+    private OnButtonPressedListener onButtonPressedListener;
+
+    public interface OnButtonPressedListener {
+        void onMenuButtonPressed(View view, ActivityBean item);
+    }
 
     public static final DiffUtil.ItemCallback<ActivityBean> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
@@ -48,25 +51,38 @@ public class AppGridRVAdapter extends FilterableListAdapter<ActivityBean, AppGri
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final ImageView icon;
         private final TextView label;
+        private final TextView packageName;
+        private final TextView activityName;
+        private final ImageButton btnMenu;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            icon = (ImageView) itemView.findViewById(R.id.item_app_grid_icon);
-            label = (TextView) itemView.findViewById(R.id.item_app_grid_label);
-            itemView.setOnClickListener(v -> {
+            icon = (ImageView) itemView.findViewById(R.id.item_app_manage_icon);
+            label = (TextView) itemView.findViewById(R.id.item_app_manage_label);
+            packageName = (TextView) itemView.findViewById(R.id.item_app_manage_package_name);
+            activityName = (TextView) itemView.findViewById(R.id.item_app_manage_activity_name);
+            btnMenu = (ImageButton) itemView.findViewById(R.id.item_app_manage_menu);
+            itemView.setOnClickListener(view -> {
                 int position = getBindingAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
                     ActivityBean item = getItem(position);
-                    onItemClickListener.onItemClick(item, v);
+                    onItemClickListener.onItemClick(item, view);
                 }
             });
-            itemView.setOnLongClickListener(v -> {
+            itemView.setOnLongClickListener(view -> {
                 int position = getBindingAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
                     ActivityBean item = getItem(position);
-                    return onItemClickListener.onItemLongClick(item, v);
+                    return onItemClickListener.onItemLongClick(item, view);
                 }
                 return false;
+            });
+            btnMenu.setOnClickListener(view -> {
+                int position = getBindingAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && onButtonPressedListener != null) {
+                    ActivityBean item = getItem(position);
+                    onButtonPressedListener.onMenuButtonPressed(view, item);
+                }
             });
         }
 
@@ -77,21 +93,33 @@ public class AppGridRVAdapter extends FilterableListAdapter<ActivityBean, AppGri
         public TextView getLabel() {
             return label;
         }
+
+        public TextView getPackageName() {
+            return packageName;
+        }
+
+        public TextView getActivityName() {
+            return activityName;
+        }
+
+        public ImageButton getBtnMenu() {
+            return btnMenu;
+        }
     }
 
-    public AppGridRVAdapter(List<ActivityBean> activityBeanList) {
+    public ListDrawerRVAdapter(List<ActivityBean> activityBeanList) {
         super(DIFF_CALLBACK, activityBeanList);
     }
 
     @NonNull
     @Override
-    public AppGridRVAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_app_grid, parent, false);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_app_list, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AppGridRVAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Context context = holder.itemView.getContext();
         ActivityBean activityBean = getItem(position);
         Drawable defIconDrawable = context.getPackageManager().getDefaultActivityIcon();
@@ -107,6 +135,8 @@ public class AppGridRVAdapter extends FilterableListAdapter<ActivityBean, AppGri
             holder.getIcon().setImageBitmap(defIconBitmap);
         }
         holder.getLabel().setText(activityBean.getLabel());
+        holder.getPackageName().setText(activityBean.getPackageName());
+        holder.getActivityName().setText(activityBean.getActivityName());
     }
 
     @NonNull
@@ -116,34 +146,16 @@ public class AppGridRVAdapter extends FilterableListAdapter<ActivityBean, AppGri
         CharSequence cs = constraint.toString().toLowerCase(Locale.ROOT);
         for (ActivityBean item : list) {
             boolean isLabelMatch = item.getLabel().toLowerCase(Locale.ROOT).contains(cs);
-            if (isLabelMatch) {
+            boolean isPackageNameMatch = item.getPackageName().toLowerCase(Locale.ROOT).contains(cs);
+            boolean isActivityNameMatch = item.getActivityName().toLowerCase(Locale.ROOT).contains(cs);
+            if (isLabelMatch || isPackageNameMatch || isActivityNameMatch) {
                 resultList.add(item);
             }
         }
         return resultList;
     }
 
-    private class ActionModeCallback implements ActionMode.Callback {
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate(R.menu.app_op_menu, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-
-        }
+    public void setOnButtonPressedListener(OnButtonPressedListener listener) {
+        this.onButtonPressedListener = listener;
     }
 }
