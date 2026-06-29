@@ -141,7 +141,7 @@ public class DrawerFragment extends Fragment {
         binding.fDrawerBtnQuit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                binding.fDrawerSv.setQuery("", true);
+                binding.fDrawerSv.setQuery("", false);
                 binding.fDrawerSv.clearFocus();
                 binding.fDrawerBtnQuit.setVisibility(View.GONE);
             }
