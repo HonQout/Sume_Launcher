@@ -82,5 +82,6 @@
     <string name="require_following_permission">此应用需要以下权限：</string>
     <string name="num_items">%d个项目</string>
     <string name="search_for_items">搜索项目</string>
+    <string name="search_for_apps">搜索应用</string>
 
 </resources>
