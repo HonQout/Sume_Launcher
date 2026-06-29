@@ -7,96 +7,62 @@
     android:background="?android:attr/windowBackground"
     tools:context=".drawer.DrawerFragment">
 
-    <FrameLayout
-        android:id="@+id/f_drawer_fl"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/f_drawer_abl"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/f_drawer_ll"
-            android:layout_width="wrap_content"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/f_drawer_mt"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:background="?android:windowBackground"
+            app:navigationIcon="@drawable/baseline_arrow_back_24"
+            app:navigationIconTint="?android:textColorPrimary"
+            app:title="@string/app_drawer"
+            app:titleTextColor="?android:textColorPrimary" />
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/f_drawer_tg"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:checkedButton="@id/f_drawer_btn_grid"
-                app:selectionRequired="true"
-                app:singleSelection="true">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/f_drawer_btn_grid"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/grid_icon"
-                    android:text="@string/grid"
-                    app:icon="@drawable/baseline_grid_view_24"
-                    app:iconTint="?android:textColorPrimary" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/f_drawer_btn_list"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/list_icon"
-                    android:text="@string/list"
-                    app:icon="@drawable/baseline_list_24"
-                    app:iconTint="?android:textColorPrimary" />
-
-            </com.google.android.material.button.MaterialButtonToggleGroup>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-    </FrameLayout>
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/f_drawer_vp2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/f_drawer_ll_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/f_drawer_fl" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/f_drawer_ll_title"
+        android:id="@+id/f_drawer_ll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/f_drawer_abl">
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/f_drawer_btn_back"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="@dimen/image_icon_size"
-            android:layout_height="@dimen/image_icon_size"
-            android:contentDescription="@string/back_icon"
-            android:src="@drawable/baseline_arrow_back_24"
-            android:tint="?android:textColorPrimary" />
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/f_drawer_sv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:iconifiedByDefault="false" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/f_drawer_tv_title"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/f_drawer_btn_quit"
+            style="@style/CustomButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_drawer"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/bottom_title_size"
-            android:textStyle="bold" />
+            android:text="@string/quit"
+            android:visibility="gone" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/f_drawer_rv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/f_drawer_ll" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

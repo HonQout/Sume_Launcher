@@ -88,7 +88,7 @@ public class WifiUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             return calcSignalLevelApi30(context, wifiInfo);
         } else {
-            return calcSignalLevelApiDef(wifiInfo);
+            return calcSignalLevelApi1(wifiInfo);
         }
     }
 
@@ -115,7 +115,7 @@ public class WifiUtils {
         }
     }
 
-    private static int calcSignalLevelApiDef(WifiInfo wifiInfo) {
+    private static int calcSignalLevelApi1(WifiInfo wifiInfo) {
         int rssi = wifiInfo.getRssi();
         if (rssi <= -100) {
             return 0;

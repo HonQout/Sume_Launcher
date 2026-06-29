@@ -2,16 +2,17 @@
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingHorizontal="@dimen/content_horizontal_padding"
     android:paddingVertical="@dimen/top_bar_vertical_padding">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/top_bar_left_part"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:gravity="start"
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -36,16 +37,13 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/top_bar_right_part"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:gravity="end"
         android:orientation="horizontal">
 
         <Space

@@ -1,46 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@+id/LauncherFragment">
+    app:startDestination="@+id/launcher_dest">
 
     <fragment
-        android:id="@+id/LauncherFragment"
+        android:id="@+id/launcher_dest"
         android:name="com.qch.sumelauncher.fragment.LauncherFragment"
-        android:label="">
+        android:label=""
+        tools:layout="@layout/fragment_launcher">
 
         <action
             android:id="@+id/action_Launcher_to_Drawer"
-            app:destination="@+id/DrawerFragment"
+            app:destination="@+id/drawer_dest"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
 
         <action
             android:id="@+id/action_Launcher_to_Settings"
-            app:destination="@id/SettingsFragment"
+            app:destination="@id/settings_dest"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
 
     <fragment
-        android:id="@+id/DrawerFragment"
+        android:id="@+id/drawer_dest"
         android:name="com.qch.sumelauncher.drawer.DrawerFragment"
-        android:label="" />
+        android:label="@string/app_drawer"
+        tools:layout="@layout/fragment_drawer" />
 
     <fragment
-        android:id="@+id/SettingsFragment"
+        android:id="@+id/settings_dest"
         android:name="com.qch.sumelauncher.fragment.SettingsFragment"
         android:label="@string/settings">
 
         <action
             android:id="@+id/action_Settings_to_Permission"
-            app:destination="@+id/PermissionFragment"
+            app:destination="@+id/permission_dest"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
 
     <fragment
-        android:id="@+id/PermissionFragment"
+        android:id="@+id/permission_dest"
         android:name="com.qch.sumelauncher.fragment.PermissionFragment"
-        android:label="@string/permission" />
+        android:label="@string/permission"
+        tools:layout="@layout/fragment_permission" />
 </navigation>

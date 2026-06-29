@@ -16,7 +16,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.bean.PermissionBean;
-import com.qch.sumelauncher.bean.PermissionSorted;
+import com.qch.sumelauncher.bean.SortedPermissions;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.PackageUtils;
@@ -85,9 +85,9 @@ public class PermissionViewModel extends AndroidViewModel {
             Context context = getApplication();
             PackageInfo packageInfo = ApplicationUtils.getPackageInfo(context, context.getPackageName());
             mPackageInfo.postValue(packageInfo);
-            PermissionSorted permissionSorted = PackageUtils.getPermissionSorted(context, context.getPackageName());
+            SortedPermissions sortedPermissions = PackageUtils.getPermissionSorted(context, context.getPackageName());
             List<PermissionBean> requestedPermissionBeanList = new ArrayList<>();
-            for (PermissionInfo permissionInfo : permissionSorted.permissionRequestedList) {
+            for (PermissionInfo permissionInfo : sortedPermissions.permissionRequestedList) {
                 requestedPermissionBeanList.add(new PermissionBean(context, permissionInfo));
             }
             sortPermissionBeanList(requestedPermissionBeanList);

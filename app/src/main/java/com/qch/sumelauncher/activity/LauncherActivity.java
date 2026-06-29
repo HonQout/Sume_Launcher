@@ -219,23 +219,15 @@ public class LauncherActivity extends AppCompatActivity {
                     NavController navController =
                             Navigation.findNavController(LauncherActivity.this, R.id.a_launcher_fcv);
                     if (launcherState == LauncherViewModel.LauncherState.NORMAL) {
-                        Log.i(TAG, "Launcher state is NORMAL. Saved instance state is "
-                                + (savedInstanceState == null));
-                        // TODO: Realize normal mode
+                        Log.i(TAG, "Launcher state is NORMAL. ");
                     } else if (launcherState == LauncherViewModel.LauncherState.EDIT) {
-                        Log.i(TAG, "Launcher state is EDIT. Saved instance state is "
-                                + (savedInstanceState == null));
+                        Log.i(TAG, "Launcher state is EDIT. ");
                         // TODO: Realize edit mode
                     } else if (launcherState == LauncherViewModel.LauncherState.SETTINGS) {
-                        Log.i(TAG, "Launcher state is SETTINGS. Saved instance state is "
-                                + (savedInstanceState == null));
-                        if (savedInstanceState == null) {
-                            // Force navigate to Settings page only if this activity is built the first time
-                            navController.navigate(R.id.action_Launcher_to_Settings);
-                        }
+                        Log.i(TAG, "Launcher state is SETTINGS. ");
+                        navController.navigate(R.id.action_Launcher_to_Settings);
                     } else if (launcherState == LauncherViewModel.LauncherState.APPS) {
-                        Log.i(TAG, "Launcher state is APPS. Saved instance state is "
-                                + (savedInstanceState == null));
+                        Log.i(TAG, "Launcher state is APPS. ");
                         navController.navigate(R.id.action_Launcher_to_Drawer);
                     }
                 });

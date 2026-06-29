@@ -12,9 +12,11 @@ import androidx.datastore.rxjava3.RxDataStore;
 import java.util.Set;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class PreferenceDataStoreImpl {
@@ -27,17 +29,20 @@ public class PreferenceDataStoreImpl {
     }
 
     public Completable setBoolean(String key, boolean value) {
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            Preferences.Key<Boolean> preferencesKey = PreferencesKeys.booleanKey(key);
-            mutablePreferences.set(preferencesKey, value);
-            return Single.just(mutablePreferences);
-        }).ignoreElement();
+        return dataStore
+                .updateDataAsync(preferences -> {
+                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
+                    Preferences.Key<Boolean> preferencesKey = PreferencesKeys.booleanKey(key);
+                    mutablePreferences.set(preferencesKey, value);
+                    return Single.just(mutablePreferences);
+                })
+                .ignoreElement();
     }
 
-    public void putBooleanAsync(String key, boolean value) {
+    public @NonNull Disposable putBooleanAsync(String key, boolean value) {
         Preferences.Key<Boolean> preferencesKey = PreferencesKeys.booleanKey(key);
-        dataStore.updateDataAsync(preferences -> {
+        return dataStore
+                .updateDataAsync(preferences -> {
                     MutablePreferences mutablePreferences = preferences.toMutablePreferences();
                     mutablePreferences.set(preferencesKey, value);
                     return Single.just(mutablePreferences);
@@ -51,17 +56,20 @@ public class PreferenceDataStoreImpl {
     }
 
     public Completable setInteger(String key, int value) {
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            Preferences.Key<Integer> preferencesKey = PreferencesKeys.intKey(key);
-            mutablePreferences.set(preferencesKey, value);
-            return Single.just(mutablePreferences);
-        }).ignoreElement();
+        return dataStore
+                .updateDataAsync(preferences -> {
+                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
+                    Preferences.Key<Integer> preferencesKey = PreferencesKeys.intKey(key);
+                    mutablePreferences.set(preferencesKey, value);
+                    return Single.just(mutablePreferences);
+                })
+                .ignoreElement();
     }
 
-    public void putIntegerAsync(String key, int value) {
+    public @NonNull Disposable putIntegerAsync(String key, int value) {
         Preferences.Key<Integer> preferencesKey = PreferencesKeys.intKey(key);
-        dataStore.updateDataAsync(preferences -> {
+        return dataStore
+                .updateDataAsync(preferences -> {
                     MutablePreferences mutablePreferences = preferences.toMutablePreferences();
                     mutablePreferences.set(preferencesKey, value);
                     return Single.just(mutablePreferences);
@@ -83,9 +91,10 @@ public class PreferenceDataStoreImpl {
         }).ignoreElement();
     }
 
-    public void putLongAsync(String key, long value) {
+    public @NonNull Disposable putLongAsync(String key, long value) {
         Preferences.Key<Long> preferencesKey = PreferencesKeys.longKey(key);
-        dataStore.updateDataAsync(preferences -> {
+        return dataStore
+                .updateDataAsync(preferences -> {
                     MutablePreferences mutablePreferences = preferences.toMutablePreferences();
                     mutablePreferences.set(preferencesKey, value);
                     return Single.just(mutablePreferences);
@@ -107,13 +116,15 @@ public class PreferenceDataStoreImpl {
         }).ignoreElement();
     }
 
-    public void putFloatAsync(String key, float value) {
+    public @NonNull Disposable putFloatAsync(String key, float value) {
         Preferences.Key<Float> preferencesKey = PreferencesKeys.floatKey(key);
-        dataStore.updateDataAsync(preferences -> {
+        return dataStore
+                .updateDataAsync(preferences -> {
                     MutablePreferences mutablePreferences = preferences.toMutablePreferences();
                     mutablePreferences.set(preferencesKey, value);
                     return Single.just(mutablePreferences);
-                }).subscribeOn(Schedulers.io())
+                })
+                .subscribeOn(Schedulers.io())
                 .subscribe(
                         success -> {
                         },
@@ -130,9 +141,9 @@ public class PreferenceDataStoreImpl {
         }).ignoreElement();
     }
 
-    public void putStringAsync(String key, String value) {
+    public @NonNull Disposable putStringAsync(String key, String value) {
         Preferences.Key<String> preferencesKey = PreferencesKeys.stringKey(key);
-        dataStore.updateDataAsync(preferences -> {
+        return dataStore.updateDataAsync(preferences -> {
                     MutablePreferences mutablePreferences = preferences.toMutablePreferences();
                     mutablePreferences.set(preferencesKey, value);
                     return Single.just(mutablePreferences);
@@ -145,21 +156,25 @@ public class PreferenceDataStoreImpl {
     }
 
     public Completable setStringSet(String key, Set<String> values) {
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            Preferences.Key<Set<String>> preferencesKey = PreferencesKeys.stringSetKey(key);
-            mutablePreferences.set(preferencesKey, values);
-            return Single.just(mutablePreferences);
-        }).ignoreElement();
+        return dataStore
+                .updateDataAsync(preferences -> {
+                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
+                    Preferences.Key<Set<String>> preferencesKey = PreferencesKeys.stringSetKey(key);
+                    mutablePreferences.set(preferencesKey, values);
+                    return Single.just(mutablePreferences);
+                })
+                .ignoreElement();
     }
 
-    public void putStringSetAsync(String key, Set<String> values) {
+    public @NonNull Disposable putStringSetAsync(String key, Set<String> values) {
         Preferences.Key<Set<String>> preferencesKey = PreferencesKeys.stringSetKey(key);
-        dataStore.updateDataAsync(preferences -> {
+        return dataStore
+                .updateDataAsync(preferences -> {
                     MutablePreferences mutablePreferences = preferences.toMutablePreferences();
                     mutablePreferences.set(preferencesKey, values);
                     return Single.just(mutablePreferences);
-                }).subscribeOn(Schedulers.io())
+                })
+                .subscribeOn(Schedulers.io())
                 .subscribe(
                         success -> {
                         },
@@ -175,7 +190,7 @@ public class PreferenceDataStoreImpl {
                     return value != null ? value : defValue;
                 })
                 .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Failed to get boolean flowable. Return default values.");
+                    Log.e(TAG, "Failed to get boolean Flowable. Return default values.");
                     return defValue;
                 })
                 .subscribeOn(Schedulers.io())
@@ -203,7 +218,7 @@ public class PreferenceDataStoreImpl {
                     return value != null ? value : defValue;
                 })
                 .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Failed to get integer flowable. Return default values.");
+                    Log.e(TAG, "Failed to get integer Flowable. Return default values.");
                     return defValue;
                 })
                 .subscribeOn(Schedulers.io())
@@ -231,7 +246,7 @@ public class PreferenceDataStoreImpl {
                     return value != null ? value : defValue;
                 })
                 .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Failed to get long flowable. Return default values.");
+                    Log.e(TAG, "Failed to get long Flowable. Return default values.");
                     return defValue;
                 })
                 .subscribeOn(Schedulers.io())
@@ -259,7 +274,7 @@ public class PreferenceDataStoreImpl {
                     return value != null ? value : defValue;
                 })
                 .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Failed to get float flowable. Return default values.");
+                    Log.e(TAG, "Failed to get float Flowable. Return default values.");
                     return defValue;
                 })
                 .subscribeOn(Schedulers.io())
@@ -287,7 +302,7 @@ public class PreferenceDataStoreImpl {
                     return value != null ? value : defValue;
                 })
                 .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Failed to get string flowable. Return default values.");
+                    Log.e(TAG, "Failed to get string Flowable. Return default values.");
                     return defValue;
                 })
                 .subscribeOn(Schedulers.io())
@@ -315,7 +330,7 @@ public class PreferenceDataStoreImpl {
                     return values != null ? values : defValues;
                 })
                 .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Failed to get string set flowable. Return default values.");
+                    Log.e(TAG, "Cannot get string set Flowable. Return default values.");
                     return defValues;
                 })
                 .subscribeOn(Schedulers.io())
