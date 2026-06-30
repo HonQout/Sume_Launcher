@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.adapter.viewpager2;
+package com.qch.sumelauncher.launcher.page;
 
 import android.annotation.SuppressLint;
 import android.util.Log;

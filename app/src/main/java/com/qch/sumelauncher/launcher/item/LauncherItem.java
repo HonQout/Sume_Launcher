@@ -1,4 +1,6 @@
-package com.qch.sumelauncher.launcher;
+package com.qch.sumelauncher.launcher.item;
+
+import com.qch.sumelauncher.launcher.cell.CellPosition;
 
 public abstract class LauncherItem {
     protected long id;

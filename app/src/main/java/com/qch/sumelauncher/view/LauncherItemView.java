@@ -7,7 +7,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.qch.sumelauncher.launcher.LauncherItem;
+import com.qch.sumelauncher.launcher.item.LauncherItem;
 
 public abstract class LauncherItemView extends FrameLayout {
     protected LauncherItem launcherItem;

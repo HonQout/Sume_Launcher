@@ -1,18 +1,15 @@
-package com.qch.sumelauncher.adapter.recyclerview;
+package com.qch.sumelauncher.recyclerview.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +24,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class GridDrawerRVAdapter extends FilterableListAdapter<ActivityBean, GridDrawerRVAdapter.ViewHolder> {
-    private static final String TAG = "AppRVAdapter";
+    private static final String TAG = "GridDrawerRVAdapter";
 
     public static final DiffUtil.ItemCallback<ActivityBean> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
@@ -121,29 +118,5 @@ public class GridDrawerRVAdapter extends FilterableListAdapter<ActivityBean, Gri
             }
         }
         return resultList;
-    }
-
-    private static class ActionModeCallback implements ActionMode.Callback {
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate(R.menu.app_op_menu, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-
-        }
     }
 }

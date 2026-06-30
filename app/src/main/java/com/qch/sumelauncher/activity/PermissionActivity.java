@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.qch.sumelauncher.adapter.recyclerview.FilterableListAdapter;
-import com.qch.sumelauncher.adapter.recyclerview.PermissionListRVAdapter;
+import com.qch.sumelauncher.recyclerview.adapter.FilterableListAdapter;
+import com.qch.sumelauncher.recyclerview.adapter.PermissionListRVAdapter;
 import com.qch.sumelauncher.bean.PermissionBean;
 import com.qch.sumelauncher.databinding.ActivityPermissionBinding;
 import com.qch.sumelauncher.utils.UIUtils;

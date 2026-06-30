@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.recyclerview;
+package com.qch.sumelauncher.recyclerview.decoration;
 
 import android.graphics.Rect;
 import android.view.View;
@@ -23,5 +23,13 @@ public class GridDecoration extends RecyclerView.ItemDecoration {
         outRect.left = column == 0 ? spacing * 2 : spacing;
         outRect.right = column == spanCount - 1 ? spacing * 2 : spacing;
         outRect.top = position >= spanCount ? 2 * spacing : 0;
+    }
+
+    public void setSpanCount(int spanCount) {
+        this.spanCount = spanCount;
+    }
+
+    public void setSpacing(int spacing) {
+        this.spacing = spacing;
     }
 }

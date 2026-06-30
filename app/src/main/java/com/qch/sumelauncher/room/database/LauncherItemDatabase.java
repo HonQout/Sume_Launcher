@@ -7,9 +7,11 @@ import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.qch.sumelauncher.bean.ActivityBean;
+import com.qch.sumelauncher.room.converter.Converters;
 import com.qch.sumelauncher.room.dao.LauncherIconDao;
 import com.qch.sumelauncher.room.entity.IconEntity;
 import com.qch.sumelauncher.room.entity.LayoutEntity;
@@ -26,6 +28,7 @@ import java.util.concurrent.Executors;
         version = 2,
         exportSchema = false
 )
+@TypeConverters({Converters.class})
 public abstract class LauncherItemDatabase extends RoomDatabase {
     private static final String TAG = "LauncherItemDatabase";
 

@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.launcher;
+package com.qch.sumelauncher.launcher.cell;
 
 public class CellPosition {
     private String layoutName;

@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.adapter.recyclerview;
+package com.qch.sumelauncher.recyclerview.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;

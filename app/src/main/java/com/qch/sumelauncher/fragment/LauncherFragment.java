@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.adapter.viewpager2.LauncherPagerAdapter;
+import com.qch.sumelauncher.launcher.page.LauncherPagerAdapter;
 import com.qch.sumelauncher.databinding.FragmentLauncherBinding;
 import com.qch.sumelauncher.viewmodel.LauncherViewModel;
 
