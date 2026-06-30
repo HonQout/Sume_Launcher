@@ -24,11 +24,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.adapter.recyclerview.FilterableListAdapter;
-import com.qch.sumelauncher.adapter.recyclerview.GridDrawerRVAdapter;
+import com.qch.sumelauncher.recyclerview.adapter.FilterableListAdapter;
+import com.qch.sumelauncher.recyclerview.adapter.GridDrawerRVAdapter;
 import com.qch.sumelauncher.bean.ActivityBean;
 import com.qch.sumelauncher.databinding.FragmentDrawerBinding;
-import com.qch.sumelauncher.recyclerview.GridDecoration;
+import com.qch.sumelauncher.recyclerview.decoration.GridDecoration;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;

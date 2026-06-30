@@ -6,6 +6,10 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import com.qch.sumelauncher.bean.ActivityRecord;
+
+import java.util.List;
+
 @Entity(
         tableName = "folders",
         foreignKeys = @ForeignKey(
@@ -14,94 +18,117 @@ import androidx.room.PrimaryKey;
                 childColumns = "layout_id",
                 onDelete = ForeignKey.CASCADE
         ),
-        indices = {@Index(value = {"layout_id", "cell_x", "cell_y"}, unique = true)}
+        indices = {@Index(value = {"layout_name", "cell_x", "cell_y"}, unique = true)}
 )
 public class FolderEntity {
     @PrimaryKey(autoGenerate = true)
-    public long id;
-    @ColumnInfo(name = "layout_id")
-    public int layoutId;
+    private long id;
+    @ColumnInfo(name = "layout_name")
+    private String layoutName;
     @ColumnInfo(name = "screen_index")
     private int screenIndex;
     @ColumnInfo(name = "cell_x")
-    public int cellX;
+    private int cellX;
     @ColumnInfo(name = "cell_y")
-    public int cellY;
+    private int cellY;
     @ColumnInfo(name = "span_x")
     private int spanX;
     @ColumnInfo(name = "span_y")
     private int spanY;
     @ColumnInfo(name = "name")
-    public String name;
+    private String name;
+    @ColumnInfo(name = "contents")
+    private List<ActivityRecord> activityRecordList;
 
-    public FolderEntity(int layoutId, int screenIndex, int cellX, int cellY, int spanX, int spanY,
-                        String name) {
-        this.layoutId = layoutId;
+    /**
+     * No-Arg Constructor
+     * Gson needs this constructor. Do not delete it.
+     */
+    public FolderEntity() {
+
+    }
+
+    public FolderEntity(String layoutName, int screenIndex, int cellX, int cellY, int spanX, int spanY,
+                        String name, List<ActivityRecord> activityRecordList) {
+        this.layoutName = layoutName;
         this.screenIndex = screenIndex;
         this.cellX = cellX;
         this.cellY = cellY;
         this.spanX = spanX;
         this.spanY = spanY;
         this.name = name;
+        this.activityRecordList = activityRecordList;
     }
 
-    public void setLayoutId(int layoutId) {
-        this.layoutId = layoutId;
-    }
-
-    public void setScreenIndex(int screenIndex) {
-        this.screenIndex = screenIndex;
-    }
-
-    public void setCellX(int cellX) {
-        this.cellX = cellX;
-    }
-
-    public void setCellY(int cellY) {
-        this.cellY = cellY;
-    }
-
-    public void setSpanX(int spanX) {
-        this.spanX = spanX;
-    }
-
-    public void setSpanY(int spanY) {
-        this.spanY = spanY;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public long getId() {
         return id;
     }
 
-    public int getLayoutId() {
-        return layoutId;
+    public void setLayoutName(String layoutName) {
+        this.layoutName = layoutName;
+    }
+
+    public String getLayoutName() {
+        return layoutName;
+    }
+
+    public void setScreenIndex(int screenIndex) {
+        this.screenIndex = screenIndex;
     }
 
     public int getScreenIndex() {
         return screenIndex;
     }
 
+    public void setCellX(int cellX) {
+        this.cellX = cellX;
+    }
+
     public int getCellX() {
         return cellX;
+    }
+
+    public void setCellY(int cellY) {
+        this.cellY = cellY;
     }
 
     public int getCellY() {
         return cellY;
     }
 
+    public void setSpanX(int spanX) {
+        this.spanX = spanX;
+    }
+
     public int getSpanX() {
         return spanX;
+    }
+
+    public void setSpanY(int spanY) {
+        this.spanY = spanY;
     }
 
     public int getSpanY() {
         return spanY;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setActivityRecordList(List<ActivityRecord> activityRecordList) {
+        this.activityRecordList = activityRecordList;
+    }
+
+    public List<ActivityRecord> getActivityRecordList() {
+        return activityRecordList;
     }
 }

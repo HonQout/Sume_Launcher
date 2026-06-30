@@ -1,12 +1,12 @@
-package com.qch.sumelauncher.launcher;
+package com.qch.sumelauncher.launcher.page;
 
 public class Coordinate {
     private int x;
     private int y;
 
-    public Coordinate(int x,int y){
-        this.x=x;
-        this.y=y;
+    public Coordinate(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
     public void setX(int x) {

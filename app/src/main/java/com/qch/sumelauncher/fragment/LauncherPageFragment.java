@@ -114,14 +114,14 @@ public class LauncherPageFragment extends Fragment {
                     return true;
                 }
             });
-            binding.fLauncherLl.setOnBlankClickListener(new LauncherLayout.OnBlankClickListener() {
+            binding.fLauncherLl.setOnBlankClickListener(new LauncherLayout.OnBlankAreaClickListener() {
                 @Override
-                public void onBlankClick(int x, int y) {
+                public void onBlankAreaClick(int x, int y) {
                     Log.i(TAG, "Clicked blank cell " + x + "," + y);
                 }
 
                 @Override
-                public boolean onBlankLongClick(int x, int y) {
+                public boolean onBlankAreaLongClick(int x, int y) {
                     Log.i(TAG, "Long clicked blank cell " + x + "," + y);
                     viewModel.setLauncherState(LauncherViewModel.LauncherState.EDIT);
                     return false;

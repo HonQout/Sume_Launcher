@@ -1,10 +1,12 @@
-package com.qch.sumelauncher.launcher;
+package com.qch.sumelauncher.launcher.item;
 
+import com.qch.sumelauncher.launcher.cell.CellPosition;
 import com.qch.sumelauncher.room.entity.IconEntity;
 
 public class LauncherIcon extends LauncherItem {
-    private String packageName;
-    private String activityName;
+    private static final String TAG = "LauncherIcon";
+    private final String packageName;
+    private final String activityName;
 
     public LauncherIcon(long id, CellPosition cellPosition, String packageName, String activityName) {
         super(id, cellPosition);
@@ -25,14 +27,14 @@ public class LauncherIcon extends LauncherItem {
         return activityName;
     }
 
-    public IconEntity toLauncherIconEntity() {
+    public IconEntity toIconEntity() {
         return new IconEntity(
                 cellPosition.getLayoutName(),
                 cellPosition.getScreenIndex(),
                 cellPosition.getCellX(),
                 cellPosition.getCellY(),
-                1,
-                1,
+                cellPosition.getSpanX(),
+                cellPosition.getSpanY(),
                 packageName,
                 activityName
         );

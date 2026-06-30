@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.adapter.recyclerview;
+package com.qch.sumelauncher.recyclerview.adapter;
 
 import android.text.TextUtils;
 import android.view.View;
@@ -61,13 +61,9 @@ public abstract class FilterableListAdapter<T, VH extends RecyclerView.ViewHolde
     }
 
     public void setList(List<T> list) {
-        if (list == null) {
-            submitList(new ArrayList<>());
-            this.list = new ArrayList<>();
-        } else {
-            submitList(new ArrayList<>(list));
-            this.list = new ArrayList<>(list);
-        }
+        List<T> mList = list == null ? new ArrayList<>() : new ArrayList<>(list);
+        submitList(mList);
+        this.list = mList;
     }
 
     public void setOnItemClickListener(@NonNull OnItemClickListener<T> onItemClickListener) {

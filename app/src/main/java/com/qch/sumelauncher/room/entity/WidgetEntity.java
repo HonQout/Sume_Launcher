@@ -7,16 +7,16 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 @Entity(
-        tableName = "icons",
+        tableName = "widgets",
         foreignKeys = @ForeignKey(
                 entity = LayoutEntity.class,
-                parentColumns = "name",
-                childColumns = "layout_name",
+                parentColumns = "id",
+                childColumns = "layout_id",
                 onDelete = ForeignKey.CASCADE
         ),
-        indices = @Index(value = {"layout_name", "screen_index", "cell_x", "cell_y"}, unique = true)
+        indices = {@Index(value = {"layout_name", "cell_x", "cell_y"}, unique = true)}
 )
-public class IconEntity {
+public class WidgetEntity {
     @PrimaryKey(autoGenerate = true)
     private long id;
     @ColumnInfo(name = "layout_name")
@@ -24,20 +24,20 @@ public class IconEntity {
     @ColumnInfo(name = "screen_index")
     private int screenIndex;
     @ColumnInfo(name = "cell_x")
-    private int cellX; // column
+    private int cellX;
     @ColumnInfo(name = "cell_y")
-    private int cellY; // row
+    private int cellY;
     @ColumnInfo(name = "span_x")
     private int spanX;
     @ColumnInfo(name = "span_y")
     private int spanY;
     @ColumnInfo(name = "package_name")
     private String packageName;
-    @ColumnInfo(name = "activity_name")
-    private String activityName;
+    @ColumnInfo(name = "receiver_name")
+    private String receiverName;
 
-    public IconEntity(String layoutName, int screenIndex, int cellX, int cellY, int spanX, int spanY,
-                      String packageName, String activityName) {
+    public WidgetEntity(String layoutName, int screenIndex, int cellX, int cellY, int spanX, int spanY,
+                        String packageName, String receiverName) {
         this.layoutName = layoutName;
         this.screenIndex = screenIndex;
         this.cellX = cellX;
@@ -45,7 +45,7 @@ public class IconEntity {
         this.spanX = spanX;
         this.spanY = spanY;
         this.packageName = packageName;
-        this.activityName = activityName;
+        this.receiverName = receiverName;
     }
 
     public void setId(long id) {
@@ -112,15 +112,11 @@ public class IconEntity {
         return packageName;
     }
 
-    public void setActivityName(String activityName) {
-        this.activityName = activityName;
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
     }
 
-    public String getActivityName() {
-        return activityName;
-    }
-
-    public String getKey() {
-        return packageName + ":" + activityName;
+    public String getReceiverName() {
+        return receiverName;
     }
 }

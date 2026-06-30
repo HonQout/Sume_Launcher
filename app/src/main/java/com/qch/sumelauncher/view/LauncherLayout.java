@@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.launcher.Coordinate;
+import com.qch.sumelauncher.launcher.page.Coordinate;
 import com.qch.sumelauncher.room.entity.IconEntity;
 import com.qch.sumelauncher.utils.UnitUtils;
 
@@ -60,15 +60,15 @@ public class LauncherLayout extends ViewGroup {
         boolean onIconLongClick(@Nullable View view, IconEntity item);
     }
 
-    public interface OnBlankClickListener {
-        void onBlankClick(int x, int y);
+    public interface OnBlankAreaClickListener {
+        void onBlankAreaClick(int x, int y);
 
-        boolean onBlankLongClick(int x, int y);
+        boolean onBlankAreaLongClick(int x, int y);
     }
 
     // interaction
     private OnIconClickListener onIconClickListener;
-    private OnBlankClickListener onBlankClickListener;
+    private OnBlankAreaClickListener onBlankAreaClickListener;
     private int longPressTimeout;
     private Runnable longPressRunnable;
     private boolean hasPerformedLongPress = false;
@@ -298,8 +298,8 @@ public class LauncherLayout extends ViewGroup {
             hasPerformedLongPress = true;
             boolean handledBySystem = super.performLongClick();
             Log.i(TAG, "Long press handled by system: " + handledBySystem);
-            if (onBlankClickListener != null) {
-                onBlankClickListener.onBlankLongClick(cellX, cellY);
+            if (onBlankAreaClickListener != null) {
+                onBlankAreaClickListener.onBlankAreaLongClick(cellX, cellY);
             }
         };
         postDelayed(longPressRunnable, longPressTimeout);
@@ -469,8 +469,8 @@ public class LauncherLayout extends ViewGroup {
         this.onIconClickListener = listener;
     }
 
-    public void setOnBlankClickListener(OnBlankClickListener listener) {
-        this.onBlankClickListener = listener;
+    public void setOnBlankClickListener(OnBlankAreaClickListener listener) {
+        this.onBlankAreaClickListener = listener;
     }
 
     public Coordinate removeIconView(IconEntity iconEntity) {
