@@ -30,7 +30,7 @@ import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
 import com.qch.sumelauncher.utils.PermissionUtils;
 import com.qch.sumelauncher.utils.UIUtils;
-import com.qch.sumelauncher.view.BatteryView;
+import com.qch.sumelauncher.topbar.view.BatteryView;
 import com.qch.sumelauncher.topbar.viewmodel.AirplaneModeViewModel;
 import com.qch.sumelauncher.launcher.viewmodel.LauncherViewModel;
 import com.qch.sumelauncher.topbar.viewmodel.BatteryViewModel;
@@ -207,6 +207,11 @@ public class LauncherActivity extends AppCompatActivity {
                     ));
             BatteryView batteryView = binding.aLauncherTopBar.topBarBv;
             batteryView.setLevel(i);
+        });
+        batteryViewModel.getIsCharging().observe(this, aBoolean -> {
+            boolean b = aBoolean == null ? false : aBoolean;
+            BatteryView batteryView = binding.aLauncherTopBar.topBarBv;
+            batteryView.setCharging(b);
         });
 
         launcherViewModel.getLauncherState().observe(this, launcherState -> {

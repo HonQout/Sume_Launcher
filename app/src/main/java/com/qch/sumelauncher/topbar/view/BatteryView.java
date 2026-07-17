@@ -1,8 +1,9 @@
-package com.qch.sumelauncher.view;
+package com.qch.sumelauncher.topbar.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
@@ -23,10 +24,12 @@ public class BatteryView extends View {
     private Paint borderPaint;
     private Paint capPaint;
     private Paint fillPaint;
+    private Paint lightningPaint;
 
     private RectF bodyRect = new RectF();
     private RectF capRect = new RectF();
     private RectF fillRect = new RectF();
+    private Path lightningPath = new Path();
 
     public BatteryView(Context context) {
         this(context, null, 0, 0);
@@ -42,13 +45,14 @@ public class BatteryView extends View {
 
     public BatteryView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        initPaints();
+        init();
     }
 
-    private void initPaints() {
+    private void init() {
         int borderColor = getContext().getColor(R.color.batteryBorderColor);
         int capColor = getContext().getColor(R.color.batteryCapColor);
         int fillColor = getContext().getColor(R.color.batteryFillColor);
+        int lightningColor = getContext().getColor(R.color.batteryLightningColor);
 
         borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         borderPaint.setStyle(Paint.Style.STROKE);
@@ -62,6 +66,10 @@ public class BatteryView extends View {
         fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         fillPaint.setStyle(Paint.Style.FILL);
         fillPaint.setColor(fillColor);
+
+        lightningPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        lightningPaint.setStyle(Paint.Style.FILL);
+        lightningPaint.setColor(lightningColor);
     }
 
     public void setLevel(int level) {
@@ -90,12 +98,14 @@ public class BatteryView extends View {
         super.onDraw(canvas);
 
         calculateBatteryRects(getWidth(), getHeight());
-
         canvas.drawRoundRect(bodyRect, cornerRadius, cornerRadius, borderPaint);
-
         canvas.drawRect(capRect, capPaint);
-
         canvas.drawRoundRect(fillRect, cornerRadius, cornerRadius, fillPaint);
+
+        if (isCharging) {
+            calculateLightningPath();
+            canvas.drawPath(lightningPath, lightningPaint);
+        }
     }
 
     @Override
@@ -124,5 +134,22 @@ public class BatteryView extends View {
         capRect.set(mHorizontalPadding + bodyWidth, mVerticalPadding + (bodyHeight - capHeight) / 2,
                 width - mHorizontalPadding, height - mVerticalPadding - (bodyHeight - capHeight) / 2);
         fillRect.set(fillLeft, fillTop, fillLeft + fillWidth, fillTop + fillHeight);
+    }
+
+    private void calculateLightningPath() {
+        float centerX = bodyRect.centerX();
+        float centerY = bodyRect.centerY();
+
+        float lHeight = bodyRect.height() * 0.8f;
+        float lWidth = lHeight * 0.4f;
+
+        lightningPath.reset();
+
+        lightningPath.moveTo(centerX + lWidth * 0.2f, centerY - lHeight * 0.5f);
+        lightningPath.lineTo(centerX - lWidth * 0.5f, centerY + lHeight * 0.05f);
+        lightningPath.lineTo(centerX - lWidth * 0.1f, centerY + lHeight * 0.05f);
+        lightningPath.lineTo(centerX - lWidth * 0.2f, centerY + lHeight * 0.5f);
+        lightningPath.lineTo(centerX + lWidth * 0.5f, centerY - lHeight * 0.05f);
+        lightningPath.lineTo(centerX + lWidth * 0.1f, centerY - lHeight * 0.05f);
     }
 }

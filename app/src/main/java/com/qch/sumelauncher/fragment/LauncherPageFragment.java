@@ -25,7 +25,7 @@ import com.qch.sumelauncher.room.entity.IconEntity;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
-import com.qch.sumelauncher.view.LauncherLayout;
+import com.qch.sumelauncher.launcher.view.LauncherLayout;
 import com.qch.sumelauncher.launcher.viewmodel.LauncherViewModel;
 
 import java.util.ArrayList;

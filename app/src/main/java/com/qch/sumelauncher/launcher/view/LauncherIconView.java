@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.view;
+package com.qch.sumelauncher.launcher.view;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
