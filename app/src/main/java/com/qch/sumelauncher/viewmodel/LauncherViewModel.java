@@ -45,7 +45,7 @@ public class LauncherViewModel extends AndroidViewModel {
     private static final int defNumColumn = 5;
 
     public enum LauncherState {
-        NORMAL, EDIT, SETTINGS, APPS
+        NORMAL, EDIT, APPS
     }
 
     public enum AppListOp {

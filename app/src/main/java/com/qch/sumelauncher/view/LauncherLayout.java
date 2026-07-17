@@ -93,9 +93,9 @@ public class LauncherLayout extends ViewGroup {
         super(context, attrs, defStyleAttr, defStyleRes);
         // Get sizes
         borderHorizontalPaddingPx = UnitUtils.dpToPx(context,
-                context.getResources().getDimensionPixelSize(R.dimen.app_border_horizontal_padding));
+                context.getResources().getDimensionPixelSize(R.dimen.launcher_layout_horizontal_padding));
         borderVerticalPaddingPx = UnitUtils.dpToPx(context,
-                context.getResources().getDimensionPixelSize(R.dimen.app_border_vertical_padding));
+                context.getResources().getDimensionPixelSize(R.dimen.launcher_layout_vertical_padding));
         gridHorizontalPaddingPx = UnitUtils.dpToPx(context,
                 context.getResources().getDimensionPixelSize(R.dimen.grid_horizontal_padding));
         gridVerticalPaddingPx = UnitUtils.dpToPx(context,
@@ -174,18 +174,32 @@ public class LauncherLayout extends ViewGroup {
         }
         for (LauncherIconView item : iconViewMap.values()) {
             IconEntity iconEntity = item.getLauncherIconEntity();
+            // Skip null item
             if (iconEntity == null) {
                 continue;
             }
+            // Find position of item
             int col = iconEntity.getCellX();
             int row = iconEntity.getCellY();
-
+            int width = item.getMeasuredWidth();
+            int height = item.getMeasuredHeight();
+            int itemHorizontalMargin = 0;
+            int itemVerticalMargin = 0;
+            if (width <= cellWidth) {
+                itemHorizontalMargin = (cellWidth - width) / 2;
+            }
+            if (height <= cellHeight) {
+                itemVerticalMargin = (cellHeight - height) / 2;
+            }
             int cellLeft = borderHorizontalPaddingPx + col * cellWidth;
             int cellTop = borderVerticalPaddingPx + row * cellHeight;
             int cellRight = cellLeft + cellWidth;
             int cellBottom = cellTop + cellHeight;
-
-            item.layout(cellLeft, cellTop, cellRight, cellBottom);
+            int itemLeft = cellLeft + itemHorizontalMargin;
+            int itemTop = cellTop + itemVerticalMargin;
+            int itemRight = cellRight - itemHorizontalMargin;
+            int itemBottom = cellBottom - itemVerticalMargin;
+            item.layout(itemLeft, itemTop, itemRight, itemBottom);
         }
     }
 
@@ -442,7 +456,7 @@ public class LauncherLayout extends ViewGroup {
         iconViewMap.clear();
         if (iconEntityList == null) {
             this.iconEntityMap = new ConcurrentHashMap<>();
-            Log.i(TAG, "Cleared list through passing null to setList().");
+            Log.i(TAG, "Cleared iconEntityMap through passing null to setIconEntityList().");
         } else {
             Log.i(TAG, "Size of new list is " + iconEntityList.size());
             for (int i = 0; i < iconEntityList.size(); i++) {
@@ -461,7 +475,9 @@ public class LauncherLayout extends ViewGroup {
                 addView(launcherIconView);
             }
         }
-        requestLayout();
+        if (!isInLayout()) {
+            requestLayout();
+        }
         postInvalidate();
     }
 

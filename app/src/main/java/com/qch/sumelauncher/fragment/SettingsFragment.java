@@ -1,14 +1,10 @@
 package com.qch.sumelauncher.fragment;
 
 import android.os.Bundle;
-import android.view.View;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -31,19 +27,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                NavController navController = Navigation.findNavController(view);
-                navController.popBackStack();
-            }
-        };
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), onBackPressedCallback);
-    }
-
-    @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         preferenceDataStoreBridge = new PreferenceDataStoreBridge(MyApplication.getPreferenceDataStore());
         getPreferenceManager().setPreferenceDataStore(preferenceDataStoreBridge);
@@ -55,8 +38,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         String key = preference.getKey();
         if (Objects.equals(key, "default_app")) {
             viewModel.startManageDefaultAppsSettings(requireActivity());
-        } else if (Objects.equals(key, "requested_permissions")) {
-            viewModel.startPermissionActivity(requireActivity());
         } else if (Objects.equals(key, "view_github_page")) {
             viewModel.openGithubPage(requireActivity());
         }

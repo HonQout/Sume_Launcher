@@ -57,7 +57,6 @@ public class LauncherIconView extends FrameLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        Log.i(TAG, "Width = " + widthMeasureSpec + "; Height = " + heightMeasureSpec);
     }
 
     @Override

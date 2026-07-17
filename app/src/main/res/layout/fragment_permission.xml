@@ -7,25 +7,6 @@
     android:background="?android:attr/windowBackground"
     tools:context=".fragment.PermissionFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/f_permission_abl"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/f_permission_mt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:navigationIcon="@drawable/baseline_arrow_back_24"
-            app:navigationIconTint="?android:textColorPrimary"
-            app:title="@string/permission"
-            app:titleTextColor="?android:textColorPrimary" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
     <LinearLayout
         android:id="@+id/a_permission_ll"
         android:layout_width="match_parent"
@@ -35,7 +16,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/f_permission_abl">
+        app:layout_constraintTop_toTopOf="parent">
 
         <FrameLayout
             android:id="@+id/f_permission_fl"

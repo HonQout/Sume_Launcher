@@ -16,12 +16,6 @@
             app:destination="@+id/drawer_dest"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
-
-        <action
-            android:id="@+id/action_Launcher_to_Settings"
-            app:destination="@id/settings_dest"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
 
     <fragment
@@ -29,22 +23,4 @@
         android:name="com.qch.sumelauncher.drawer.DrawerFragment"
         android:label="@string/app_drawer"
         tools:layout="@layout/fragment_drawer" />
-
-    <fragment
-        android:id="@+id/settings_dest"
-        android:name="com.qch.sumelauncher.fragment.SettingsFragment"
-        android:label="@string/settings">
-
-        <action
-            android:id="@+id/action_Settings_to_Permission"
-            app:destination="@+id/permission_dest"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/permission_dest"
-        android:name="com.qch.sumelauncher.fragment.PermissionFragment"
-        android:label="@string/permission"
-        tools:layout="@layout/fragment_permission" />
 </navigation>
