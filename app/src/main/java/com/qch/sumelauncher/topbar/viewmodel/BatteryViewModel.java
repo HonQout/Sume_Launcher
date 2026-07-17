@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.viewmodel;
+package com.qch.sumelauncher.topbar.viewmodel;
 
 import android.app.Application;
 import android.content.BroadcastReceiver;
@@ -7,14 +7,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.utils.BatteryUtils;
 
 public class BatteryViewModel extends AndroidViewModel {
@@ -22,8 +20,6 @@ public class BatteryViewModel extends AndroidViewModel {
     // data
     private final MutableLiveData<Integer> mLevel = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mIsCharging = new MutableLiveData<>();
-    @DrawableRes
-    private final MutableLiveData<Integer> mIcon = new MutableLiveData<>();
     // broadcast receiver
     private BroadcastReceiver broadcastReceiver;
 
@@ -58,7 +54,6 @@ public class BatteryViewModel extends AndroidViewModel {
                         status == BatteryManager.BATTERY_STATUS_FULL;
                 mLevel.postValue((int) batteryPct);
                 mIsCharging.postValue(isCharging);
-                mIcon.postValue(getBatteryIconRes(level, isCharging));
             }
         };
 
@@ -78,7 +73,6 @@ public class BatteryViewModel extends AndroidViewModel {
         boolean isCharging = BatteryUtils.isCharging(getApplication());
         mLevel.postValue(level);
         mIsCharging.postValue(isCharging);
-        mIcon.postValue(getBatteryIconRes(level, isCharging));
     }
 
     public LiveData<Integer> getLevel() {
@@ -87,38 +81,5 @@ public class BatteryViewModel extends AndroidViewModel {
 
     public LiveData<Boolean> getIsCharging() {
         return mIsCharging;
-    }
-
-    public LiveData<Integer> getIcon() {
-        return mIcon;
-    }
-
-    @DrawableRes
-    public int getBatteryIconRes(int level, boolean isCharging) {
-        if (isCharging) {
-            return R.drawable.baseline_battery_charging_full_24;
-        } else {
-            if (level < 0) {
-                return R.drawable.baseline_battery_unknown_24;
-            } else if (level < 100 / 7) {
-                return R.drawable.baseline_battery_alert_24;
-            } else if (level < 100 / 7 * 2) {
-                return R.drawable.baseline_battery_1_bar_24;
-            } else if (level < 100 / 7 * 3) {
-                return R.drawable.baseline_battery_2_bar_24;
-            } else if (level < 100 / 7 * 4) {
-                return R.drawable.baseline_battery_3_bar_24;
-            } else if (level < 100 / 7 * 5) {
-                return R.drawable.baseline_battery_4_bar_24;
-            } else if (level < 100 / 7 * 6) {
-                return R.drawable.baseline_battery_5_bar_24;
-            } else if (level < 100) {
-                return R.drawable.baseline_battery_6_bar_24;
-            } else if (level == 100) {
-                return R.drawable.baseline_battery_full_24;
-            } else {
-                return R.drawable.baseline_battery_unknown_24;
-            }
-        }
     }
 }

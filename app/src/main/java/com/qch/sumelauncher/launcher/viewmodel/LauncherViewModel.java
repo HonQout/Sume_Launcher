@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.viewmodel;
+package com.qch.sumelauncher.launcher.viewmodel;
 
 import android.app.Application;
 import android.content.BroadcastReceiver;

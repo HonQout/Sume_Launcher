@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.fragment;
+package com.qch.sumelauncher.settings.ui;
 
 import android.os.Bundle;
 
@@ -15,7 +15,7 @@ import com.qch.sumelauncher.bean.PermissionBean;
 import com.qch.sumelauncher.databinding.FragmentPermissionBinding;
 import com.qch.sumelauncher.recyclerview.adapter.FilterableListAdapter;
 import com.qch.sumelauncher.recyclerview.adapter.PermissionListRVAdapter;
-import com.qch.sumelauncher.viewmodel.PermissionViewModel;
+import com.qch.sumelauncher.settings.viewmodel.PermissionViewModel;
 
 import java.util.ArrayList;
 

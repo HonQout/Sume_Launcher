@@ -17,10 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.activity.SettingsActivity;
+import com.qch.sumelauncher.settings.ui.SettingsActivity;
 import com.qch.sumelauncher.launcher.page.LauncherPagerAdapter;
 import com.qch.sumelauncher.databinding.FragmentLauncherBinding;
-import com.qch.sumelauncher.viewmodel.LauncherViewModel;
+import com.qch.sumelauncher.launcher.viewmodel.LauncherViewModel;
 
 public class LauncherFragment extends Fragment {
     private static final String TAG = "LauncherFragment";

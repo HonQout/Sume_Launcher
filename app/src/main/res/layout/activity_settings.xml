@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="?android:windowBackground"
     android:fitsSystemWindows="true"
-    tools:context=".activity.SettingsActivity">
+    tools:context=".settings.ui.SettingsActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/a_settings_tb"
