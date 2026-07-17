@@ -1,6 +1,8 @@
 package com.qch.sumelauncher.utils;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
@@ -101,5 +103,11 @@ public class UIUtils {
             }
         }
         view.invalidate();
+    }
+
+    public static boolean isDarkMode(Context context) {
+        int nightMode = context.getApplicationContext().getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK;
+        return nightMode == Configuration.UI_MODE_NIGHT_YES;
     }
 }

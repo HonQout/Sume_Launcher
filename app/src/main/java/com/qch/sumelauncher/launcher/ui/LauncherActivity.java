@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.activity;
+package com.qch.sumelauncher.launcher.ui;
 
 import android.Manifest;
 import android.os.Build;
@@ -30,13 +30,14 @@ import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
 import com.qch.sumelauncher.utils.PermissionUtils;
 import com.qch.sumelauncher.utils.UIUtils;
-import com.qch.sumelauncher.viewmodel.AirplaneModeViewModel;
-import com.qch.sumelauncher.viewmodel.LauncherViewModel;
-import com.qch.sumelauncher.viewmodel.BatteryViewModel;
-import com.qch.sumelauncher.viewmodel.BluetoothViewModel;
-import com.qch.sumelauncher.viewmodel.SettingsViewModel;
-import com.qch.sumelauncher.viewmodel.WifiViewModel;
-import com.qch.sumelauncher.viewmodel.TimeViewModel;
+import com.qch.sumelauncher.view.BatteryView;
+import com.qch.sumelauncher.topbar.viewmodel.AirplaneModeViewModel;
+import com.qch.sumelauncher.launcher.viewmodel.LauncherViewModel;
+import com.qch.sumelauncher.topbar.viewmodel.BatteryViewModel;
+import com.qch.sumelauncher.topbar.viewmodel.BluetoothViewModel;
+import com.qch.sumelauncher.settings.viewmodel.SettingsViewModel;
+import com.qch.sumelauncher.topbar.viewmodel.WifiViewModel;
+import com.qch.sumelauncher.topbar.viewmodel.TimeViewModel;
 
 public class LauncherActivity extends AppCompatActivity {
     private static final String TAG = "LauncherActivity";
@@ -204,12 +205,8 @@ public class LauncherActivity extends AppCompatActivity {
                             ContextCompat.getString(this, R.string.battery_percentage),
                             i
                     ));
-        });
-        batteryViewModel.getIcon().observe(this, integer -> {
-            int i = integer == null ? R.drawable.baseline_battery_unknown_24 : integer;
-            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
-            AppCompatImageView imageView = linearLayoutCompat.findViewById(R.id.top_bar_iv_battery);
-            imageView.setImageResource(i);
+            BatteryView batteryView = binding.aLauncherTopBar.topBarBv;
+            batteryView.setLevel(i);
         });
 
         launcherViewModel.getLauncherState().observe(this, launcherState -> {

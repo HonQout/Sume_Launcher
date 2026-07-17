@@ -32,7 +32,7 @@ import com.qch.sumelauncher.recyclerview.decoration.GridDecoration;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
-import com.qch.sumelauncher.viewmodel.LauncherViewModel;
+import com.qch.sumelauncher.launcher.viewmodel.LauncherViewModel;
 
 import java.util.ArrayList;
 import java.util.List;

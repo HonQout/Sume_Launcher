@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.viewmodel;
+package com.qch.sumelauncher.settings.viewmodel;
 
 import android.app.Activity;
 import android.app.Application;

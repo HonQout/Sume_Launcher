@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.fragment;
+package com.qch.sumelauncher.settings.ui;
 
 import android.os.Bundle;
 
@@ -11,7 +11,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.persistence.PreferenceDataStoreBridge;
-import com.qch.sumelauncher.viewmodel.SettingsViewModel;
+import com.qch.sumelauncher.settings.viewmodel.SettingsViewModel;
 
 import java.util.Objects;
 

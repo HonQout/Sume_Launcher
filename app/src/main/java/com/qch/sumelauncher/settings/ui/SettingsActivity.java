@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.activity;
+package com.qch.sumelauncher.settings.ui;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +13,6 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.databinding.ActivitySettingsBinding;
-import com.qch.sumelauncher.fragment.SettingsFragment;
 
 public class SettingsActivity extends AppCompatActivity
         implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
