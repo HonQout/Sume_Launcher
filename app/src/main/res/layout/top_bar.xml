@@ -62,7 +62,7 @@
             android:layout_width="1dp"
             android:layout_height="0dp" />
 
-        <com.qch.sumelauncher.view.BatteryView
+        <com.qch.sumelauncher.topbar.view.BatteryView
             android:id="@+id/top_bar_bv"
             android:layout_width="@dimen/top_bar_battery_width"
             android:layout_height="@dimen/top_bar_battery_height" />

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".fragment.LauncherPageFragment">
 
-    <com.qch.sumelauncher.view.LauncherLayout
+    <com.qch.sumelauncher.launcher.view.LauncherLayout
         android:id="@+id/f_launcher_ll"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

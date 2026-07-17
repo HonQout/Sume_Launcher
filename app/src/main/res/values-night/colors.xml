@@ -3,4 +3,5 @@
     <color name="batteryBorderColor">@color/white</color>
     <color name="batteryCapColor">@color/white</color>
     <color name="batteryFillColor">@color/white</color>
+    <color name="batteryLightningColor">@color/black</color>
 </resources>
