@@ -15,7 +15,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.activity.PermissionActivity;
 import com.qch.sumelauncher.utils.IntentUtils;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -65,14 +64,6 @@ public class SettingsViewModel extends AndroidViewModel {
         } else {
             Toast.makeText(activity, R.string.cannot_find_activity, Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public void startPermissionActivity(@NonNull Activity activity) {
-        Intent intent = new Intent(activity, PermissionActivity.class);
-        if (!getAnimationValue()) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        }
-        activity.startActivity(intent);
     }
 
     public void openGithubPage(@NonNull Activity activity) {

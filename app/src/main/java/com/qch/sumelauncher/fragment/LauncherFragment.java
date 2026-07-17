@@ -1,5 +1,6 @@
 package com.qch.sumelauncher.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.qch.sumelauncher.R;
+import com.qch.sumelauncher.activity.SettingsActivity;
 import com.qch.sumelauncher.launcher.page.LauncherPagerAdapter;
 import com.qch.sumelauncher.databinding.FragmentLauncherBinding;
 import com.qch.sumelauncher.viewmodel.LauncherViewModel;
@@ -27,13 +29,6 @@ public class LauncherFragment extends Fragment {
 
     public LauncherFragment() {
         // Required empty public constructor
-    }
-
-    public static LauncherFragment newInstance() {
-        LauncherFragment fragment = new LauncherFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -79,8 +74,10 @@ public class LauncherFragment extends Fragment {
                         ));
             }
         });
-        binding.fLauncherBtnSettings.setOnClickListener(v ->
-                viewModel.setLauncherState(LauncherViewModel.LauncherState.SETTINGS));
+        binding.fLauncherBtnSettings.setOnClickListener(v -> {
+            Intent intent = new Intent(requireActivity(), SettingsActivity.class);
+            requireActivity().startActivity(intent);
+        });
         binding.fLauncherBtnEdit.setOnClickListener(v ->
                 viewModel.setLauncherState(LauncherViewModel.LauncherState.EDIT));
         binding.fLauncherBtnApps.setOnClickListener(v ->

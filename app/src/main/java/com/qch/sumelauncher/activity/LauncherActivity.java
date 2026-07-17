@@ -223,9 +223,6 @@ public class LauncherActivity extends AppCompatActivity {
                     } else if (launcherState == LauncherViewModel.LauncherState.EDIT) {
                         Log.i(TAG, "Launcher state is EDIT. ");
                         // TODO: Realize edit mode
-                    } else if (launcherState == LauncherViewModel.LauncherState.SETTINGS) {
-                        Log.i(TAG, "Launcher state is SETTINGS. ");
-                        navController.navigate(R.id.action_Launcher_to_Settings);
                     } else if (launcherState == LauncherViewModel.LauncherState.APPS) {
                         Log.i(TAG, "Launcher state is APPS. ");
                         navController.navigate(R.id.action_Launcher_to_Drawer);

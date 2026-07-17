@@ -57,9 +57,10 @@
         app:title="@string/header_privacy">
 
         <Preference
+            app:fragment="com.qch.sumelauncher.fragment.PermissionFragment"
             app:iconSpaceReserved="false"
-            app:key="requested_permissions"
-            app:title="@string/requested_permissions" />
+            app:key="permission"
+            app:title="@string/permission" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
