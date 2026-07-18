@@ -2,6 +2,6 @@
 <resources>
     <color name="batteryBorderColor">@color/white</color>
     <color name="batteryCapColor">@color/white</color>
-    <color name="batteryFillColor">@color/white</color>
-    <color name="batteryLightningColor">@color/black</color>
+    <color name="batteryFillColor">@color/light_gray</color>
+    <color name="batteryLightningColor">@color/gray</color>
 </resources>

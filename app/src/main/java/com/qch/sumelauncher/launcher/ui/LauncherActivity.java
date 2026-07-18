@@ -12,7 +12,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.ActivityCompat;
@@ -22,10 +21,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.google.android.material.color.MaterialColors;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
+import com.qch.sumelauncher.topbar.ui.TopBarManager;
+import com.qch.sumelauncher.topbar.viewmodel.RingerModeViewModel;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
 import com.qch.sumelauncher.utils.PermissionUtils;
@@ -45,6 +45,7 @@ public class LauncherActivity extends AppCompatActivity {
     private LauncherViewModel launcherViewModel;
     private SettingsViewModel settingsViewModel;
     private TimeViewModel timeViewModel;
+    private RingerModeViewModel ringerModeViewModel;
     private AirplaneModeViewModel airplaneModeViewModel;
     private WifiViewModel wifiViewModel;
     private BluetoothViewModel bluetoothViewModel;
@@ -69,6 +70,7 @@ public class LauncherActivity extends AppCompatActivity {
         launcherViewModel = viewModelProvider.get(LauncherViewModel.class);
         settingsViewModel = viewModelProvider.get(SettingsViewModel.class);
         timeViewModel = viewModelProvider.get(TimeViewModel.class);
+        ringerModeViewModel = viewModelProvider.get(RingerModeViewModel.class);
         airplaneModeViewModel = viewModelProvider.get(AirplaneModeViewModel.class);
         wifiViewModel = viewModelProvider.get(WifiViewModel.class);
         bluetoothViewModel = viewModelProvider.get(BluetoothViewModel.class);
@@ -88,113 +90,94 @@ public class LauncherActivity extends AppCompatActivity {
                     binding.aLauncherTopBar.topBarLeftPart.findViewById(R.id.top_bar_tv_date);
             textView.setText(currentDateText);
         });
-        airplaneModeViewModel.getAirplaneModeEnabled().observe(this, isEnabled -> {
-            if (isEnabled) {
-                AppCompatImageView imageView = new AppCompatImageView(LauncherActivity.this);
-                imageView.setTag("top_bar_airplane_mode");
-                imageView.setImageResource(R.drawable.baseline_airplanemode_active_24);
-                imageView.setColorFilter(
-                        MaterialColors.getColor(imageView, com.google.android.material.R.attr.colorOnSurface)
-                );
-                imageView.setPadding(0, 0, 0, 0);
-                LinearLayoutCompat.LayoutParams layoutParams = new LinearLayoutCompat.LayoutParams(
-                        getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
-                        getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size)
-                );
-                layoutParams.setMargins(2, 0, 2, 0);
-                imageView.setLayoutParams(layoutParams);
-                LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
-                linearLayoutCompat.addView(imageView, 0);
-                Log.i(TAG, "Added airplane mode icon.");
+        ringerModeViewModel.getRingerMode().observe(this, ringerMode -> {
+            if (ringerMode == null) {
+                Log.e(TAG, "Failed to get ringer mode.");
+                return;
+            }
+            boolean shouldDisplay = false;
+            int iconRes = 0;
+            switch (ringerMode) {
+                case Silent: {
+                    shouldDisplay = true;
+                    iconRes = R.drawable.baseline_bell_off_24;
+                    break;
+                }
+                case Vibrate: {
+                    shouldDisplay = true;
+                    iconRes = R.drawable.baseline_vibration_24;
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+            if (shouldDisplay) {
+                TopBarManager.replaceIcon(LauncherActivity.this,
+                        binding.aLauncherTopBar.topBarRightPart,
+                        TopBarManager.TopBarIcons.RINGER_MODE,
+                        iconRes,
+                        LauncherActivity.TAG);
             } else {
-                LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
-                linearLayoutCompat.removeView(linearLayoutCompat.findViewWithTag("top_bar_airplane_mode"));
-                Log.i(TAG, "Removed airplane mode icon.");
+                TopBarManager.removeIcon(binding.aLauncherTopBar.topBarRightPart,
+                        TopBarManager.TopBarIcons.RINGER_MODE, LauncherActivity.TAG);
+            }
+        });
+        airplaneModeViewModel.getAirplaneModeEnabled().observe(this, isEnabled -> {
+            if (isEnabled == null) {
+                Log.e(TAG, "Failed to get airplane mode.");
+                return;
+            }
+            if (isEnabled) {
+                TopBarManager.addIcon(LauncherActivity.this,
+                        binding.aLauncherTopBar.topBarRightPart,
+                        TopBarManager.TopBarIcons.AIRPLANE_MODE,
+                        R.drawable.baseline_airplanemode_active_24,
+                        LauncherActivity.TAG);
+            } else {
+                TopBarManager.removeIcon(binding.aLauncherTopBar.topBarRightPart,
+                        TopBarManager.TopBarIcons.AIRPLANE_MODE, LauncherActivity.TAG);
             }
         });
         wifiViewModel.getWifiEnabled().observe(this, isEnabled -> {
-            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
             if (isEnabled) {
-                if (linearLayoutCompat.findViewWithTag("top_bar_wifi") != null) {
-                    Log.i(TAG, "Wifi icon already exists.");
-                    return;
-                }
-                AppCompatImageView imageView = new AppCompatImageView(LauncherActivity.this);
-                imageView.setTag("top_bar_wifi");
-                imageView.setImageResource(wifiViewModel.getWifiIconResValue());
-                imageView.setColorFilter(
-                        MaterialColors.getColor(imageView, com.google.android.material.R.attr.colorOnSurface)
-                );
-                imageView.setPadding(0, 0, 0, 0);
-                LinearLayoutCompat.LayoutParams layoutParams = new LinearLayoutCompat.LayoutParams(
-                        getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
-                        getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size)
-                );
-                layoutParams.setMargins(2, 0, 2, 0);
-                imageView.setLayoutParams(layoutParams);
-                linearLayoutCompat.addView(imageView, 0);
-                Log.i(TAG, "Added wifi icon.");
+                TopBarManager.addIcon(LauncherActivity.this,
+                        binding.aLauncherTopBar.topBarRightPart,
+                        TopBarManager.TopBarIcons.WIFI,
+                        wifiViewModel.getWifiIconResValue(),
+                        LauncherActivity.TAG);
             } else {
-                View view = linearLayoutCompat.findViewWithTag("top_bar_wifi");
-                if (view == null) {
-                    Log.i(TAG, "Wifi icon doesn't exist.");
-                    return;
-                }
-                linearLayoutCompat.removeView(view);
-                Log.i(TAG, "Removed wifi icon.");
+                TopBarManager.removeIcon(binding.aLauncherTopBar.topBarRightPart,
+                        TopBarManager.TopBarIcons.WIFI, LauncherActivity.TAG);
             }
         });
-        wifiViewModel.getWifiIconRes().observe(this, integer -> {
-            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
-            View view = linearLayoutCompat.findViewWithTag("top_bar_wifi");
-            if (!(view instanceof AppCompatImageView)) {
-                Log.e(TAG, "Cannot find wifi icon.");
+        wifiViewModel.getWifiIconRes().observe(this, iconRes -> {
+            if (iconRes == null) {
+                Log.e(TAG, "Failed to get icon resource of Wi-Fi.");
                 return;
             }
-            AppCompatImageView imageView = (AppCompatImageView) view;
-            imageView.setImageResource(wifiViewModel.getWifiIconResValue());
+            TopBarManager.modifyIcon(binding.aLauncherTopBar.topBarRightPart,
+                    TopBarManager.TopBarIcons.WIFI, iconRes, LauncherActivity.TAG);
         });
         bluetoothViewModel.getBtEnabled().observe(this, isEnabled -> {
-            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
             if (isEnabled) {
-                if (linearLayoutCompat.findViewWithTag("top_bar_bluetooth") != null) {
-                    Log.i(TAG, "Bluetooth icon already exists.");
-                    return;
-                }
-                AppCompatImageView imageView = new AppCompatImageView(LauncherActivity.this);
-                imageView.setTag("top_bar_bluetooth");
-                imageView.setImageResource(bluetoothViewModel.getBtIconResValue());
-                imageView.setColorFilter(
-                        MaterialColors.getColor(imageView, com.google.android.material.R.attr.colorOnSurface)
-                );
-                imageView.setPadding(0, 0, 0, 0);
-                LinearLayoutCompat.LayoutParams layoutParams = new LinearLayoutCompat.LayoutParams(
-                        getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
-                        getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size)
-                );
-                layoutParams.setMargins(2, 0, 2, 0);
-                imageView.setLayoutParams(layoutParams);
-                linearLayoutCompat.addView(imageView, 0);
-                Log.i(TAG, "Added bluetooth icon.");
+                TopBarManager.addIcon(LauncherActivity.this,
+                        binding.aLauncherTopBar.topBarRightPart,
+                        TopBarManager.TopBarIcons.BLUETOOTH,
+                        bluetoothViewModel.getBtIconResValue(),
+                        LauncherActivity.TAG);
             } else {
-                View view = linearLayoutCompat.findViewWithTag("top_bar_bluetooth");
-                if (view == null) {
-                    Log.i(TAG, "Bluetooth icon doesn't exist.");
-                    return;
-                }
-                linearLayoutCompat.removeView(view);
-                Log.i(TAG, "Removed bluetooth icon.");
+                TopBarManager.removeIcon(binding.aLauncherTopBar.topBarRightPart,
+                        TopBarManager.TopBarIcons.BLUETOOTH, LauncherActivity.TAG);
             }
         });
-        bluetoothViewModel.getBtIconRes().observe(this, icon -> {
-            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
-            View view = linearLayoutCompat.findViewWithTag("top_bar_bluetooth");
-            if (!(view instanceof AppCompatImageView)) {
-                Log.e(TAG, "Cannot find bluetooth icon.");
+        bluetoothViewModel.getBtIconRes().observe(this, iconRes -> {
+            if (iconRes == null) {
+                Log.e(TAG, "Failed to get icon resource of bluetooth.");
                 return;
             }
-            AppCompatImageView imageView = (AppCompatImageView) view;
-            imageView.setImageResource(bluetoothViewModel.getBtIconResValue());
+            TopBarManager.modifyIcon(binding.aLauncherTopBar.topBarRightPart,
+                    TopBarManager.TopBarIcons.BLUETOOTH, iconRes, LauncherActivity.TAG);
         });
         batteryViewModel.getLevel().observe(this, integer -> {
             int i = integer == null ? 0 : integer;
