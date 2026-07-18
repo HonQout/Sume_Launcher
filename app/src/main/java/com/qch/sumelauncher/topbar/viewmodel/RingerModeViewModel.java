@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -13,16 +14,17 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.qch.sumelauncher.utils.ConnectivityUtils;
+import com.qch.sumelauncher.utils.AudioUtils;
+import com.qch.sumelauncher.utils.AudioUtils.RingerMode;
 
-public class AirplaneModeViewModel extends AndroidViewModel {
-    private static final String TAG = "AirplaneModeViewModel";
+public class RingerModeViewModel extends AndroidViewModel {
+    private static final String TAG = "RingerModeViewModel";
     // data
-    private final MutableLiveData<Boolean> mAirplaneModeEnabled = new MutableLiveData<>();
+    private final MutableLiveData<RingerMode> mRingerMode = new MutableLiveData<>();
     // broadcast receiver
     private BroadcastReceiver broadcastReceiver = null;
 
-    public AirplaneModeViewModel(@NonNull Application application) {
+    public RingerModeViewModel(@NonNull Application application) {
         super(application);
         update();
         registerBroadcastReceiver();
@@ -35,7 +37,7 @@ public class AirplaneModeViewModel extends AndroidViewModel {
     }
 
     private void update() {
-        mAirplaneModeEnabled.postValue(ConnectivityUtils.isAirplaneModeEnabled(getApplication()));
+        mRingerMode.postValue(AudioUtils.getRingerMode(getApplication()));
     }
 
     private void registerBroadcastReceiver() {
@@ -44,14 +46,29 @@ public class AirplaneModeViewModel extends AndroidViewModel {
         }
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        filter.addAction(AudioManager.RINGER_MODE_CHANGED_ACTION);
 
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d(TAG, "Received intent.");
-                boolean state = intent.getBooleanExtra("state", false);
-                mAirplaneModeEnabled.postValue(state);
+                int newRingerMode = intent.getIntExtra(AudioManager.EXTRA_RINGER_MODE, -1);
+                switch (newRingerMode) {
+                    case AudioManager.RINGER_MODE_SILENT: {
+                        mRingerMode.postValue(RingerMode.Silent);
+                        break;
+                    }
+
+                    case AudioManager.RINGER_MODE_VIBRATE: {
+                        mRingerMode.postValue(RingerMode.Vibrate);
+                        break;
+                    }
+
+                    case AudioManager.RINGER_MODE_NORMAL: {
+                        mRingerMode.postValue(RingerMode.Normal);
+                        break;
+                    }
+                }
             }
         };
 
@@ -66,7 +83,7 @@ public class AirplaneModeViewModel extends AndroidViewModel {
         }
     }
 
-    public LiveData<Boolean> getAirplaneModeEnabled() {
-        return mAirplaneModeEnabled;
+    public LiveData<RingerMode> getRingerMode() {
+        return mRingerMode;
     }
 }

@@ -140,8 +140,8 @@ public class BatteryView extends View {
         float centerX = bodyRect.centerX();
         float centerY = bodyRect.centerY();
 
-        float lHeight = bodyRect.height() * 0.8f;
-        float lWidth = lHeight * 0.4f;
+        float lHeight = bodyRect.height() * 0.9f;
+        float lWidth = lHeight * 0.5f;
 
         lightningPath.reset();
 
