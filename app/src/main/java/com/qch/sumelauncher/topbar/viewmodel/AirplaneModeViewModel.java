@@ -49,7 +49,6 @@ public class AirplaneModeViewModel extends AndroidViewModel {
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "Received intent.");
                 boolean state = intent.getBooleanExtra("state", false);
                 mAirplaneModeEnabled.postValue(state);
             }

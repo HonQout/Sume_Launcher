@@ -51,7 +51,6 @@ public class RingerModeViewModel extends AndroidViewModel {
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "Received intent.");
                 int newRingerMode = intent.getIntExtra(AudioManager.EXTRA_RINGER_MODE, -1);
                 switch (newRingerMode) {
                     case AudioManager.RINGER_MODE_SILENT: {

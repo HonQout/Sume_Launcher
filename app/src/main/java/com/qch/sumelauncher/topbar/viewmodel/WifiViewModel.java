@@ -80,10 +80,8 @@ public class WifiViewModel extends AndroidViewModel {
                 int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
                         WifiManager.WIFI_STATE_UNKNOWN);
                 if (wifiState == WifiManager.WIFI_STATE_DISABLED) {
-                    Log.i(TAG, "Received intent. Set mWifiEnabled to false.");
                     mWifiEnabled.postValue(false);
                 } else if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
-                    Log.i(TAG, "Received intent. Set mWifiEnabled to true.");
                     mWifiEnabled.postValue(true);
                 }
             }

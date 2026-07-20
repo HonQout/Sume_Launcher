@@ -12,10 +12,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatTextView;
-import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -24,13 +21,12 @@ import androidx.navigation.Navigation;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
-import com.qch.sumelauncher.topbar.ui.TopBarManager;
+import com.qch.sumelauncher.topbar.view.TopBarView;
 import com.qch.sumelauncher.topbar.viewmodel.RingerModeViewModel;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
 import com.qch.sumelauncher.utils.PermissionUtils;
 import com.qch.sumelauncher.utils.UIUtils;
-import com.qch.sumelauncher.topbar.view.BatteryView;
 import com.qch.sumelauncher.topbar.viewmodel.AirplaneModeViewModel;
 import com.qch.sumelauncher.launcher.viewmodel.LauncherViewModel;
 import com.qch.sumelauncher.topbar.viewmodel.BatteryViewModel;
@@ -79,16 +75,12 @@ public class LauncherActivity extends AppCompatActivity {
         launcherViewModel.getDisplayStatusBar().observe(this, b ->
                 UIUtils.handleStatusBarVisibility(getWindow(), b == null || b));
         launcherViewModel.getDisplayTopBar().observe(this, displayTopBar ->
-                binding.aLauncherTopBar.getRoot().setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
+                binding.aLauncherTopBar.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
         timeViewModel.getCurrentTimeText().observe(this, currentTimeText -> {
-            AppCompatTextView textView =
-                    binding.aLauncherTopBar.topBarLeftPart.findViewById(R.id.top_bar_tv_time);
-            textView.setText(currentTimeText);
+            binding.aLauncherTopBar.setTimeText(currentTimeText);
         });
         timeViewModel.getCurrentDateText().observe(this, currentDateText -> {
-            AppCompatTextView textView =
-                    binding.aLauncherTopBar.topBarLeftPart.findViewById(R.id.top_bar_tv_date);
-            textView.setText(currentDateText);
+            binding.aLauncherTopBar.setDateText(currentDateText);
         });
         ringerModeViewModel.getRingerMode().observe(this, ringerMode -> {
             if (ringerMode == null) {
@@ -113,14 +105,14 @@ public class LauncherActivity extends AppCompatActivity {
                 }
             }
             if (shouldDisplay) {
-                TopBarManager.replaceIcon(LauncherActivity.this,
-                        binding.aLauncherTopBar.topBarRightPart,
-                        TopBarManager.TopBarIcons.RINGER_MODE,
-                        iconRes,
-                        LauncherActivity.TAG);
+                binding.aLauncherTopBar.addChildView(
+                        LauncherActivity.this,
+                        TopBarView.ViewTag.RINGER_MODE,
+                        new TopBarView.IconExtra(iconRes),
+                        TopBarView.ConflictStrategy.REPLACE_EXISTING
+                );
             } else {
-                TopBarManager.removeIcon(binding.aLauncherTopBar.topBarRightPart,
-                        TopBarManager.TopBarIcons.RINGER_MODE, LauncherActivity.TAG);
+                binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.RINGER_MODE);
             }
         });
         airplaneModeViewModel.getAirplaneModeEnabled().observe(this, isEnabled -> {
@@ -129,26 +121,26 @@ public class LauncherActivity extends AppCompatActivity {
                 return;
             }
             if (isEnabled) {
-                TopBarManager.addIcon(LauncherActivity.this,
-                        binding.aLauncherTopBar.topBarRightPart,
-                        TopBarManager.TopBarIcons.AIRPLANE_MODE,
-                        R.drawable.baseline_airplanemode_active_24,
-                        LauncherActivity.TAG);
+                binding.aLauncherTopBar.addChildView(
+                        LauncherActivity.this,
+                        TopBarView.ViewTag.AIRPLANE_MODE,
+                        new TopBarView.IconExtra(R.drawable.baseline_airplanemode_active_24),
+                        TopBarView.ConflictStrategy.REPLACE_EXISTING
+                );
             } else {
-                TopBarManager.removeIcon(binding.aLauncherTopBar.topBarRightPart,
-                        TopBarManager.TopBarIcons.AIRPLANE_MODE, LauncherActivity.TAG);
+                binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.AIRPLANE_MODE);
             }
         });
         wifiViewModel.getWifiEnabled().observe(this, isEnabled -> {
             if (isEnabled) {
-                TopBarManager.addIcon(LauncherActivity.this,
-                        binding.aLauncherTopBar.topBarRightPart,
-                        TopBarManager.TopBarIcons.WIFI,
-                        wifiViewModel.getWifiIconResValue(),
-                        LauncherActivity.TAG);
+                binding.aLauncherTopBar.addChildView(
+                        LauncherActivity.this,
+                        TopBarView.ViewTag.WIFI,
+                        new TopBarView.IconExtra(wifiViewModel.getWifiIconResValue()),
+                        TopBarView.ConflictStrategy.REPLACE_EXISTING
+                );
             } else {
-                TopBarManager.removeIcon(binding.aLauncherTopBar.topBarRightPart,
-                        TopBarManager.TopBarIcons.WIFI, LauncherActivity.TAG);
+                binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.WIFI);
             }
         });
         wifiViewModel.getWifiIconRes().observe(this, iconRes -> {
@@ -156,19 +148,19 @@ public class LauncherActivity extends AppCompatActivity {
                 Log.e(TAG, "Failed to get icon resource of Wi-Fi.");
                 return;
             }
-            TopBarManager.modifyIcon(binding.aLauncherTopBar.topBarRightPart,
-                    TopBarManager.TopBarIcons.WIFI, iconRes, LauncherActivity.TAG);
+            binding.aLauncherTopBar.modifyChildView(TopBarView.ViewTag.WIFI,
+                    new TopBarView.IconExtra(iconRes));
         });
         bluetoothViewModel.getBtEnabled().observe(this, isEnabled -> {
             if (isEnabled) {
-                TopBarManager.addIcon(LauncherActivity.this,
-                        binding.aLauncherTopBar.topBarRightPart,
-                        TopBarManager.TopBarIcons.BLUETOOTH,
-                        bluetoothViewModel.getBtIconResValue(),
-                        LauncherActivity.TAG);
+                binding.aLauncherTopBar.addChildView(
+                        LauncherActivity.this,
+                        TopBarView.ViewTag.BLUETOOTH,
+                        new TopBarView.IconExtra(bluetoothViewModel.getBtIconResValue()),
+                        TopBarView.ConflictStrategy.REPLACE_EXISTING
+                );
             } else {
-                TopBarManager.removeIcon(binding.aLauncherTopBar.topBarRightPart,
-                        TopBarManager.TopBarIcons.BLUETOOTH, LauncherActivity.TAG);
+                binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.BLUETOOTH);
             }
         });
         bluetoothViewModel.getBtIconRes().observe(this, iconRes -> {
@@ -176,25 +168,16 @@ public class LauncherActivity extends AppCompatActivity {
                 Log.e(TAG, "Failed to get icon resource of bluetooth.");
                 return;
             }
-            TopBarManager.modifyIcon(binding.aLauncherTopBar.topBarRightPart,
-                    TopBarManager.TopBarIcons.BLUETOOTH, iconRes, LauncherActivity.TAG);
+            binding.aLauncherTopBar.modifyChildView(TopBarView.ViewTag.BLUETOOTH,
+                    new TopBarView.IconExtra(iconRes));
         });
         batteryViewModel.getLevel().observe(this, integer -> {
-            int i = integer == null ? 0 : integer;
-            LinearLayoutCompat linearLayoutCompat = binding.aLauncherTopBar.topBarRightPart;
-            AppCompatTextView textView = linearLayoutCompat.findViewById(R.id.top_bar_tv_battery);
-            textView.setText(
-                    String.format(
-                            ContextCompat.getString(this, R.string.battery_percentage),
-                            i
-                    ));
-            BatteryView batteryView = binding.aLauncherTopBar.topBarBv;
-            batteryView.setLevel(i);
+            int level = integer == null ? 0 : integer;
+            binding.aLauncherTopBar.setBatteryLevel(this, level);
         });
         batteryViewModel.getIsCharging().observe(this, aBoolean -> {
-            boolean b = aBoolean == null ? false : aBoolean;
-            BatteryView batteryView = binding.aLauncherTopBar.topBarBv;
-            batteryView.setCharging(b);
+            boolean isCharging = aBoolean == null ? false : aBoolean;
+            binding.aLauncherTopBar.setBatteryCharging(isCharging);
         });
 
         launcherViewModel.getLauncherState().observe(this, launcherState -> {

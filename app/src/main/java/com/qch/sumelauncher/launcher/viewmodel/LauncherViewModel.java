@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -19,10 +18,10 @@ import androidx.lifecycle.Transformations;
 
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.bean.ActivityBean;
+import com.qch.sumelauncher.compat.CollectionCompat;
 import com.qch.sumelauncher.room.entity.IconEntity;
 import com.qch.sumelauncher.room.repository.LauncherIconRepository;
 import com.qch.sumelauncher.utils.ApplicationUtils;
-import com.qch.sumelauncher.utils.CollectionUtils;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -319,13 +318,8 @@ public class LauncherViewModel extends AndroidViewModel {
                 // Update ActivityBeanList
                 if (op == AppListOp.REMOVE || op == AppListOp.REPLACE) {
                     try {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            list.removeIf(item ->
-                                    Objects.equals(packageName, item.getPackageName()));
-                        } else {
-                            CollectionUtils.removeByCondition(list, item ->
-                                    Objects.equals(packageName, item.getPackageName()));
-                        }
+                        CollectionCompat.removeIf(list,
+                                item -> Objects.equals(packageName, item.getPackageName()));
                     } catch (Exception e) {
                         Log.e(TAG, "Cannot remove activity beans of " + packageName);
                     }

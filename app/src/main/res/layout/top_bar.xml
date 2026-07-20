@@ -44,29 +44,6 @@
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:gravity="end|center_vertical"
-        android:orientation="horizontal">
-
-        <Space
-            android:layout_width="4dp"
-            android:layout_height="0dp" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/top_bar_tv_battery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/top_bar_text_size"
-            android:textStyle="bold" />
-
-        <Space
-            android:layout_width="2dp"
-            android:layout_height="0dp" />
-
-        <com.qch.sumelauncher.topbar.view.BatteryView
-            android:id="@+id/top_bar_bv"
-            android:layout_width="@dimen/top_bar_battery_width"
-            android:layout_height="@dimen/top_bar_battery_height" />
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
+        android:orientation="horizontal" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>
