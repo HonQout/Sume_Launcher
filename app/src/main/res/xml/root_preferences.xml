@@ -57,7 +57,7 @@
         app:title="@string/header_privacy">
 
         <Preference
-            app:fragment="com.qch.sumelauncher.fragment.PermissionFragment"
+            app:fragment="com.qch.sumelauncher.settings.ui.PermissionFragment"
             app:iconSpaceReserved="false"
             app:key="permission"
             app:title="@string/permission" />
