@@ -7,7 +7,7 @@
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            app:icon="@drawable/baseline_bell_24"
+            app:icon="@drawable/baseline_bell_settings_24"
             app:iconSpaceReserved="true"
             app:key="ringer_mode"
             app:title="@string/ringer_mode" />
@@ -20,21 +20,21 @@
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            app:icon="@drawable/baseline_airplanemode_active_24"
+            app:icon="@drawable/baseline_airplanemode_settings_24"
             app:iconSpaceReserved="true"
             app:key="airplane_mode"
             app:title="@string/airplane_mode" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            app:icon="@drawable/baseline_wifi_3_bar_24"
+            app:icon="@drawable/baseline_wifi_settings_24"
             app:iconSpaceReserved="true"
             app:key="wlan"
             app:title="@string/wlan" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            app:icon="@drawable/baseline_bluetooth_24"
+            app:icon="@drawable/baseline_bluetooth_settings_24"
             app:iconSpaceReserved="true"
             app:key="bluetooth"
             app:title="@string/bluetooth" />
@@ -47,7 +47,7 @@
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            app:icon="@drawable/baseline_percent_24"
+            app:icon="@drawable/baseline_percent_settings_24"
             app:iconSpaceReserved="true"
             app:key="battery_percentage"
             app:title="@string/battery_percentage" />

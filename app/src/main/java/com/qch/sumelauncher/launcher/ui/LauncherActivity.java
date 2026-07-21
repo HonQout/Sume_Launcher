@@ -160,7 +160,7 @@ public class LauncherActivity extends AppCompatActivity {
                     binding.aLauncherTopBar.addChildView(
                             LauncherActivity.this,
                             TopBarView.ViewTag.AIRPLANE_MODE,
-                            new TopBarView.IconExtra(R.drawable.baseline_airplanemode_active_24),
+                            new TopBarView.IconExtra(R.drawable.baseline_airplanemode_24),
                             TopBarView.ConflictStrategy.REPLACE_EXISTING
                     );
                     break;

@@ -29,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         // Set Toolbar
-        setSupportActionBar(binding.aSettingsTb);
+        setSupportActionBar(binding.aSettingsMt);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
