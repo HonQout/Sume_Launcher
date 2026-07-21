@@ -12,7 +12,7 @@ public class CollectionCompat {
 
     public static <T> boolean removeIf(Collection<T> collection, Predicate<T> predicate) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            collection.removeIf(predicate::satisfyCondition);
+            return collection.removeIf(predicate::satisfyCondition);
         } else {
             Iterator<T> iterator = collection.iterator();
             while (iterator.hasNext()) {
@@ -20,7 +20,7 @@ public class CollectionCompat {
                     iterator.remove();
                 }
             }
+            return true;
         }
-        return true;
     }
 }

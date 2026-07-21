@@ -29,15 +29,12 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class PermissionViewModel extends AndroidViewModel {
     private final String TAG = "PermissionViewModel";
     // data
-    private final MutableLiveData<Boolean> mDisplayStatusBar = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mAnimation = new MutableLiveData<>();
     private final MutableLiveData<PackageInfo> mPackageInfo = new MutableLiveData<>();
     private final MutableLiveData<List<PermissionBean>> mRequestedPermissionBeanList = new MutableLiveData<>();
@@ -60,24 +57,14 @@ public class PermissionViewModel extends AndroidViewModel {
     }
 
     private void initDisposable() {
-        // display_status_bar
-        Disposable disposable1 = MyApplication.getPreferenceDataStore()
-                .getBooleanFlowable("display_status_bar", true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        mDisplayStatusBar::postValue,
-                        error -> Log.e(TAG, "Failed to get value of key display_status_bar")
-                );
-        compositeDisposable.add(disposable1);
         // animation
-        Disposable disposable2 = MyApplication.getPreferenceDataStore()
+        Disposable disposable = MyApplication.getPreferenceDataStore()
                 .getBooleanFlowable("animation", true)
                 .subscribe(
                         mAnimation::postValue,
-                        error -> Log.e(TAG, "Failed to get value of key animation")
+                        error -> Log.e(TAG, "Failed to get value of key animation.")
                 );
-        compositeDisposable.add(disposable2);
+        compositeDisposable.add(disposable);
     }
 
     public void init() {
@@ -112,10 +99,6 @@ public class PermissionViewModel extends AndroidViewModel {
                 .setMessage(permissionBean.getDescription())
                 .setPositiveButton(R.string.confirm, (dialog, which) -> dialog.dismiss());
         DialogUtils.show(builder, getAnimationValue());
-    }
-
-    public LiveData<Boolean> getDisplayStatusBar() {
-        return mDisplayStatusBar;
     }
 
     public boolean getAnimationValue() {

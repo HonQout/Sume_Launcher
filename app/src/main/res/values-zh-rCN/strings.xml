@@ -64,6 +64,7 @@
     <string name="grid_size">网格尺寸</string>
     <string name="display_status_bar">显示状态栏</string>
     <string name="display_top_bar">显示顶栏</string>
+    <string name="top_bar_icon">顶栏图标</string>
     <string name="animation">动画</string>
     <string name="scroll_switch_page">滑动翻页</string>
     <string name="volume_key_switch_page">音量键翻页</string>
@@ -80,7 +81,14 @@
     <string name="perm_fine_location_reason">此应用请求访问您的精确位置权限以显示WiFi信号水平和WiFi SSID。\n您的位置信息不会被记录或存储。\n如果您拒绝此权限，由于Android API的限制，将不会显示上述信息。\n您可以点击“应用信息”以前往系统设置中的应用信息页面并授予此权限。</string>
     <string name="require_following_permission">此应用需要以下权限：</string>
     <string name="num_items">%d个项目</string>
-    <string name="search_for_items">搜索项目</string>
     <string name="search_for_apps">搜索应用</string>
+    <string name="audio">声音</string>
+    <string name="ringer_mode">铃声模式</string>
+    <string name="connectivity">连接性</string>
+    <string name="wlan">无线局域网</string>
+    <string name="bluetooth">蓝牙</string>
+    <string name="battery">电池</string>
+    <string name="airplane_mode">飞行模式</string>
+    <string name="battery_percentage">电池百分比</string>
 
 </resources>

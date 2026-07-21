@@ -21,6 +21,7 @@ import androidx.navigation.Navigation;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
+import com.qch.sumelauncher.settings.viewmodel.SettingsViewModel;
 import com.qch.sumelauncher.topbar.view.TopBarView;
 import com.qch.sumelauncher.topbar.viewmodel.RingerModeViewModel;
 import com.qch.sumelauncher.utils.DialogUtils;
@@ -31,9 +32,8 @@ import com.qch.sumelauncher.topbar.viewmodel.AirplaneModeViewModel;
 import com.qch.sumelauncher.launcher.viewmodel.LauncherViewModel;
 import com.qch.sumelauncher.topbar.viewmodel.BatteryViewModel;
 import com.qch.sumelauncher.topbar.viewmodel.BluetoothViewModel;
-import com.qch.sumelauncher.settings.viewmodel.SettingsViewModel;
-import com.qch.sumelauncher.topbar.viewmodel.WifiViewModel;
 import com.qch.sumelauncher.topbar.viewmodel.TimeViewModel;
+import com.qch.sumelauncher.topbar.viewmodel.WifiViewModel;
 
 public class LauncherActivity extends AppCompatActivity {
     private static final String TAG = "LauncherActivity";
@@ -72,111 +72,163 @@ public class LauncherActivity extends AppCompatActivity {
         bluetoothViewModel = viewModelProvider.get(BluetoothViewModel.class);
         batteryViewModel = viewModelProvider.get(BatteryViewModel.class);
         // Observe
-        launcherViewModel.getDisplayStatusBar().observe(this, b ->
+        settingsViewModel.getDisplayStatusBar().observe(this, b ->
                 UIUtils.handleStatusBarVisibility(getWindow(), b == null || b));
-        launcherViewModel.getDisplayTopBar().observe(this, displayTopBar ->
+        settingsViewModel.getDisplayTopBar().observe(this, displayTopBar ->
                 binding.aLauncherTopBar.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
+        settingsViewModel.getDisplayRingerMode().observe(this, shouldDisplay -> {
+            if (shouldDisplay) {
+                ringerModeViewModel.restoreRingerModeIconState();
+                ringerModeViewModel.setIconVisible(true);
+            } else {
+                ringerModeViewModel.setIconVisible(false);
+                ringerModeViewModel.setRingerModeIconState(RingerModeViewModel.RingerModeIconState.HIDDEN);
+            }
+        });
+        settingsViewModel.getDisplayAirplaneMode().observe(this, shouldDisplay -> {
+            if (shouldDisplay) {
+                airplaneModeViewModel.restoreAirplaneModeIconState();
+                airplaneModeViewModel.setIconVisible(true);
+            } else {
+                airplaneModeViewModel.setIconVisible(false);
+                airplaneModeViewModel.setAirplaneModeIconState(AirplaneModeViewModel.AirplaneModeIconState.HIDDEN);
+            }
+        });
+        settingsViewModel.getDisplayWlan().observe(this, shouldDisplay -> {
+            if (shouldDisplay) {
+                wifiViewModel.restoreWifiIconState();
+                wifiViewModel.setIconVisible(true);
+            } else {
+                wifiViewModel.setIconVisible(false);
+                wifiViewModel.setWifiIconState(WifiViewModel.WifiIconState.HIDDEN);
+            }
+        });
+        settingsViewModel.getDisplayBluetooth().observe(this, shouldDisplay -> {
+            if (shouldDisplay) {
+                bluetoothViewModel.restoreBtModeIconState();
+                bluetoothViewModel.setIconVisible(true);
+            } else {
+                bluetoothViewModel.setIconVisible(false);
+                bluetoothViewModel.setBtStateIconState(BluetoothViewModel.BtStateIconState.HIDDEN);
+            }
+        });
+        settingsViewModel.getDisplayBatteryPct().observe(this, shouldDisplay -> {
+            if (shouldDisplay) {
+                binding.aLauncherTopBar.addChildView(this,
+                        TopBarView.ViewTag.BATTERY_PCT,
+                        new TopBarView.BatteryPctExtra(batteryViewModel.getLevelValue()),
+                        TopBarView.ConflictStrategy.REPLACE_EXISTING);
+            } else {
+                binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.BATTERY_PCT);
+            }
+        });
         timeViewModel.getCurrentTimeText().observe(this, currentTimeText -> {
             binding.aLauncherTopBar.setTimeText(currentTimeText);
         });
         timeViewModel.getCurrentDateText().observe(this, currentDateText -> {
             binding.aLauncherTopBar.setDateText(currentDateText);
         });
-        ringerModeViewModel.getRingerMode().observe(this, ringerMode -> {
-            if (ringerMode == null) {
-                Log.e(TAG, "Failed to get ringer mode.");
+        ringerModeViewModel.getRingerModeIconState().observe(this, state -> {
+            if (state == null) {
+                Log.e(TAG, "Failed to get state of ringer mode icon.");
                 return;
             }
-            boolean shouldDisplay = false;
-            int iconRes = 0;
-            switch (ringerMode) {
-                case Silent: {
-                    shouldDisplay = true;
-                    iconRes = R.drawable.baseline_bell_off_24;
+            switch (state) {
+                case SILENT: {
+                    binding.aLauncherTopBar.modifyOrAddChildView(this,
+                            TopBarView.ViewTag.RINGER_MODE, new TopBarView.IconExtra(R.drawable.baseline_bell_off_24));
                     break;
                 }
-                case Vibrate: {
-                    shouldDisplay = true;
-                    iconRes = R.drawable.baseline_vibration_24;
+                case VIBRATE: {
+                    binding.aLauncherTopBar.modifyOrAddChildView(this,
+                            TopBarView.ViewTag.RINGER_MODE, new TopBarView.IconExtra(R.drawable.baseline_vibration_24));
                     break;
                 }
-                default: {
+                case HIDDEN: {
+                    binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.RINGER_MODE);
                     break;
                 }
             }
-            if (shouldDisplay) {
-                binding.aLauncherTopBar.addChildView(
-                        LauncherActivity.this,
-                        TopBarView.ViewTag.RINGER_MODE,
-                        new TopBarView.IconExtra(iconRes),
-                        TopBarView.ConflictStrategy.REPLACE_EXISTING
-                );
-            } else {
-                binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.RINGER_MODE);
-            }
         });
-        airplaneModeViewModel.getAirplaneModeEnabled().observe(this, isEnabled -> {
-            if (isEnabled == null) {
-                Log.e(TAG, "Failed to get airplane mode.");
+        airplaneModeViewModel.getAirplaneModeIconState().observe(this, state -> {
+            if (state == null) {
+                Log.e(TAG, "Failed to get state of airplane mode icon.");
                 return;
             }
-            if (isEnabled) {
-                binding.aLauncherTopBar.addChildView(
-                        LauncherActivity.this,
-                        TopBarView.ViewTag.AIRPLANE_MODE,
-                        new TopBarView.IconExtra(R.drawable.baseline_airplanemode_active_24),
-                        TopBarView.ConflictStrategy.REPLACE_EXISTING
-                );
-            } else {
-                binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.AIRPLANE_MODE);
+            switch (state) {
+                case ON: {
+                    binding.aLauncherTopBar.addChildView(
+                            LauncherActivity.this,
+                            TopBarView.ViewTag.AIRPLANE_MODE,
+                            new TopBarView.IconExtra(R.drawable.baseline_airplanemode_active_24),
+                            TopBarView.ConflictStrategy.REPLACE_EXISTING
+                    );
+                    break;
+                }
+                case HIDDEN: {
+                    binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.AIRPLANE_MODE);
+                    break;
+                }
             }
         });
-        wifiViewModel.getWifiEnabled().observe(this, isEnabled -> {
-            if (isEnabled) {
-                binding.aLauncherTopBar.addChildView(
-                        LauncherActivity.this,
-                        TopBarView.ViewTag.WIFI,
-                        new TopBarView.IconExtra(wifiViewModel.getWifiIconResValue()),
-                        TopBarView.ConflictStrategy.REPLACE_EXISTING
-                );
-            } else {
-                binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.WIFI);
-            }
-        });
-        wifiViewModel.getWifiIconRes().observe(this, iconRes -> {
-            if (iconRes == null) {
-                Log.e(TAG, "Failed to get icon resource of Wi-Fi.");
+        wifiViewModel.getWifiIconState().observe(this, state -> {
+            if (state == null) {
+                Log.e(TAG, "Failed to get state of Wi-Fi icon.");
                 return;
             }
-            binding.aLauncherTopBar.modifyChildView(TopBarView.ViewTag.WIFI,
-                    new TopBarView.IconExtra(iconRes));
-        });
-        bluetoothViewModel.getBtEnabled().observe(this, isEnabled -> {
-            if (isEnabled) {
-                binding.aLauncherTopBar.addChildView(
-                        LauncherActivity.this,
-                        TopBarView.ViewTag.BLUETOOTH,
-                        new TopBarView.IconExtra(bluetoothViewModel.getBtIconResValue()),
-                        TopBarView.ConflictStrategy.REPLACE_EXISTING
-                );
-            } else {
-                binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.BLUETOOTH);
+            switch (state) {
+                case NOT_CONNECTED: {
+                    binding.aLauncherTopBar.modifyOrAddChildView(this, TopBarView.ViewTag.WIFI,
+                            new TopBarView.IconExtra(R.drawable.baseline_wifi_null_24));
+                    break;
+                }
+                case CONNECTED_1: {
+                    binding.aLauncherTopBar.modifyOrAddChildView(this, TopBarView.ViewTag.WIFI,
+                            new TopBarView.IconExtra(R.drawable.baseline_wifi_1_bar_24));
+                    break;
+                }
+                case CONNECTED_2: {
+                    binding.aLauncherTopBar.modifyOrAddChildView(this, TopBarView.ViewTag.WIFI,
+                            new TopBarView.IconExtra(R.drawable.baseline_wifi_2_bar_24));
+                    break;
+                }
+                case CONNECTED_3: {
+                    binding.aLauncherTopBar.modifyOrAddChildView(this, TopBarView.ViewTag.WIFI,
+                            new TopBarView.IconExtra(R.drawable.baseline_wifi_3_bar_24));
+                    break;
+                }
+                case HIDDEN: {
+                    binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.WIFI);
+                    break;
+                }
             }
         });
-        bluetoothViewModel.getBtIconRes().observe(this, iconRes -> {
-            if (iconRes == null) {
-                Log.e(TAG, "Failed to get icon resource of bluetooth.");
+        bluetoothViewModel.getBtStateIconState().observe(this, state -> {
+            if (state == null) {
+                Log.e(TAG, "Failed to get state of bluetooth state icon.");
                 return;
             }
-            binding.aLauncherTopBar.modifyChildView(TopBarView.ViewTag.BLUETOOTH,
-                    new TopBarView.IconExtra(iconRes));
+            switch (state) {
+                case ENABLED: {
+                    binding.aLauncherTopBar.addChildView(
+                            LauncherActivity.this,
+                            TopBarView.ViewTag.BLUETOOTH,
+                            new TopBarView.IconExtra(R.drawable.baseline_bluetooth_24),
+                            TopBarView.ConflictStrategy.REPLACE_EXISTING
+                    );
+                    break;
+                }
+                case HIDDEN: {
+                    binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.BLUETOOTH);
+                }
+            }
         });
         batteryViewModel.getLevel().observe(this, integer -> {
             int level = integer == null ? 0 : integer;
             binding.aLauncherTopBar.setBatteryLevel(this, level);
         });
         batteryViewModel.getIsCharging().observe(this, aBoolean -> {
-            boolean isCharging = aBoolean == null ? false : aBoolean;
+            boolean isCharging = aBoolean != null && aBoolean;
             binding.aLauncherTopBar.setBatteryCharging(isCharging);
         });
 
@@ -198,11 +250,12 @@ public class LauncherActivity extends AppCompatActivity {
                 });
             }
         });
-        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-            if (isGranted) {
-                wifiViewModel.update();
-            }
-        });
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        wifiViewModel.update();
+                    }
+                });
     }
 
     @Override
@@ -212,7 +265,7 @@ public class LauncherActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ||
                 PermissionUtils.isPermissionGranted(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             Log.i(TAG, "No need to show the dialog to ask for permission.");
-        } else if (launcherViewModel.getAskForPermFineLocationValue()) {
+        } else if (settingsViewModel.getAskForPermFineLocationValue()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 showPermFineLocationDialog();
             } else {
@@ -230,6 +283,6 @@ public class LauncherActivity extends AppCompatActivity {
                 .setNeutralButton(R.string.deny, (dialog, which) ->
                         MyApplication.getPreferenceDataStore().setBoolean("ask_for_perm_fine_location", false))
                 .setNegativeButton(R.string.cancel, null);
-        DialogUtils.show(builder, launcherViewModel.getAnimationValue());
+        DialogUtils.show(builder, settingsViewModel.getAnimationValue());
     }
 }

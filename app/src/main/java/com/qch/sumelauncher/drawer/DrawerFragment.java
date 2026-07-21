@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.os.BundleCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -29,6 +30,7 @@ import com.qch.sumelauncher.recyclerview.adapter.GridDrawerRVAdapter;
 import com.qch.sumelauncher.bean.ActivityBean;
 import com.qch.sumelauncher.databinding.FragmentDrawerBinding;
 import com.qch.sumelauncher.recyclerview.decoration.GridDecoration;
+import com.qch.sumelauncher.settings.viewmodel.SettingsViewModel;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
@@ -41,7 +43,8 @@ public class DrawerFragment extends Fragment {
     private static final String TAG = "DrawerFragment";
     private static final String KEY_GRID_LAYOUT_STATE = "GRID_LAYOUT_STATE";
     private FragmentDrawerBinding binding;
-    private LauncherViewModel viewModel;
+    private LauncherViewModel launcherViewModel;
+    private SettingsViewModel settingsViewModel;
     private GridLayoutManager gridLayoutManager;
     private GridDrawerRVAdapter gridDrawerRVAdapter;
 
@@ -75,9 +78,10 @@ public class DrawerFragment extends Fragment {
         Log.i(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         // Initialize view model
-        viewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
+        launcherViewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
+        settingsViewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
         // Initialize layout manager
-        gridLayoutManager = new GridLayoutManager(requireContext(), viewModel.getNumColumnValue());
+        gridLayoutManager = new GridLayoutManager(requireContext(), launcherViewModel.getNumColumnValue());
         // Initialize adapter of recycler view
         gridDrawerRVAdapter = new GridDrawerRVAdapter(new ArrayList<>());
         gridDrawerRVAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
@@ -99,30 +103,24 @@ public class DrawerFragment extends Fragment {
             binding.fDrawerRv.setLayoutManager(gridLayoutManager);
             binding.fDrawerRv.setAdapter(gridDrawerRVAdapter);
             binding.fDrawerRv.addItemDecoration(new GridDecoration(
-                    viewModel.getNumColumnValue(),
+                    launcherViewModel.getNumColumnValue(),
                     getResources().getDimensionPixelSize(R.dimen.app_grid_space)
             ));
         } else {
-            Parcelable gridLayoutState = savedInstanceState.getParcelable(KEY_GRID_LAYOUT_STATE);
+            Parcelable gridLayoutState = BundleCompat.getParcelable(savedInstanceState,
+                    KEY_GRID_LAYOUT_STATE, Parcelable.class);
             if (gridLayoutState != null) {
                 gridLayoutManager.onRestoreInstanceState(gridLayoutState);
             }
         }
-        viewModel.getActivityBeanList().observe(getViewLifecycleOwner(), gridDrawerRVAdapter::setList);
+        launcherViewModel.getActivityBeanList().observe(getViewLifecycleOwner(), gridDrawerRVAdapter::setList);
         // Initialize view
-        binding.fDrawerMt.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavController navController = Navigation.findNavController(view);
-                navController.popBackStack();
-            }
+        binding.fDrawerMt.setNavigationOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(view);
+            navController.popBackStack();
         });
-        binding.fDrawerSv.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                binding.fDrawerBtnQuit.setVisibility(View.VISIBLE);
-            }
-        });
+        binding.fDrawerSv.setOnQueryTextFocusChangeListener((v, hasFocus) ->
+                binding.fDrawerBtnQuit.setVisibility(View.VISIBLE));
         binding.fDrawerSv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -138,13 +136,10 @@ public class DrawerFragment extends Fragment {
                 return true;
             }
         });
-        binding.fDrawerBtnQuit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                binding.fDrawerSv.setQuery("", false);
-                binding.fDrawerSv.clearFocus();
-                binding.fDrawerBtnQuit.setVisibility(View.GONE);
-            }
+        binding.fDrawerBtnQuit.setOnClickListener(v -> {
+            binding.fDrawerSv.setQuery("", false);
+            binding.fDrawerSv.clearFocus();
+            binding.fDrawerBtnQuit.setVisibility(View.GONE);
         });
         // Set onBackPressed callback
         OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
@@ -237,7 +232,7 @@ public class DrawerFragment extends Fragment {
                                 IntentUtils.requireUninstallApp(requireContext(), packageName)
                         ))
                 .setNegativeButton(R.string.cancel, null);
-        DialogUtils.show(builder, viewModel.getAnimationValue());
+        DialogUtils.show(builder, settingsViewModel.getAnimationValue());
     }
 
     private void showUninstallThisAppDialog() {
@@ -251,6 +246,6 @@ public class DrawerFragment extends Fragment {
                                         requireContext().getPackageName())
                         ))
                 .setNegativeButton(R.string.cancel, null);
-        DialogUtils.show(builder, viewModel.getAnimationValue());
+        DialogUtils.show(builder, settingsViewModel.getAnimationValue());
     }
 }

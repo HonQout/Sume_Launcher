@@ -64,10 +64,6 @@ public class WifiUtils {
     }
 
     public static boolean isWifiConnected(@NonNull Context context) {
-        if (!isWifiSupported(context)) {
-            Log.e(TAG, "Wifi is not supported.");
-            return false;
-        }
         NetworkCapabilities networkCapabilities = getNetworkCapabilities(context);
         return networkCapabilities != null &&
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
@@ -158,6 +154,9 @@ public class WifiUtils {
                     return calcSignalLevel(context, wifiInfo);
                 }
             }
+        } else {
+            Log.e(TAG, "Failed to get signal level. Permission "
+                    + Manifest.permission.ACCESS_FINE_LOCATION + " is not granted.");
         }
         // There's no other way
         return UNKNOWN_SIGNAL_LEVEL;

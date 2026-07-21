@@ -7,29 +7,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.utils.BluetoothUtils;
 
 public class BluetoothViewModel extends AndroidViewModel {
     private static final String TAG = "BluetoothViewModel";
-    // static
-    @DrawableRes
-    private static final int iconDisabled = R.drawable.baseline_bluetooth_disabled_24;
-    @DrawableRes
-    private static final int iconEnabled = R.drawable.baseline_bluetooth_24;
     // data
-    private final MutableLiveData<Boolean> mBtEnabled = new MutableLiveData<>(false);
-    @DrawableRes
-    private final MutableLiveData<Integer> mBtIconRes = new MutableLiveData<>(iconDisabled);
+    private final MutableLiveData<Boolean> mBtState = new MutableLiveData<>();
+    private final MutableLiveData<BtStateIconState> mBtStateIconState = new MutableLiveData<>();
+    private boolean isIconVisible = true;
     // broadcast receiver
     private BroadcastReceiver broadcastReceiver = null;
+
+    public enum BtStateIconState {
+        HIDDEN,
+        ENABLED,
+        CONNECTED
+    }
 
     public BluetoothViewModel(@NonNull Application application) {
         super(application);
@@ -46,8 +45,8 @@ public class BluetoothViewModel extends AndroidViewModel {
     private void init() {
         Context context = getApplication();
         boolean isEnabled = BluetoothUtils.isBluetoothEnabled(context);
-        mBtEnabled.postValue(isEnabled);
-        mBtIconRes.postValue(isEnabled ? iconEnabled : iconDisabled);
+        mBtState.postValue(isEnabled);
+        setBtStateIconStateInner(isEnabled);
     }
 
     private void registerBroadcastReceiver() {
@@ -69,13 +68,12 @@ public class BluetoothViewModel extends AndroidViewModel {
                 if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
                     int btState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
                             BluetoothAdapter.STATE_OFF);
-                    if (btState == BluetoothAdapter.STATE_OFF) {
-                        mBtEnabled.postValue(false);
-                        mBtIconRes.postValue(iconDisabled);
-                    } else if (btState == BluetoothAdapter.STATE_ON) {
-                        mBtEnabled.postValue(true);
-                        mBtIconRes.postValue(iconEnabled);
+                    boolean value = false;
+                    if (btState == BluetoothAdapter.STATE_ON) {
+                        value = true;
                     }
+                    mBtState.postValue(value);
+                    setBtStateIconStateInner(value);
                 }
             }
         };
@@ -91,16 +89,42 @@ public class BluetoothViewModel extends AndroidViewModel {
         }
     }
 
-    public LiveData<Boolean> getBtEnabled() {
-        return mBtEnabled;
+    public LiveData<Boolean> getBtState() {
+        return mBtState;
     }
 
-    public LiveData<Integer> getBtIconRes() {
-        return mBtIconRes;
+    private void setBtStateIconStateInner(boolean value) {
+        if (isIconVisible) {
+            if (value) {
+                mBtStateIconState.postValue(BtStateIconState.ENABLED);
+            } else {
+                mBtStateIconState.postValue(BtStateIconState.HIDDEN);
+            }
+        }
     }
 
-    @DrawableRes
-    public int getBtIconResValue() {
-        return mBtIconRes.getValue() == null ? iconDisabled : mBtIconRes.getValue();
+    public void setBtStateIconState(BtStateIconState state) {
+        mBtStateIconState.postValue(state);
+    }
+
+    public void restoreBtModeIconState() {
+        Boolean value = mBtState.getValue();
+        if (value == null) {
+            mBtStateIconState.postValue(BtStateIconState.HIDDEN);
+            return;
+        }
+        if (value) {
+            mBtStateIconState.postValue(BtStateIconState.ENABLED);
+        } else {
+            mBtStateIconState.postValue(BtStateIconState.HIDDEN);
+        }
+    }
+
+    public LiveData<BtStateIconState> getBtStateIconState() {
+        return mBtStateIconState;
+    }
+
+    public void setIconVisible(boolean isIconVisible) {
+        this.isIconVisible = isIconVisible;
     }
 }

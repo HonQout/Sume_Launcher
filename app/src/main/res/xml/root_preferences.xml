@@ -16,6 +16,12 @@
             app:key="display_top_bar"
             app:title="@string/display_top_bar" />
 
+        <Preference
+            app:fragment="com.qch.sumelauncher.settings.ui.TopBarIconFragment"
+            app:iconSpaceReserved="false"
+            app:key="top_bar_icon"
+            app:title="@string/top_bar_icon" />
+
         <ListPreference
             app:defaultValue="5,5"
             app:entries="@array/grid_size_entries"
@@ -89,7 +95,6 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="version"
-            app:summary="@string/version_name"
             app:title="@string/version" />
 
         <Preference
