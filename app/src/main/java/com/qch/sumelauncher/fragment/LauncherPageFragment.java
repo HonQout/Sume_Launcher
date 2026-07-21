@@ -21,12 +21,13 @@ import android.widget.Toast;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.bean.ActivityBean;
 import com.qch.sumelauncher.databinding.FragmentLauncherPageBinding;
+import com.qch.sumelauncher.launcher.view.LauncherLayout;
+import com.qch.sumelauncher.launcher.viewmodel.LauncherViewModel;
 import com.qch.sumelauncher.room.entity.IconEntity;
+import com.qch.sumelauncher.settings.viewmodel.SettingsViewModel;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
-import com.qch.sumelauncher.launcher.view.LauncherLayout;
-import com.qch.sumelauncher.launcher.viewmodel.LauncherViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,8 @@ public class LauncherPageFragment extends Fragment {
     private static final String ARG_POSITION = "POSITION";
     private FragmentLauncherPageBinding binding;
     private int position;
-    private LauncherViewModel viewModel;
+    private LauncherViewModel launcherViewModel;
+    private SettingsViewModel settingsViewModel;
 
     public LauncherPageFragment() {
         // Required empty public constructor
@@ -72,18 +74,19 @@ public class LauncherPageFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Log.i(TAG, "LauncherPageFragment #" + position + " onViewCreated");
         super.onViewCreated(view, savedInstanceState);
-        viewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
-        viewModel.getNumRow().observe(getViewLifecycleOwner(), integer -> {
+        launcherViewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
+        settingsViewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
+        launcherViewModel.getNumRow().observe(getViewLifecycleOwner(), integer -> {
             if (integer != null) {
                 binding.fLauncherLl.setNumRows(integer);
             }
         });
-        viewModel.getNumColumn().observe(getViewLifecycleOwner(), integer -> {
+        launcherViewModel.getNumColumn().observe(getViewLifecycleOwner(), integer -> {
             if (integer != null) {
                 binding.fLauncherLl.setNumColumns(integer);
             }
         });
-        viewModel.getLauncherIconMap().observe(getViewLifecycleOwner(), map -> {
+        launcherViewModel.getLauncherIconMap().observe(getViewLifecycleOwner(), map -> {
             if (map == null) {
                 Log.e(TAG, "Map of paged icons is null.");
                 return;
@@ -123,12 +126,12 @@ public class LauncherPageFragment extends Fragment {
                 @Override
                 public boolean onBlankAreaLongClick(int x, int y) {
                     Log.i(TAG, "Long clicked blank cell " + x + "," + y);
-                    viewModel.setLauncherState(LauncherViewModel.LauncherState.EDIT);
+                    launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.EDIT);
                     return false;
                 }
             });
         });
-        viewModel.getLauncherState().observe(getViewLifecycleOwner(), launcherState -> {
+        launcherViewModel.getLauncherState().observe(getViewLifecycleOwner(), launcherState -> {
             binding.fLauncherLl.setEditMode(launcherState == LauncherViewModel.LauncherState.EDIT);
         });
     }
@@ -165,11 +168,11 @@ public class LauncherPageFragment extends Fragment {
         popupMenu.setOnMenuItemClickListener(menuItem -> {
             int menuId = menuItem.getItemId();
             if (menuId == R.id.move_to_new_screen) {
-                viewModel.moveIconToNewScreen(iconEntity);
+                launcherViewModel.moveIconToNewScreen(iconEntity);
                 return true;
             } else if (menuId == R.id.remove_icon) {
                 binding.fLauncherLl.removeIconView(iconEntity);
-                viewModel.removeIcon(iconEntity);
+                launcherViewModel.removeIcon(iconEntity);
                 return true;
             } else if (menuId == R.id.uninstall) {
                 ApplicationUtils.ApplicationType type = ApplicationUtils.getApplicationType(
@@ -227,7 +230,7 @@ public class LauncherPageFragment extends Fragment {
                                 IntentUtils.requireUninstallApp(requireContext(), packageName)
                         ))
                 .setNegativeButton(R.string.cancel, null);
-        DialogUtils.show(builder, viewModel.getAnimationValue());
+        DialogUtils.show(builder, settingsViewModel.getAnimationValue());
     }
 
     private void showUninstallThisAppDialog() {
@@ -241,6 +244,6 @@ public class LauncherPageFragment extends Fragment {
                                         requireContext().getPackageName())
                         ))
                 .setNegativeButton(R.string.cancel, null);
-        DialogUtils.show(builder, viewModel.getAnimationValue());
+        DialogUtils.show(builder, settingsViewModel.getAnimationValue());
     }
 }

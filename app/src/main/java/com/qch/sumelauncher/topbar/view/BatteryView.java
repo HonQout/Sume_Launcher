@@ -17,7 +17,8 @@ public class BatteryView extends View {
     private final float horizontalPadding = 2f;
     private final float verticalPadding = 2f;
     private final float borderWidth = 2f;
-    private final float cornerRadius = 12f;
+    private final float borderCornerRadius = 12f;
+    private final float fillCornerRadius = 8f;
     private int level = 100;
     private boolean isCharging = false;
 
@@ -98,9 +99,9 @@ public class BatteryView extends View {
         super.onDraw(canvas);
 
         calculateBatteryRects(getWidth(), getHeight());
-        canvas.drawRoundRect(bodyRect, cornerRadius, cornerRadius, borderPaint);
+        canvas.drawRoundRect(bodyRect, borderCornerRadius, borderCornerRadius, borderPaint);
         canvas.drawRect(capRect, capPaint);
-        canvas.drawRoundRect(fillRect, cornerRadius, cornerRadius, fillPaint);
+        canvas.drawRoundRect(fillRect, fillCornerRadius, fillCornerRadius, fillPaint);
 
         if (isCharging) {
             calculateLightningPath();

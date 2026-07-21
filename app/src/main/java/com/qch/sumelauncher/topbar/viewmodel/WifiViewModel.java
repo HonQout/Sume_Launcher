@@ -13,14 +13,12 @@ import android.net.NetworkRequest;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.utils.ConnectivityUtils;
 import com.qch.sumelauncher.utils.WifiUtils;
 
@@ -30,12 +28,20 @@ public class WifiViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> mWifiEnabled = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mWifiConnected = new MutableLiveData<>();
     private final MutableLiveData<Integer> mWifiSignalLevel = new MutableLiveData<>();
-    @DrawableRes
-    private final MutableLiveData<Integer> mWifiIconRes = new MutableLiveData<>();
+    private final MutableLiveData<WifiIconState> mWifiIconState = new MutableLiveData<>();
+    private boolean isIconVisible = true;
     // broadcast receiver
     private BroadcastReceiver broadcastReceiver = null;
     // callback
     private ConnectivityManager.NetworkCallback wifiCallback;
+
+    public enum WifiIconState {
+        HIDDEN,
+        NOT_CONNECTED,
+        CONNECTED_1,
+        CONNECTED_2,
+        CONNECTED_3
+    }
 
     public WifiViewModel(@NonNull Application application) {
         super(application);
@@ -55,14 +61,13 @@ public class WifiViewModel extends AndroidViewModel {
         boolean isWifiEnabled = WifiUtils.isWifiEnabled(context);
         Log.i(TAG, "Executed update(). Set mWifiEnabled to " + isWifiEnabled);
         this.mWifiEnabled.postValue(isWifiEnabled);
+        int signalLevel = WifiUtils.UNKNOWN_SIGNAL_LEVEL;
         if (isWifiEnabled) {
-            int signalLevel =
-                    WifiUtils.getSignalLevel(context, WifiUtils.getNetworkCapabilities(context));
-            this.mWifiSignalLevel.postValue(signalLevel);
-            this.mWifiIconRes.postValue(getWifiIconResInternal(signalLevel));
-        } else {
-            this.mWifiSignalLevel.postValue(WifiUtils.UNKNOWN_SIGNAL_LEVEL);
-            this.mWifiIconRes.postValue(getWifiIconResInternal(WifiUtils.UNKNOWN_SIGNAL_LEVEL));
+            signalLevel = WifiUtils.getSignalLevel(context, WifiUtils.getNetworkCapabilities(context));
+        }
+        this.mWifiSignalLevel.postValue(signalLevel);
+        if (isIconVisible) {
+            this.mWifiIconState.postValue(getWifiIconStateInternal(signalLevel));
         }
     }
 
@@ -80,8 +85,10 @@ public class WifiViewModel extends AndroidViewModel {
                 int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
                         WifiManager.WIFI_STATE_UNKNOWN);
                 if (wifiState == WifiManager.WIFI_STATE_DISABLED) {
+                    Log.i(TAG, "Wifi is disabled.");
                     mWifiEnabled.postValue(false);
                 } else if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
+                    Log.i(TAG, "Wifi is enabled.");
                     mWifiEnabled.postValue(true);
                 }
             }
@@ -122,7 +129,13 @@ public class WifiViewModel extends AndroidViewModel {
                 Log.i(TAG, "Wifi is lost.");
                 super.onLost(network);
                 mWifiConnected.postValue(false);
-                mWifiIconRes.postValue(getWifiIconResInternal(WifiUtils.DEFAULT_SIGNAL_LEVEL));
+                if (isIconVisible) {
+                    if (WifiUtils.isWifiEnabled(context)) {
+                        mWifiIconState.postValue(WifiIconState.NOT_CONNECTED);
+                    } else {
+                        mWifiIconState.postValue(WifiIconState.HIDDEN);
+                    }
+                }
             }
 
             @Override
@@ -132,7 +145,9 @@ public class WifiViewModel extends AndroidViewModel {
                 super.onCapabilitiesChanged(network, networkCapabilities);
                 int signalLevel = WifiUtils.getSignalLevel(context, networkCapabilities);
                 mWifiSignalLevel.postValue(signalLevel);
-                mWifiIconRes.postValue(getWifiIconResInternal(signalLevel));
+                if (isIconVisible) {
+                    mWifiIconState.postValue(getWifiIconStateInternal(signalLevel));
+                }
             }
 
             @Override
@@ -169,27 +184,48 @@ public class WifiViewModel extends AndroidViewModel {
         return mWifiSignalLevel;
     }
 
-    public LiveData<Integer> getWifiIconRes() {
-        return mWifiIconRes;
+    public void setWifiIconState(WifiIconState state) {
+        mWifiIconState.postValue(state);
     }
 
-    @DrawableRes
-    public int getWifiIconResValue() {
-        return mWifiIconRes.getValue() == null ?
-                R.drawable.baseline_wifi_null_24 : mWifiIconRes.getValue();
+    public void restoreWifiIconState() {
+        // If Wi-Fi is not enabled, hide the icon.
+        if (mWifiEnabled.getValue() == null || !mWifiEnabled.getValue()) {
+            mWifiIconState.postValue(WifiIconState.HIDDEN);
+            return;
+        }
+        // Now, mWifiEnabled can only be Boolean(true). Therefore, Wi-Fi is enabled.
+        // If Wi-Fi is connected, decide the signal level.
+        if (mWifiConnected.getValue() != null && mWifiConnected.getValue()) {
+            if (mWifiSignalLevel.getValue() != null) {
+                int signalLevel = mWifiSignalLevel.getValue();
+                mWifiIconState.postValue(getWifiIconStateInternal(signalLevel));
+                return;
+            }
+        }
+        // Although signal level runs into a problem, we have confirmed that Wi-Fi is enabled.
+        mWifiIconState.postValue(WifiIconState.NOT_CONNECTED);
     }
 
-    @DrawableRes
-    private int getWifiIconResInternal(int signalLevel) {
+    public LiveData<WifiIconState> getWifiIconState() {
+        return mWifiIconState;
+    }
+
+    public void setIconVisible(boolean isIconVisible) {
+        this.isIconVisible = isIconVisible;
+    }
+
+
+    private WifiIconState getWifiIconStateInternal(int signalLevel) {
         switch (signalLevel) {
             case 0:
-                return R.drawable.baseline_wifi_1_bar_24;
+                return WifiIconState.CONNECTED_1;
             case 1:
-                return R.drawable.baseline_wifi_2_bar_24;
+                return WifiIconState.CONNECTED_2;
             case 2:
-                return R.drawable.baseline_wifi_3_bar_24;
+                return WifiIconState.CONNECTED_3;
             default:
-                return R.drawable.baseline_wifi_null_24;
+                return WifiIconState.NOT_CONNECTED;
         }
     }
 }

@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Sume Launcher</string>
-    <string name="version_name" translatable="false">1.3.0 beta7</string>
 
     <!-- Basic -->
     <string name="cancel">Cancel</string>
@@ -64,6 +63,7 @@
     <string name="grid_size">Grid size</string>
     <string name="display_status_bar">Display status bar</string>
     <string name="display_top_bar">Display top bar</string>
+    <string name="top_bar_icon">Top bar icon</string>
     <string name="animation">Animation</string>
     <string name="scroll_switch_page">Scroll to switch page</string>
     <string name="volume_key_switch_page">Use volume key to switch page</string>
@@ -75,15 +75,23 @@
     <string name="version">Version</string>
     <string name="view_github_page">View GitHub page</string>
     <string name="github_address" translatable="false">https://github.com/HonQout/Sume_Launcher</string>
+    <string name="audio">Audio</string>
+    <string name="ringer_mode">Ringer mode</string>
+    <string name="connectivity">Connectivity</string>
+    <string name="airplane_mode">Airplane mode</string>
+    <string name="wifi" translatable="false">Wi-Fi</string>
+    <string name="wlan">WLAN</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="battery">Battery</string>
+    <string name="battery_percentage">Battery percentage</string>
 
     <!-- Others -->
-    <string name="battery_percentage" translatable="false">%d%%</string>
+    <string name="battery_percentage_format" translatable="false">%d%%</string>
     <string name="page_text" translatable="false">%d/%d</string>
     <string name="request_permission">Request permission</string>
-    <string name="perm_fine_location_reason">This application requires permission to access your fine location in order to display wifi signal level and wifi ssid.\nYour location information will not be recorded or saved.\nIf you deny this permission, information mentioned above will not be displayed due to limitation of Android API.\nYou can press \"App info\" to go to Application Info page in system settings and grant this permission.</string>
+    <string name="perm_fine_location_reason">This application requires permission to access your fine location in order to display Wi-Fi signal level and Wi-Fi ssid.\nYour location information will not be recorded or saved.\nIf you deny this permission, information mentioned above will not be displayed due to limitation of Android API.\nYou can press \"App info\" to go to Application Info page in system settings and grant this permission.</string>
     <string name="require_following_permission">This application requires the following permission(s):</string>
     <string name="num_items">%d item(s)</string>
-    <string name="search_for_items">Search for items</string>
     <string name="search_for_apps">Search for apps</string>
 
 </resources>

@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -18,13 +17,20 @@ import com.qch.sumelauncher.utils.ConnectivityUtils;
 public class AirplaneModeViewModel extends AndroidViewModel {
     private static final String TAG = "AirplaneModeViewModel";
     // data
-    private final MutableLiveData<Boolean> mAirplaneModeEnabled = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mAirplaneMode = new MutableLiveData<>();
+    private final MutableLiveData<AirplaneModeIconState> mAirplaneModeIconState = new MutableLiveData<>();
+    private boolean isIconVisible = true;
     // broadcast receiver
     private BroadcastReceiver broadcastReceiver = null;
 
+    public enum AirplaneModeIconState {
+        HIDDEN,
+        ON
+    }
+
     public AirplaneModeViewModel(@NonNull Application application) {
         super(application);
-        update();
+        init();
         registerBroadcastReceiver();
     }
 
@@ -34,8 +40,10 @@ public class AirplaneModeViewModel extends AndroidViewModel {
         unregisterBroadcastReceiver();
     }
 
-    private void update() {
-        mAirplaneModeEnabled.postValue(ConnectivityUtils.isAirplaneModeEnabled(getApplication()));
+    private void init() {
+        boolean value = ConnectivityUtils.isAirplaneModeEnabled(getApplication());
+        mAirplaneMode.postValue(value);
+        setAirplaneModeIconStateInner(value);
     }
 
     private void registerBroadcastReceiver() {
@@ -50,7 +58,8 @@ public class AirplaneModeViewModel extends AndroidViewModel {
             @Override
             public void onReceive(Context context, Intent intent) {
                 boolean state = intent.getBooleanExtra("state", false);
-                mAirplaneModeEnabled.postValue(state);
+                mAirplaneMode.postValue(state);
+                setAirplaneModeIconStateInner(state);
             }
         };
 
@@ -65,7 +74,42 @@ public class AirplaneModeViewModel extends AndroidViewModel {
         }
     }
 
-    public LiveData<Boolean> getAirplaneModeEnabled() {
-        return mAirplaneModeEnabled;
+    public LiveData<Boolean> getAirplaneMode() {
+        return mAirplaneMode;
+    }
+
+    private void setAirplaneModeIconStateInner(boolean value) {
+        if (isIconVisible) {
+            if (value) {
+                mAirplaneModeIconState.postValue(AirplaneModeIconState.ON);
+            } else {
+                mAirplaneModeIconState.postValue(AirplaneModeIconState.HIDDEN);
+            }
+        }
+    }
+
+    public void setAirplaneModeIconState(AirplaneModeIconState state) {
+        mAirplaneModeIconState.postValue(state);
+    }
+
+    public void restoreAirplaneModeIconState() {
+        Boolean value = mAirplaneMode.getValue();
+        if (value == null) {
+            mAirplaneModeIconState.postValue(AirplaneModeIconState.HIDDEN);
+            return;
+        }
+        if (value) {
+            mAirplaneModeIconState.postValue(AirplaneModeIconState.ON);
+        } else {
+            mAirplaneModeIconState.postValue(AirplaneModeIconState.HIDDEN);
+        }
+    }
+
+    public LiveData<AirplaneModeIconState> getAirplaneModeIconState() {
+        return mAirplaneModeIconState;
+    }
+
+    public void setIconVisible(boolean isIconVisible) {
+        this.isIconVisible = isIconVisible;
     }
 }

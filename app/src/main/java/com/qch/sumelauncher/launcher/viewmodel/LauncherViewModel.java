@@ -55,12 +55,6 @@ public class LauncherViewModel extends AndroidViewModel {
     private LiveData<Integer> numScreen;
     private LiveData<Map<Integer, List<IconEntity>>> launcherIconMap;
     private final MutableLiveData<LauncherState> mLauncherState = new MutableLiveData<>(LauncherState.NORMAL);
-    private final MutableLiveData<Boolean> mDisplayStatusBar = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> mDisplayTopBar = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> mAnimation = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> mScrollToSwitchPage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> mVolumeKeySwitchPage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> mAskForPermFineLocation = new MutableLiveData<>();
     private final MutableLiveData<String> mGridSize = new MutableLiveData<>("5,5");
     private final MutableLiveData<Integer> mNumRow = new MutableLiveData<>();
     private final MutableLiveData<Integer> mNumColumn = new MutableLiveData<>();
@@ -218,56 +212,8 @@ public class LauncherViewModel extends AndroidViewModel {
     }
 
     private void initDisposable() {
-        // display_status_bar
-        Disposable disposable1 = MyApplication.getPreferenceDataStore()
-                .getBooleanFlowable("display_status_bar", true)
-                .subscribe(
-                        mDisplayStatusBar::postValue,
-                        throwable -> Log.e(TAG, "Cannot get value of key display_status_bar.", throwable)
-                );
-        compositeDisposable.add(disposable1);
-        // display_top_bar
-        Disposable disposable2 = MyApplication.getPreferenceDataStore()
-                .getBooleanFlowable("display_top_bar", true)
-                .subscribe(
-                        mDisplayTopBar::postValue,
-                        throwable -> Log.e(TAG, "Cannot get value of key display_top_bar.", throwable)
-                );
-        compositeDisposable.add(disposable2);
-        // animation
-        Disposable disposable3 = MyApplication.getPreferenceDataStore()
-                .getBooleanFlowable("animation", true)
-                .subscribe(
-                        mAnimation::postValue,
-                        throwable -> Log.e(TAG, "Cannot get value of key animation.", throwable)
-                );
-        compositeDisposable.add(disposable3);
-        // scroll_switch_page
-        Disposable disposable4 = MyApplication.getPreferenceDataStore()
-                .getBooleanFlowable("scroll_switch_page", true)
-                .subscribe(
-                        mScrollToSwitchPage::postValue,
-                        throwable -> Log.e(TAG, "Cannot get value of key scroll_switch_page.", throwable)
-                );
-        compositeDisposable.add(disposable4);
-        // volume_key_switch_page
-        Disposable disposable5 = MyApplication.getPreferenceDataStore()
-                .getBooleanFlowable("volume_key_switch_page", true)
-                .subscribe(
-                        mVolumeKeySwitchPage::postValue,
-                        throwable -> Log.e(TAG, "Cannot get value of key volume_key_switch_page.", throwable)
-                );
-        compositeDisposable.add(disposable5);
-        // ask_for_perm_fine_location
-        Disposable disposable6 = MyApplication.getPreferenceDataStore()
-                .getBooleanFlowable("ask_for_perm_fine_location", true)
-                .subscribe(
-                        mAskForPermFineLocation::postValue,
-                        throwable -> Log.e(TAG, "Cannot get value of key ask_for_perm_fine_location.", throwable)
-                );
-        compositeDisposable.add(disposable6);
         // grid_size
-        Disposable disposable7 = MyApplication.getPreferenceDataStore()
+        Disposable disposable = MyApplication.getPreferenceDataStore()
                 .getStringFlowable("grid_size", "5,5")
                 .subscribe(gridSize -> {
                             mGridSize.postValue(gridSize);
@@ -290,7 +236,7 @@ public class LauncherViewModel extends AndroidViewModel {
                         },
                         throwable -> Log.e(TAG, "Cannot get value of key grid_size.", throwable)
                 );
-        compositeDisposable.add(disposable7);
+        compositeDisposable.add(disposable);
     }
 
     private void sortActivityBeanList(List<ActivityBean> list) {
@@ -362,34 +308,6 @@ public class LauncherViewModel extends AndroidViewModel {
         return mLauncherState;
     }
 
-    public LiveData<Boolean> getDisplayStatusBar() {
-        return mDisplayStatusBar;
-    }
-
-    public LiveData<Boolean> getDisplayTopBar() {
-        return mDisplayTopBar;
-    }
-
-    public LiveData<Boolean> getAnimation() {
-        return mAnimation;
-    }
-
-    public boolean getAnimationValue() {
-        return mAnimation.getValue() == null || mAnimation.getValue();
-    }
-
-    public LiveData<Boolean> getScrollToSwitchPage() {
-        return mScrollToSwitchPage;
-    }
-
-    public boolean getVolumeKeySwitchPageValue() {
-        return mVolumeKeySwitchPage.getValue() == null || mVolumeKeySwitchPage.getValue();
-    }
-
-    public boolean getAskForPermFineLocationValue() {
-        return mAskForPermFineLocation.getValue() == null || mAskForPermFineLocation.getValue();
-    }
-
     public LiveData<Integer> getNumRow() {
         return mNumRow;
     }
@@ -427,10 +345,6 @@ public class LauncherViewModel extends AndroidViewModel {
 
     public LiveData<List<ActivityBean>> getActivityBeanList() {
         return mActivityBeanList;
-    }
-
-    public List<ActivityBean> getActivityBeanListValue() {
-        return mActivityBeanList.getValue() == null ? new ArrayList<>() : mActivityBeanList.getValue();
     }
 
     public LiveData<Map<Integer, List<IconEntity>>> getLauncherIconMap() {

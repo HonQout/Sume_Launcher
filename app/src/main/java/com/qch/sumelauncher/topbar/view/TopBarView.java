@@ -187,7 +187,7 @@ public class TopBarView extends LinearLayoutCompat {
                 // Set text style
                 textView.setTypeface(textView.getTypeface(), Typeface.BOLD);
                 // Set content
-                textView.setText(String.format(ContextCompat.getString(context, R.string.battery_percentage), level));
+                textView.setText(String.format(ContextCompat.getString(context, R.string.battery_percentage_format), level));
                 // Set tag
                 textView.setTag(ViewTag.BATTERY_PCT);
 
@@ -270,6 +270,36 @@ public class TopBarView extends LinearLayoutCompat {
         return false;
     }
 
+    public boolean modifyOrAddChildView(Context context, ViewTag viewTag, Object extra) {
+        switch (viewTag) {
+            case RINGER_MODE:
+            case AIRPLANE_MODE:
+            case WIFI:
+            case BLUETOOTH: {
+                if (!(extra instanceof IconExtra)) {
+                    Log.e(TAG, "Failed to add view " + viewTag.name() + ". Illegal argument: extra.");
+                    return false;
+                }
+                IconExtra iconExtra = (IconExtra) extra;
+                int res = iconExtra.res;
+
+                View view = binding.topBarRightPart.findViewWithTag(viewTag);
+                if (view instanceof AppCompatImageView) {
+                    AppCompatImageView imageView = (AppCompatImageView) view;
+                    imageView.setImageResource(res);
+                    return true;
+                } else {
+                    return addChildView(context, viewTag, extra, ConflictStrategy.REPLACE_EXISTING);
+                }
+            }
+            case BATTERY_PCT:
+            case BATTERY: {
+                return false;
+            }
+        }
+        return false;
+    }
+
     public boolean removeChildView(ViewTag viewTag) {
         View view = binding.topBarRightPart.findViewWithTag(viewTag);
         if (view == null) {
@@ -288,7 +318,7 @@ public class TopBarView extends LinearLayoutCompat {
             TextView textView = (TextView) view1;
             textView.setText(
                     String.format(
-                            ContextCompat.getString(context, R.string.battery_percentage),
+                            ContextCompat.getString(context, R.string.battery_percentage_format),
                             level
                     ));
         }

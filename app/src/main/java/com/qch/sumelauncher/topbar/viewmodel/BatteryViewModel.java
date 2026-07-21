@@ -79,6 +79,10 @@ public class BatteryViewModel extends AndroidViewModel {
         return mLevel;
     }
 
+    public int getLevelValue() {
+        return mLevel.getValue() == null ? 0 : mLevel.getValue();
+    }
+
     public LiveData<Boolean> getIsCharging() {
         return mIsCharging;
     }
