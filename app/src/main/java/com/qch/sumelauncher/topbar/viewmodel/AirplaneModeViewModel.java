@@ -18,7 +18,7 @@ public class AirplaneModeViewModel extends AndroidViewModel {
     private static final String TAG = "AirplaneModeViewModel";
     // data
     private final MutableLiveData<Boolean> mAirplaneMode = new MutableLiveData<>();
-    private final MutableLiveData<AirplaneModeIconState> mAirplaneModeIconState = new MutableLiveData<>();
+    private final MutableLiveData<AirplaneModeIconState> mIconState = new MutableLiveData<>();
     private boolean isIconVisible = true;
     // broadcast receiver
     private BroadcastReceiver broadcastReceiver = null;
@@ -43,7 +43,7 @@ public class AirplaneModeViewModel extends AndroidViewModel {
     private void init() {
         boolean value = ConnectivityUtils.isAirplaneModeEnabled(getApplication());
         mAirplaneMode.postValue(value);
-        setAirplaneModeIconStateInner(value);
+        setIconStateInternal(value);
     }
 
     private void registerBroadcastReceiver() {
@@ -59,7 +59,7 @@ public class AirplaneModeViewModel extends AndroidViewModel {
             public void onReceive(Context context, Intent intent) {
                 boolean state = intent.getBooleanExtra("state", false);
                 mAirplaneMode.postValue(state);
-                setAirplaneModeIconStateInner(state);
+                setIconStateInternal(state);
             }
         };
 
@@ -78,35 +78,35 @@ public class AirplaneModeViewModel extends AndroidViewModel {
         return mAirplaneMode;
     }
 
-    private void setAirplaneModeIconStateInner(boolean value) {
+    private void setIconStateInternal(boolean value) {
         if (isIconVisible) {
             if (value) {
-                mAirplaneModeIconState.postValue(AirplaneModeIconState.ON);
+                mIconState.postValue(AirplaneModeIconState.ON);
             } else {
-                mAirplaneModeIconState.postValue(AirplaneModeIconState.HIDDEN);
+                mIconState.postValue(AirplaneModeIconState.HIDDEN);
             }
         }
     }
 
-    public void setAirplaneModeIconState(AirplaneModeIconState state) {
-        mAirplaneModeIconState.postValue(state);
+    public void setIconState(AirplaneModeIconState state) {
+        mIconState.postValue(state);
     }
 
-    public void restoreAirplaneModeIconState() {
+    public void restoreIconState() {
         Boolean value = mAirplaneMode.getValue();
         if (value == null) {
-            mAirplaneModeIconState.postValue(AirplaneModeIconState.HIDDEN);
+            mIconState.postValue(AirplaneModeIconState.HIDDEN);
             return;
         }
         if (value) {
-            mAirplaneModeIconState.postValue(AirplaneModeIconState.ON);
+            mIconState.postValue(AirplaneModeIconState.ON);
         } else {
-            mAirplaneModeIconState.postValue(AirplaneModeIconState.HIDDEN);
+            mIconState.postValue(AirplaneModeIconState.HIDDEN);
         }
     }
 
-    public LiveData<AirplaneModeIconState> getAirplaneModeIconState() {
-        return mAirplaneModeIconState;
+    public LiveData<AirplaneModeIconState> getIconState() {
+        return mIconState;
     }
 
     public void setIconVisible(boolean isIconVisible) {

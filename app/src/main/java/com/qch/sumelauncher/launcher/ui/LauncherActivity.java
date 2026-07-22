@@ -78,25 +78,25 @@ public class LauncherActivity extends AppCompatActivity {
                 binding.aLauncherTopBar.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
         settingsViewModel.getDisplayRingerMode().observe(this, shouldDisplay -> {
             if (shouldDisplay) {
-                ringerModeViewModel.restoreRingerModeIconState();
+                ringerModeViewModel.restoreIconState();
                 ringerModeViewModel.setIconVisible(true);
             } else {
                 ringerModeViewModel.setIconVisible(false);
-                ringerModeViewModel.setRingerModeIconState(RingerModeViewModel.RingerModeIconState.HIDDEN);
+                ringerModeViewModel.setIconState(RingerModeViewModel.RingerModeIconState.HIDDEN);
             }
         });
         settingsViewModel.getDisplayAirplaneMode().observe(this, shouldDisplay -> {
             if (shouldDisplay) {
-                airplaneModeViewModel.restoreAirplaneModeIconState();
+                airplaneModeViewModel.restoreIconState();
                 airplaneModeViewModel.setIconVisible(true);
             } else {
                 airplaneModeViewModel.setIconVisible(false);
-                airplaneModeViewModel.setAirplaneModeIconState(AirplaneModeViewModel.AirplaneModeIconState.HIDDEN);
+                airplaneModeViewModel.setIconState(AirplaneModeViewModel.AirplaneModeIconState.HIDDEN);
             }
         });
         settingsViewModel.getDisplayWlan().observe(this, shouldDisplay -> {
             if (shouldDisplay) {
-                wifiViewModel.restoreWifiIconState();
+                wifiViewModel.restoreIconState();
                 wifiViewModel.setIconVisible(true);
             } else {
                 wifiViewModel.setIconVisible(false);
@@ -105,11 +105,11 @@ public class LauncherActivity extends AppCompatActivity {
         });
         settingsViewModel.getDisplayBluetooth().observe(this, shouldDisplay -> {
             if (shouldDisplay) {
-                bluetoothViewModel.restoreBtModeIconState();
+                bluetoothViewModel.restoreIconState();
                 bluetoothViewModel.setIconVisible(true);
             } else {
                 bluetoothViewModel.setIconVisible(false);
-                bluetoothViewModel.setBtStateIconState(BluetoothViewModel.BtStateIconState.HIDDEN);
+                bluetoothViewModel.setIconState(BluetoothViewModel.BluetoothIconState.HIDDEN);
             }
         });
         settingsViewModel.getDisplayBatteryPct().observe(this, shouldDisplay -> {
@@ -128,7 +128,7 @@ public class LauncherActivity extends AppCompatActivity {
         timeViewModel.getCurrentDateText().observe(this, currentDateText -> {
             binding.aLauncherTopBar.setDateText(currentDateText);
         });
-        ringerModeViewModel.getRingerModeIconState().observe(this, state -> {
+        ringerModeViewModel.getIconState().observe(this, state -> {
             if (state == null) {
                 Log.e(TAG, "Failed to get state of ringer mode icon.");
                 return;
@@ -150,7 +150,7 @@ public class LauncherActivity extends AppCompatActivity {
                 }
             }
         });
-        airplaneModeViewModel.getAirplaneModeIconState().observe(this, state -> {
+        airplaneModeViewModel.getIconState().observe(this, state -> {
             if (state == null) {
                 Log.e(TAG, "Failed to get state of airplane mode icon.");
                 return;
@@ -171,7 +171,7 @@ public class LauncherActivity extends AppCompatActivity {
                 }
             }
         });
-        wifiViewModel.getWifiIconState().observe(this, state -> {
+        wifiViewModel.getIconState().observe(this, state -> {
             if (state == null) {
                 Log.e(TAG, "Failed to get state of Wi-Fi icon.");
                 return;
@@ -182,17 +182,17 @@ public class LauncherActivity extends AppCompatActivity {
                             new TopBarView.IconExtra(R.drawable.baseline_wifi_null_24));
                     break;
                 }
-                case CONNECTED_1: {
+                case CONNECTED_0: {
                     binding.aLauncherTopBar.modifyOrAddChildView(this, TopBarView.ViewTag.WIFI,
                             new TopBarView.IconExtra(R.drawable.baseline_wifi_1_bar_24));
                     break;
                 }
-                case CONNECTED_2: {
+                case CONNECTED_1: {
                     binding.aLauncherTopBar.modifyOrAddChildView(this, TopBarView.ViewTag.WIFI,
                             new TopBarView.IconExtra(R.drawable.baseline_wifi_2_bar_24));
                     break;
                 }
-                case CONNECTED_3: {
+                case CONNECTED_2: {
                     binding.aLauncherTopBar.modifyOrAddChildView(this, TopBarView.ViewTag.WIFI,
                             new TopBarView.IconExtra(R.drawable.baseline_wifi_3_bar_24));
                     break;
@@ -203,7 +203,7 @@ public class LauncherActivity extends AppCompatActivity {
                 }
             }
         });
-        bluetoothViewModel.getBtStateIconState().observe(this, state -> {
+        bluetoothViewModel.getIconState().observe(this, state -> {
             if (state == null) {
                 Log.e(TAG, "Failed to get state of bluetooth state icon.");
                 return;
