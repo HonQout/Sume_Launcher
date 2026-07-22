@@ -18,13 +18,13 @@ import com.qch.sumelauncher.utils.BluetoothUtils;
 public class BluetoothViewModel extends AndroidViewModel {
     private static final String TAG = "BluetoothViewModel";
     // data
-    private final MutableLiveData<Boolean> mBtState = new MutableLiveData<>();
-    private final MutableLiveData<BtStateIconState> mBtStateIconState = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mBluetoothState = new MutableLiveData<>();
+    private final MutableLiveData<BluetoothIconState> mIconState = new MutableLiveData<>();
     private boolean isIconVisible = true;
     // broadcast receiver
     private BroadcastReceiver broadcastReceiver = null;
 
-    public enum BtStateIconState {
+    public enum BluetoothIconState {
         HIDDEN,
         ENABLED,
         CONNECTED
@@ -45,8 +45,8 @@ public class BluetoothViewModel extends AndroidViewModel {
     private void init() {
         Context context = getApplication();
         boolean isEnabled = BluetoothUtils.isBluetoothEnabled(context);
-        mBtState.postValue(isEnabled);
-        setBtStateIconStateInner(isEnabled);
+        mBluetoothState.postValue(isEnabled);
+        setIconStateInternal(isEnabled);
     }
 
     private void registerBroadcastReceiver() {
@@ -72,8 +72,8 @@ public class BluetoothViewModel extends AndroidViewModel {
                     if (btState == BluetoothAdapter.STATE_ON) {
                         value = true;
                     }
-                    mBtState.postValue(value);
-                    setBtStateIconStateInner(value);
+                    mBluetoothState.postValue(value);
+                    setIconStateInternal(value);
                 }
             }
         };
@@ -89,39 +89,39 @@ public class BluetoothViewModel extends AndroidViewModel {
         }
     }
 
-    public LiveData<Boolean> getBtState() {
-        return mBtState;
+    public LiveData<Boolean> getBluetoothState() {
+        return mBluetoothState;
     }
 
-    private void setBtStateIconStateInner(boolean value) {
+    private void setIconStateInternal(boolean value) {
         if (isIconVisible) {
             if (value) {
-                mBtStateIconState.postValue(BtStateIconState.ENABLED);
+                mIconState.postValue(BluetoothIconState.ENABLED);
             } else {
-                mBtStateIconState.postValue(BtStateIconState.HIDDEN);
+                mIconState.postValue(BluetoothIconState.HIDDEN);
             }
         }
     }
 
-    public void setBtStateIconState(BtStateIconState state) {
-        mBtStateIconState.postValue(state);
+    public void setIconState(BluetoothIconState state) {
+        mIconState.postValue(state);
     }
 
-    public void restoreBtModeIconState() {
-        Boolean value = mBtState.getValue();
+    public void restoreIconState() {
+        Boolean value = mBluetoothState.getValue();
         if (value == null) {
-            mBtStateIconState.postValue(BtStateIconState.HIDDEN);
+            mIconState.postValue(BluetoothIconState.HIDDEN);
             return;
         }
         if (value) {
-            mBtStateIconState.postValue(BtStateIconState.ENABLED);
+            mIconState.postValue(BluetoothIconState.ENABLED);
         } else {
-            mBtStateIconState.postValue(BtStateIconState.HIDDEN);
+            mIconState.postValue(BluetoothIconState.HIDDEN);
         }
     }
 
-    public LiveData<BtStateIconState> getBtStateIconState() {
-        return mBtStateIconState;
+    public LiveData<BluetoothIconState> getIconState() {
+        return mIconState;
     }
 
     public void setIconVisible(boolean isIconVisible) {

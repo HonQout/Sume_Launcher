@@ -162,7 +162,7 @@ public class TopBarView extends LinearLayoutCompat {
                 layoutParams.setMargins(2, 2, 2, 2);
                 imageView.setLayoutParams(layoutParams);
 
-                addChildViewInner(container, imageView, viewTag);
+                addChildViewInternal(container, imageView, viewTag);
                 return true;
             }
             case BATTERY_PCT: {
@@ -192,7 +192,7 @@ public class TopBarView extends LinearLayoutCompat {
                 textView.setTag(ViewTag.BATTERY_PCT);
 
                 // Find index to insert
-                addChildViewInner(container, textView, viewTag);
+                addChildViewInternal(container, textView, viewTag);
                 return true;
             }
             case BATTERY: {
@@ -215,14 +215,14 @@ public class TopBarView extends LinearLayoutCompat {
                 batteryView.setCharging(isCharging);
                 batteryView.setTag(ViewTag.BATTERY);
 
-                addChildViewInner(container, batteryView, viewTag);
+                addChildViewInternal(container, batteryView, viewTag);
                 return true;
             }
         }
         return false;
     }
 
-    private void addChildViewInner(ViewGroup container, View child, ViewTag viewTag) {
+    private void addChildViewInternal(ViewGroup container, View child, ViewTag viewTag) {
         int insertIndex = -1;
         for (int i = 0; i < container.getChildCount(); i++) {
             View existingChild = container.getChildAt(i);
