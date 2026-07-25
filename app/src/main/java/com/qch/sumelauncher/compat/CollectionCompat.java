@@ -10,6 +10,11 @@ public class CollectionCompat {
         boolean satisfyCondition(T item);
     }
 
+    // Private constructor prevents this class from being instantiated.
+    private CollectionCompat() {
+
+    }
+
     public static <T> boolean removeIf(Collection<T> collection, Predicate<T> predicate) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return collection.removeIf(predicate::satisfyCondition);

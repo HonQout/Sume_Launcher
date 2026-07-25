@@ -21,44 +21,44 @@ public class CellPosition {
         this.layoutName = layoutName;
     }
 
-    public void setScreenIndex(int screenIndex) {
-        this.screenIndex = screenIndex;
-    }
-
-    public void setCellX(int cellX) {
-        this.cellX = cellX;
-    }
-
-    public void setCellY(int cellY) {
-        this.cellY = cellY;
-    }
-
-    public void setSpanX(int spanX) {
-        this.spanX = spanX;
-    }
-
-    public void setSpanY(int spanY) {
-        this.spanY = spanY;
-    }
-
     public String getLayoutName() {
         return layoutName;
+    }
+
+    public void setScreenIndex(int screenIndex) {
+        this.screenIndex = screenIndex;
     }
 
     public int getScreenIndex() {
         return screenIndex;
     }
 
+    public void setCellX(int cellX) {
+        this.cellX = cellX;
+    }
+
     public int getCellX() {
         return cellX;
+    }
+
+    public void setCellY(int cellY) {
+        this.cellY = cellY;
     }
 
     public int getCellY() {
         return cellY;
     }
 
+    public void setSpanX(int spanX) {
+        this.spanX = spanX;
+    }
+
     public int getSpanX() {
         return spanX;
+    }
+
+    public void setSpanY(int spanY) {
+        this.spanY = spanY;
     }
 
     public int getSpanY() {
