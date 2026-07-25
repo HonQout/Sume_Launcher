@@ -281,7 +281,7 @@ public class LauncherActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.app_info, (dialog, which) ->
                         IntentUtils.openAppDetailsPage(this, this.getPackageName()))
                 .setNeutralButton(R.string.deny, (dialog, which) ->
-                        MyApplication.getPreferenceDataStore().setBoolean("ask_for_perm_fine_location", false))
+                        MyApplication.getPreferenceDataStore().putBoolean("ask_for_perm_fine_location", false))
                 .setNegativeButton(R.string.cancel, null);
         DialogUtils.show(builder, settingsViewModel.getAnimationValue());
     }

@@ -19,12 +19,12 @@ public abstract class LauncherItem {
         this.id = id;
     }
 
-    public void setCellPosition(CellPosition cellPosition) {
-        this.cellPosition = cellPosition;
-    }
-
     public long getId() {
         return id;
+    }
+
+    public void setCellPosition(CellPosition cellPosition) {
+        this.cellPosition = cellPosition;
     }
 
     public CellPosition getCellPosition() {

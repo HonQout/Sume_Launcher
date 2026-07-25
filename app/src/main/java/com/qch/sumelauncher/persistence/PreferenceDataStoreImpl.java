@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.datastore.preferences.core.MutablePreferences;
 import androidx.datastore.preferences.core.Preferences;
+import androidx.datastore.preferences.core.PreferencesFactory;
 import androidx.datastore.preferences.core.PreferencesKeys;
 import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder;
 import androidx.datastore.rxjava3.RxDataStore;
@@ -13,11 +14,9 @@ import java.util.Set;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class PreferenceDataStoreImpl {
     private static final String TAG = "PreferenceDataStoreImpl";
@@ -28,18 +27,10 @@ public class PreferenceDataStoreImpl {
         dataStore = new RxPreferenceDataStoreBuilder(context.getApplicationContext(), NAME).build();
     }
 
-    public Completable setBoolean(String key, boolean value) {
-        return dataStore
-                .updateDataAsync(preferences -> {
-                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-                    Preferences.Key<Boolean> preferencesKey = PreferencesKeys.booleanKey(key);
-                    mutablePreferences.set(preferencesKey, value);
-                    return Single.just(mutablePreferences);
-                })
-                .ignoreElement();
-    }
-
-    public @NonNull Disposable putBooleanAsync(String key, boolean value) {
+    /**
+     * Put a boolean value into the preference data store. This operation is asynchronous.
+     */
+    public @NonNull Disposable putBoolean(String key, boolean value) {
         Preferences.Key<Boolean> preferencesKey = PreferencesKeys.booleanKey(key);
         return dataStore
                 .updateDataAsync(preferences -> {
@@ -47,306 +38,336 @@ public class PreferenceDataStoreImpl {
                     mutablePreferences.set(preferencesKey, value);
                     return Single.just(mutablePreferences);
                 })
-                .subscribeOn(Schedulers.io())
                 .subscribe(
                         success -> {
                         },
-                        throwable -> Log.e(TAG, "Failed to set key " + key, throwable)
+                        throwable ->
+                                Log.e(TAG, "Failed to put boolean value with key " + key + ".", throwable)
                 );
     }
 
-    public Completable setInteger(String key, int value) {
-        return dataStore
-                .updateDataAsync(preferences -> {
-                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-                    Preferences.Key<Integer> preferencesKey = PreferencesKeys.intKey(key);
-                    mutablePreferences.set(preferencesKey, value);
-                    return Single.just(mutablePreferences);
-                })
-                .ignoreElement();
+    /**
+     * Get the boolean value corresponding to the key from the preference data store. This operation
+     * is synchronous.
+     */
+    public boolean getBoolean(String key, boolean defaultValue) {
+        Preferences.Key<Boolean> preferencesKey = PreferencesKeys.booleanKey(key);
+        try {
+            return dataStore
+                    .data()
+                    .map(preferences -> {
+                        Boolean value = preferences.get(preferencesKey);
+                        return value != null ? value : defaultValue;
+                    })
+                    .blockingFirst(defaultValue);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to get boolean value by key " + key + ". Return default value.");
+            return defaultValue;
+        }
     }
 
-    public @NonNull Disposable putIntegerAsync(String key, int value) {
-        Preferences.Key<Integer> preferencesKey = PreferencesKeys.intKey(key);
-        return dataStore
-                .updateDataAsync(preferences -> {
-                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-                    mutablePreferences.set(preferencesKey, value);
-                    return Single.just(mutablePreferences);
-                })
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        success -> {
-                        },
-                        throwable -> Log.e(TAG, "Failed to set key " + key, throwable)
-                );
-    }
-
-    public Completable setLong(String key, long value) {
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            Preferences.Key<Long> preferencesKey = PreferencesKeys.longKey(key);
-            mutablePreferences.set(preferencesKey, value);
-            return Single.just(mutablePreferences);
-        }).ignoreElement();
-    }
-
-    public @NonNull Disposable putLongAsync(String key, long value) {
-        Preferences.Key<Long> preferencesKey = PreferencesKeys.longKey(key);
-        return dataStore
-                .updateDataAsync(preferences -> {
-                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-                    mutablePreferences.set(preferencesKey, value);
-                    return Single.just(mutablePreferences);
-                })
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        success -> {
-                        },
-                        throwable -> Log.e(TAG, "Failed to set key " + key, throwable)
-                );
-    }
-
-    public Completable setFloat(String key, float value) {
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            Preferences.Key<Float> preferencesKey = PreferencesKeys.floatKey(key);
-            mutablePreferences.set(preferencesKey, value);
-            return Single.just(mutablePreferences);
-        }).ignoreElement();
-    }
-
-    public @NonNull Disposable putFloatAsync(String key, float value) {
-        Preferences.Key<Float> preferencesKey = PreferencesKeys.floatKey(key);
-        return dataStore
-                .updateDataAsync(preferences -> {
-                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-                    mutablePreferences.set(preferencesKey, value);
-                    return Single.just(mutablePreferences);
-                })
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        success -> {
-                        },
-                        throwable -> Log.e(TAG, "Failed to set key " + key, throwable)
-                );
-    }
-
-    public Completable setString(String key, String value) {
-        return dataStore.updateDataAsync(preferences -> {
-            MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-            Preferences.Key<String> preferencesKey = PreferencesKeys.stringKey(key);
-            mutablePreferences.set(preferencesKey, value);
-            return Single.just(mutablePreferences);
-        }).ignoreElement();
-    }
-
-    public @NonNull Disposable putStringAsync(String key, String value) {
-        Preferences.Key<String> preferencesKey = PreferencesKeys.stringKey(key);
-        return dataStore.updateDataAsync(preferences -> {
-                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-                    mutablePreferences.set(preferencesKey, value);
-                    return Single.just(mutablePreferences);
-                }).subscribeOn(Schedulers.io())
-                .subscribe(
-                        success -> {
-                        },
-                        throwable -> Log.e(TAG, "Failed to set key " + key, throwable)
-                );
-    }
-
-    public Completable setStringSet(String key, Set<String> values) {
-        return dataStore
-                .updateDataAsync(preferences -> {
-                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-                    Preferences.Key<Set<String>> preferencesKey = PreferencesKeys.stringSetKey(key);
-                    mutablePreferences.set(preferencesKey, values);
-                    return Single.just(mutablePreferences);
-                })
-                .ignoreElement();
-    }
-
-    public @NonNull Disposable putStringSetAsync(String key, Set<String> values) {
-        Preferences.Key<Set<String>> preferencesKey = PreferencesKeys.stringSetKey(key);
-        return dataStore
-                .updateDataAsync(preferences -> {
-                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
-                    mutablePreferences.set(preferencesKey, values);
-                    return Single.just(mutablePreferences);
-                })
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        success -> {
-                        },
-                        throwable -> Log.e(TAG, "Failed to set key " + key, throwable)
-                );
-    }
-
+    /**
+     * Get a Flowable of the boolean value corresponding to the key from the preference data store.
+     */
     public Flowable<Boolean> getBooleanFlowable(String key, boolean defValue) {
         Preferences.Key<Boolean> preferencesKey = PreferencesKeys.booleanKey(key);
-        return dataStore.data()
+        return dataStore
+                .data()
+                .onErrorReturn(throwable -> {
+                    Log.e(TAG, "Failed to get Flowable of boolean value by key " + key + ".", throwable);
+                    return PreferencesFactory.createEmpty();
+                })
                 .map(preferences -> {
                     Boolean value = preferences.get(preferencesKey);
                     return value != null ? value : defValue;
                 })
-                .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Failed to get boolean Flowable. Return default values.");
-                    return defValue;
-                })
-                .subscribeOn(Schedulers.io())
+                .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public boolean getBooleanSync(String key, boolean defValue) {
+    /**
+     * Put an integer value into the preference data store. This operation is asynchronous.
+     */
+    public @NonNull Disposable putInteger(String key, int value) {
+        Preferences.Key<Integer> preferencesKey = PreferencesKeys.intKey(key);
+        return dataStore
+                .updateDataAsync(preferences -> {
+                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
+                    mutablePreferences.set(preferencesKey, value);
+                    return Single.just(mutablePreferences);
+                })
+                .subscribe(
+                        success -> {
+                        },
+                        throwable ->
+                                Log.e(TAG, "Failed to put integer with key " + key + ".", throwable)
+                );
+    }
+
+    /**
+     * Get the integer value corresponding to the key from the preference data store. This operation
+     * is synchronous.
+     */
+    public int getInteger(String key, int defaultValue) {
+        Preferences.Key<Integer> preferencesKey = PreferencesKeys.intKey(key);
         try {
-            Preferences.Key<Boolean> preferencesKey = PreferencesKeys.booleanKey(key);
             return dataStore
                     .data()
-                    .map(preferences -> preferences.get(preferencesKey))
-                    .blockingFirst(defValue);
+                    .map(preferences -> {
+                        Integer value = preferences.get(preferencesKey);
+                        return value != null ? value : defaultValue;
+                    })
+                    .blockingFirst(defaultValue);
         } catch (Exception e) {
-            Log.e(TAG, "Failed to get boolean data synchronously. Return default value.");
-            return defValue;
+            Log.e(TAG, "Failed to get integer value by key " + key + ". Return default value.");
+            return defaultValue;
         }
     }
 
+    /**
+     * Get a Flowable of the integer value corresponding to the key from the preference data store.
+     */
     public Flowable<Integer> getIntegerFlowable(String key, int defValue) {
         Preferences.Key<Integer> preferencesKey = PreferencesKeys.intKey(key);
-        return dataStore.data()
+        return dataStore
+                .data()
+                .onErrorReturn(throwable -> {
+                    Log.e(TAG, "Failed to get Flowable of integer value by key " + key + ".", throwable);
+                    return PreferencesFactory.createEmpty();
+                })
                 .map(preferences -> {
                     Integer value = preferences.get(preferencesKey);
                     return value != null ? value : defValue;
                 })
-                .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Failed to get integer Flowable. Return default values.");
-                    return defValue;
-                })
-                .subscribeOn(Schedulers.io())
+                .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public int getIntegerSync(String key, int defValue) {
+    /**
+     * Put a long value into the preference data store. This operation is asynchronous.
+     */
+    public @NonNull Disposable putLong(String key, long value) {
+        Preferences.Key<Long> preferencesKey = PreferencesKeys.longKey(key);
+        return dataStore
+                .updateDataAsync(preferences -> {
+                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
+                    mutablePreferences.set(preferencesKey, value);
+                    return Single.just(mutablePreferences);
+                })
+                .subscribe(
+                        success -> {
+                        },
+                        throwable ->
+                                Log.e(TAG, "Failed to put long value with key " + key + ".", throwable)
+                );
+    }
+
+    /**
+     * Get the long value corresponding to the key from the preference data store. This operation is
+     * synchronous.
+     */
+    public Long getLong(String key, long defaultValue) {
+        Preferences.Key<Long> preferencesKey = PreferencesKeys.longKey(key);
         try {
-            Preferences.Key<Integer> preferencesKey = PreferencesKeys.intKey(key);
             return dataStore
                     .data()
-                    .map(preferences -> preferences.get(preferencesKey))
-                    .blockingFirst(defValue);
+                    .map(preferences -> {
+                        Long value = preferences.get(preferencesKey);
+                        return value != null ? value : defaultValue;
+                    })
+                    .blockingFirst(defaultValue);
         } catch (Exception e) {
-            Log.e(TAG, "Failed to get integer data synchronously. Return default value.");
-            return defValue;
+            Log.e(TAG, "Failed to get long value by key " + key + ". Return default value.");
+            return defaultValue;
         }
     }
 
+    /**
+     * Get a Flowable of the long value corresponding to the key from the preference data store.
+     */
     public Flowable<Long> getLongFlowable(String key, long defValue) {
         Preferences.Key<Long> preferencesKey = PreferencesKeys.longKey(key);
-        return dataStore.data()
+        return dataStore
+                .data()
+                .onErrorReturn(throwable -> {
+                    Log.e(TAG, "Failed to get Flowable of long value by key " + key + ".", throwable);
+                    return PreferencesFactory.createEmpty();
+                })
                 .map(preferences -> {
                     Long value = preferences.get(preferencesKey);
                     return value != null ? value : defValue;
                 })
-                .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Failed to get long Flowable. Return default values.");
-                    return defValue;
-                })
-                .subscribeOn(Schedulers.io())
+                .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Long getLongSync(String key, long defValue) {
+    /**
+     * Put a float value into the preference data store. This operation is asynchronous.
+     */
+    public @NonNull Disposable putFloat(String key, float value) {
+        Preferences.Key<Float> preferencesKey = PreferencesKeys.floatKey(key);
+        return dataStore
+                .updateDataAsync(preferences -> {
+                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
+                    mutablePreferences.set(preferencesKey, value);
+                    return Single.just(mutablePreferences);
+                })
+                .subscribe(
+                        success -> {
+                        },
+                        throwable ->
+                                Log.e(TAG, "Failed to put float value with key " + key + ".", throwable)
+                );
+    }
+
+    /**
+     * Get the float value corresponding to the key from the preference data store. This operation
+     * is synchronous.
+     */
+    public float getFloat(String key, float defaultValue) {
+        Preferences.Key<Float> preferencesKey = PreferencesKeys.floatKey(key);
         try {
-            Preferences.Key<Long> preferencesKey = PreferencesKeys.longKey(key);
             return dataStore
                     .data()
-                    .map(preferences -> preferences.get(preferencesKey))
-                    .blockingFirst(defValue);
+                    .map(preferences -> {
+                        Float value = preferences.get(preferencesKey);
+                        return value != null ? value : defaultValue;
+                    })
+                    .blockingFirst(defaultValue);
         } catch (Exception e) {
-            Log.e(TAG, "Failed to get long data synchronously. Return default value.");
-            return defValue;
+            Log.e(TAG, "Failed to get float value by key " + key + ". Return default value.");
+            return defaultValue;
         }
     }
 
+    /**
+     * Get a Flowable of the float value corresponding to the key from the preference data store.
+     */
     public Flowable<Float> getFloatFlowable(String key, float defValue) {
         Preferences.Key<Float> preferencesKey = PreferencesKeys.floatKey(key);
-        return dataStore.data()
+        return dataStore
+                .data()
+                .onErrorReturn(throwable -> {
+                    Log.e(TAG, "Failed to get Flowable of float value by key " + key + ".", throwable);
+                    return PreferencesFactory.createEmpty();
+                })
                 .map(preferences -> {
                     Float value = preferences.get(preferencesKey);
                     return value != null ? value : defValue;
                 })
-                .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Failed to get float Flowable. Return default values.");
-                    return defValue;
-                })
-                .subscribeOn(Schedulers.io())
+                .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public float getFloatSync(String key, float defValue) {
+    /**
+     * Put a string value into the preference data store. This operation is asynchronous.
+     */
+    public @NonNull Disposable putString(String key, String value) {
+        Preferences.Key<String> preferencesKey = PreferencesKeys.stringKey(key);
+        return dataStore
+                .updateDataAsync(preferences -> {
+                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
+                    mutablePreferences.set(preferencesKey, value);
+                    return Single.just(mutablePreferences);
+                }).subscribe(
+                        success -> {
+                        },
+                        throwable ->
+                                Log.e(TAG, "Failed to put string value with key " + key + ".", throwable)
+                );
+    }
+
+    /**
+     * Get the string value corresponding to the key from the preference data store. This operation
+     * is synchronous.
+     */
+    public String getString(String key, String defaultValue) {
+        Preferences.Key<String> preferencesKey = PreferencesKeys.stringKey(key);
         try {
-            Preferences.Key<Float> preferencesKey = PreferencesKeys.floatKey(key);
             return dataStore
                     .data()
-                    .map(preferences -> preferences.get(preferencesKey))
-                    .blockingFirst(defValue);
+                    .map(preferences -> {
+                        String value = preferences.get(preferencesKey);
+                        return value != null ? value : defaultValue;
+                    })
+                    .blockingFirst(defaultValue);
         } catch (Exception e) {
-            Log.e(TAG, "Failed to get float data synchronously. Return default value.");
-            return defValue;
+            Log.e(TAG, "Failed to get string value by key " + key + ". Return default value.");
+            return defaultValue;
         }
     }
 
     public Flowable<String> getStringFlowable(String key, String defValue) {
         Preferences.Key<String> preferencesKey = PreferencesKeys.stringKey(key);
-        return dataStore.data()
+        return dataStore
+                .data()
+                .onErrorReturn(throwable -> {
+                    Log.e(TAG, "Failed to get Flowable of string value by key " + key + ".", throwable);
+                    return PreferencesFactory.createEmpty();
+                })
                 .map(preferences -> {
                     String value = preferences.get(preferencesKey);
                     return value != null ? value : defValue;
                 })
-                .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Failed to get string Flowable. Return default values.");
-                    return defValue;
-                })
-                .subscribeOn(Schedulers.io())
+                .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public String getStringSync(String key, String defValue) {
+    /**
+     * Put a string set value into the preference data store. This operation is asynchronous.
+     */
+    public @NonNull Disposable putStringSet(String key, Set<String> values) {
+        Preferences.Key<Set<String>> preferencesKey = PreferencesKeys.stringSetKey(key);
+        return dataStore
+                .updateDataAsync(preferences -> {
+                    MutablePreferences mutablePreferences = preferences.toMutablePreferences();
+                    mutablePreferences.set(preferencesKey, values);
+                    return Single.just(mutablePreferences);
+                })
+                .subscribe(
+                        success -> {
+                        },
+                        throwable ->
+                                Log.e(TAG, "Failed to put string set value with key " + key + ".", throwable)
+                );
+    }
+
+    /**
+     * Get the string set value corresponding to the key from the preference data store. This
+     * operation is synchronous.
+     */
+    public Set<String> getStringSet(String key, Set<String> defaultValues) {
+        Preferences.Key<Set<String>> preferencesKey = PreferencesKeys.stringSetKey(key);
         try {
-            Preferences.Key<String> preferencesKey = PreferencesKeys.stringKey(key);
             return dataStore
                     .data()
-                    .map(preferences -> preferences.get(preferencesKey))
-                    .blockingFirst(defValue);
+                    .map(preferences -> {
+                        Set<String> value = preferences.get(preferencesKey);
+                        return value != null ? value : defaultValues;
+                    })
+                    .blockingFirst(defaultValues);
         } catch (Exception e) {
-            Log.e(TAG, "Failed to get string data synchronously. Return default value.");
-            return defValue;
+            Log.e(TAG, "Failed to get string set value by key " + key + ". Return default values.");
+            return defaultValues;
         }
     }
 
+    /**
+     * Get a Flowable of the string set value corresponding to the key from the preference data store.
+     */
     public Flowable<Set<String>> getStringSetFlowable(String key, Set<String> defValues) {
         Preferences.Key<Set<String>> preferencesKey = PreferencesKeys.stringSetKey(key);
-        return dataStore.data()
+        return dataStore
+                .data()
+                .onErrorReturn(throwable -> {
+                    Log.e(TAG, "Failed to get Flowable of string set value by key " + key + ".", throwable);
+                    return PreferencesFactory.createEmpty();
+                })
                 .map(preferences -> {
                     Set<String> values = preferences.get(preferencesKey);
                     return values != null ? values : defValues;
                 })
-                .onErrorReturn(throwable -> {
-                    Log.e(TAG, "Cannot get string set Flowable. Return default values.");
-                    return defValues;
-                })
-                .subscribeOn(Schedulers.io())
+                .distinctUntilChanged()
                 .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Set<String> getStringSetSync(String key, Set<String> defValues) {
-        try {
-            Preferences.Key<Set<String>> preferencesKey = PreferencesKeys.stringSetKey(key);
-            return dataStore
-                    .data()
-                    .map(preferences -> preferences.get(preferencesKey))
-                    .blockingFirst(defValues);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to get string set data synchronously. Return default value.");
-            return defValues;
-        }
     }
 }
