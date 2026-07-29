@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.qch.sumelauncher.bean.PermissionBean;
+import com.qch.sumelauncher.data.model.permission.PermissionBean;
 import com.qch.sumelauncher.databinding.FragmentPermissionBinding;
 import com.qch.sumelauncher.recyclerview.adapter.FilterableListAdapter;
 import com.qch.sumelauncher.recyclerview.adapter.PermissionListRVAdapter;
@@ -40,7 +40,7 @@ public class PermissionFragment extends Fragment {
         binding = FragmentPermissionBinding.inflate(inflater, container, false);
         binding.fPermissionRv.setLayoutManager(new LinearLayoutManager(requireContext()));
         PermissionListRVAdapter adapter = new PermissionListRVAdapter(new ArrayList<>());
-        adapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<PermissionBean>() {
+        adapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
             @Override
             public void onItemClick(PermissionBean item, View view) {
                 viewModel.showPermissionDetailDialog(requireActivity(), item);

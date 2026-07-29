@@ -15,8 +15,8 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.bean.PermissionBean;
-import com.qch.sumelauncher.bean.SortedPermissions;
+import com.qch.sumelauncher.data.model.permission.PermissionBean;
+import com.qch.sumelauncher.data.model.permission.SortedPermissions;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.PackageUtils;

@@ -6,7 +6,7 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-import com.qch.sumelauncher.bean.ActivityRecord;
+import com.qch.sumelauncher.data.model.launcher.ActivityRecord;
 
 import java.util.List;
 

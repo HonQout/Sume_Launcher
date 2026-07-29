@@ -4,7 +4,7 @@ import androidx.room.TypeConverter;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.qch.sumelauncher.bean.ActivityRecord;
+import com.qch.sumelauncher.data.model.launcher.ActivityRecord;
 
 import java.lang.reflect.Type;
 import java.util.List;

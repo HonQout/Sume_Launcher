@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:windowBackground"
-    tools:context=".launcher.ui.LauncherActivity">
+    tools:context=".ui.launcher.activity.LauncherActivity">
 
-    <com.qch.sumelauncher.topbar.view.TopBarView
+    <com.qch.sumelauncher.ui.topbar.view.TopBarView
         android:id="@+id/a_launcher_top_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

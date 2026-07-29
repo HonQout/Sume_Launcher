@@ -1,0 +1,148 @@
+package com.qch.sumelauncher.ui.topbar.viewmodel;
+
+import android.app.Application;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
+import com.qch.sumelauncher.utils.RingerModeUtils;
+import com.qch.sumelauncher.utils.RingerModeUtils.RingerMode;
+
+public class RingerModeViewModel extends AndroidViewModel {
+    private static final String TAG = "RingerModeViewModel";
+    // data
+    private final MutableLiveData<RingerMode> mRingerMode = new MutableLiveData<>();
+    private final MutableLiveData<RingerModeIconState> mIconState = new MutableLiveData<>();
+    private boolean isIconVisible = true;
+    // broadcast receiver
+    private BroadcastReceiver broadcastReceiver = null;
+
+    public enum RingerModeIconState {
+        HIDDEN,
+        SILENT,
+        VIBRATE
+    }
+
+    public RingerModeViewModel(@NonNull Application application) {
+        super(application);
+        init();
+        registerBroadcastReceiver();
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        unregisterBroadcastReceiver();
+    }
+
+    private void init() {
+        RingerMode mode = RingerModeUtils.getRingerMode(getApplication());
+        mRingerMode.postValue(mode);
+        setIconStateInner(mode);
+    }
+
+    private void registerBroadcastReceiver() {
+        if (broadcastReceiver != null) {
+            return;
+        }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(AudioManager.RINGER_MODE_CHANGED_ACTION);
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int newRingerMode = intent.getIntExtra(AudioManager.EXTRA_RINGER_MODE, 2);
+                RingerMode mode = RingerMode.Normal;
+                switch (newRingerMode) {
+                    case AudioManager.RINGER_MODE_SILENT: {
+                        mode = RingerMode.Silent;
+                        break;
+                    }
+
+                    case AudioManager.RINGER_MODE_VIBRATE: {
+                        mode = RingerMode.Vibrate;
+                        break;
+                    }
+                }
+                mRingerMode.postValue(mode);
+                setIconStateInner(mode);
+            }
+        };
+
+        ContextCompat.registerReceiver(getApplication(), broadcastReceiver, filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED);
+    }
+
+    private void unregisterBroadcastReceiver() {
+        if (broadcastReceiver != null) {
+            getApplication().unregisterReceiver(broadcastReceiver);
+            broadcastReceiver = null;
+        }
+    }
+
+    public LiveData<RingerMode> getRingerMode() {
+        return mRingerMode;
+    }
+
+    private void setIconStateInner(RingerMode mode) {
+        if (isIconVisible) {
+            switch (mode) {
+                case Silent: {
+                    mIconState.postValue(RingerModeIconState.SILENT);
+                    break;
+                }
+                case Vibrate: {
+                    mIconState.postValue(RingerModeIconState.VIBRATE);
+                    break;
+                }
+                case Normal: {
+                    mIconState.postValue(RingerModeIconState.HIDDEN);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void setIconState(RingerModeIconState state) {
+        mIconState.postValue(state);
+    }
+
+    public void restoreIconState() {
+        RingerMode value = mRingerMode.getValue();
+        if (value == null) {
+            mIconState.postValue(RingerModeIconState.HIDDEN);
+            return;
+        }
+        switch (value) {
+            case Silent: {
+                mIconState.postValue(RingerModeIconState.SILENT);
+                break;
+            }
+            case Vibrate: {
+                mIconState.postValue(RingerModeIconState.VIBRATE);
+                break;
+            }
+            case Normal: {
+                mIconState.postValue(RingerModeIconState.HIDDEN);
+                break;
+            }
+        }
+    }
+
+    public LiveData<RingerModeIconState> getIconState() {
+        return mIconState;
+    }
+
+    public void setIconVisible(boolean isIconVisible) {
+        this.isIconVisible = isIconVisible;
+    }
+}

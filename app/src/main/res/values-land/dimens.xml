@@ -5,9 +5,9 @@
     <dimen name="top_bar_icon_size">20dp</dimen>
     <dimen name="launcher_layout_horizontal_padding">5dp</dimen>
     <dimen name="launcher_layout_vertical_padding">5dp</dimen>
-    <dimen name="grid_horizontal_padding">5dp</dimen>
-    <dimen name="grid_vertical_padding">5dp</dimen>
-    <dimen name="app_grid_inner_padding">5dp</dimen>
+    <dimen name="grid_horizontal_padding">2dp</dimen>
+    <dimen name="grid_vertical_padding">2dp</dimen>
+    <dimen name="app_grid_padding">5dp</dimen>
     <dimen name="app_grid_space">2dp</dimen>
     <dimen name="app_icon_size">50dp</dimen>
     <dimen name="app_label_size">12sp</dimen>

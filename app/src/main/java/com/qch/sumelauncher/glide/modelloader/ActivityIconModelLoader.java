@@ -1,7 +1,7 @@
 package com.qch.sumelauncher.glide.modelloader;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,10 +11,10 @@ import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.load.model.ModelLoaderFactory;
 import com.bumptech.glide.load.model.MultiModelLoaderFactory;
-import com.qch.sumelauncher.bean.ActivityBean;
+import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 import com.qch.sumelauncher.glide.datafetcher.ActivityIconDataFetcher;
 
-public class ActivityIconModelLoader implements ModelLoader<ActivityBean, Bitmap> {
+public class ActivityIconModelLoader implements ModelLoader<ActivityModel, Drawable> {
     private final Context context;
 
     public ActivityIconModelLoader(Context context) {
@@ -23,18 +23,18 @@ public class ActivityIconModelLoader implements ModelLoader<ActivityBean, Bitmap
 
     @Nullable
     @Override
-    public LoadData<Bitmap> buildLoadData(@NonNull ActivityBean activityBean, int width, int height,
+    public LoadData<Drawable> buildLoadData(@NonNull ActivityModel activityModel, int width, int height,
                                           @NonNull Options options) {
-        return new LoadData<>(new GlideUrl(activityBean.getKey()),
-                new ActivityIconDataFetcher(context, activityBean));
+        return new LoadData<>(new GlideUrl(activityModel.getKey()),
+                new ActivityIconDataFetcher(context, activityModel));
     }
 
     @Override
-    public boolean handles(@NonNull ActivityBean activityBean) {
+    public boolean handles(@NonNull ActivityModel activityModel) {
         return true;
     }
 
-    public static class Factory implements ModelLoaderFactory<ActivityBean, Bitmap> {
+    public static class Factory implements ModelLoaderFactory<ActivityModel, Drawable> {
         private final Context context;
 
         public Factory(Context context) {
@@ -43,7 +43,7 @@ public class ActivityIconModelLoader implements ModelLoader<ActivityBean, Bitmap
 
         @NonNull
         @Override
-        public ModelLoader<ActivityBean, Bitmap> build(@NonNull MultiModelLoaderFactory multiFactory) {
+        public ModelLoader<ActivityModel, Drawable> build(@NonNull MultiModelLoaderFactory multiFactory) {
             return new ActivityIconModelLoader(context);
         }
 

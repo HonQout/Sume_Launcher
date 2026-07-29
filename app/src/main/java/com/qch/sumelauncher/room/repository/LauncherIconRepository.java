@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 
+import com.qch.sumelauncher.data.model.launcher.IconModel;
 import com.qch.sumelauncher.multithread.AppExecutors;
 import com.qch.sumelauncher.room.dao.LauncherIconDao;
 import com.qch.sumelauncher.room.database.LauncherItemDatabase;
@@ -95,7 +96,7 @@ public class LauncherIconRepository {
         return dao.getIconListInLayout(layoutName);
     }
 
-    public LiveData<Map<Integer, List<IconEntity>>> getIconMapInLayout(String layoutName) {
+    public LiveData<Map<Integer, List<IconEntity>>> getIconEntityMapInLayout(String layoutName) {
         LiveData<List<IconEntity>> list = getIconListInLayout(layoutName);
         return Transformations.map(list, iconEntities -> {
             // error correction
@@ -123,6 +124,40 @@ public class LauncherIconRepository {
                     map.put(iconEntity.getScreenIndex(), new ArrayList<>());
                 }
                 Objects.requireNonNull(map.get(iconEntity.getScreenIndex())).add(iconEntity);
+            }
+            return map;
+        });
+    }
+
+    public LiveData<Map<Integer, List<IconModel>>> getIconModelMapInLayout(String layoutName) {
+        LiveData<List<IconEntity>> list = getIconListInLayout(layoutName);
+        return Transformations.map(list, iconEntities -> {
+            // error correction
+            List<IconEntity> compactedList = compactScreens(iconEntities);
+            // place IconEntity items into map
+            Map<Integer, List<IconModel>> map = new TreeMap<>();
+            for (IconEntity iconEntity : compactedList) {
+                // check if this record is significant
+                String packageName = iconEntity.getPackageName();
+                String activityName = iconEntity.getActivityName();
+                if (TextUtils.isEmpty(packageName) || TextUtils.isEmpty(activityName)) {
+                    deleteIcon(iconEntity, true);
+                    continue;
+                }
+                // check if the activity corresponding to this record still exists
+                // TODO: There should be optimization of this operation to avoid waiting for
+                //       communication with system service
+                ActivityInfo activityInfo =
+                        ApplicationUtils.getActivityInfo(appContext, packageName, activityName);
+                if (activityInfo == null) {
+                    deleteIcon(iconEntity, true);
+                    continue;
+                }
+                if (!map.containsKey(iconEntity.getScreenIndex())) {
+                    map.put(iconEntity.getScreenIndex(), new ArrayList<>());
+                }
+                IconModel iconModel = new IconModel(appContext.getApplicationContext(), iconEntity);
+                Objects.requireNonNull(map.get(iconEntity.getScreenIndex())).add(iconModel);
             }
             return map;
         });

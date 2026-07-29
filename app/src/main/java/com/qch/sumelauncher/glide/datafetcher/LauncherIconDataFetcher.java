@@ -1,7 +1,6 @@
 package com.qch.sumelauncher.glide.datafetcher;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
@@ -9,27 +8,25 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.data.DataFetcher;
-import com.qch.sumelauncher.room.entity.IconEntity;
+import com.qch.sumelauncher.data.model.launcher.IconModel;
 import com.qch.sumelauncher.utils.ApplicationUtils;
-import com.qch.sumelauncher.utils.DrawableUtils;
 
-public class LauncherIconDataFetcher implements DataFetcher<Bitmap> {
+public class LauncherIconDataFetcher implements DataFetcher<Drawable> {
     private final Context appContext;
     private final String packageName;
     private final String activityName;
 
-    public LauncherIconDataFetcher(Context appContext, IconEntity iconEntity) {
+    public LauncherIconDataFetcher(Context appContext, IconModel iconModel) {
         this.appContext = appContext.getApplicationContext();
-        this.packageName = iconEntity.getPackageName();
-        this.activityName = iconEntity.getActivityName();
+        this.packageName = iconModel.getPackageName();
+        this.activityName = iconModel.getActivityName();
     }
 
     @Override
-    public void loadData(@NonNull Priority priority, @NonNull DataCallback<? super Bitmap> callback) {
+    public void loadData(@NonNull Priority priority, @NonNull DataCallback<? super Drawable> callback) {
         try {
             Drawable icon = ApplicationUtils.getActivityIcon(appContext, packageName, activityName);
-            Bitmap bitmap = DrawableUtils.toBitmap(icon);
-            callback.onDataReady(bitmap);
+            callback.onDataReady(icon);
         } catch (Exception e) {
             callback.onLoadFailed(e);
         }
@@ -47,8 +44,8 @@ public class LauncherIconDataFetcher implements DataFetcher<Bitmap> {
 
     @NonNull
     @Override
-    public Class<Bitmap> getDataClass() {
-        return Bitmap.class;
+    public Class<Drawable> getDataClass() {
+        return Drawable.class;
     }
 
     @NonNull
