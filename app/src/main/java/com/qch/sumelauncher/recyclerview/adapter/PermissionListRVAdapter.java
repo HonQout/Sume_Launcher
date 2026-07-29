@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.bean.PermissionBean;
+import com.qch.sumelauncher.data.model.permission.PermissionBean;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -18,7 +18,6 @@
     <string name="quit">Quit</string>
 
     <!-- Menu -->
-    <string name="move_to_new_screen">Move to new screen</string>
     <string name="remove_icon">Remove icon</string>
     <string name="uninstall">Uninstall</string>
     <string name="app_info">App info</string>

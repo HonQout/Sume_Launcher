@@ -10,7 +10,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.qch.sumelauncher.bean.ActivityBean;
+import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 import com.qch.sumelauncher.room.converter.Converters;
 import com.qch.sumelauncher.room.dao.LauncherIconDao;
 import com.qch.sumelauncher.room.entity.IconEntity;
@@ -65,7 +65,7 @@ public abstract class LauncherItemDatabase extends RoomDatabase {
     public static List<IconEntity> getDefaultLauncherIconList(@NonNull Context context,
                                                               @NonNull LayoutEntity layoutEntity) {
         List<IconEntity> iconEntityList = new ArrayList<>();
-        List<ActivityBean> activityBeanList
+        List<ActivityModel> activityModelList
                 = ApplicationUtils.getActivityBeanList(context, null);
         String layoutName = layoutEntity.getName();
         int numColumn = layoutEntity.getNumColumns();
@@ -73,12 +73,12 @@ public abstract class LauncherItemDatabase extends RoomDatabase {
         int screenIndex = 0;
         int cellX = 0; // column
         int cellY = 0; // row
-        for (int i = 0; i < activityBeanList.size(); i++) {
+        for (int i = 0; i < activityModelList.size(); i++) {
             Log.i(TAG, "Layout = " + layoutName + " ScreenIndex = " + screenIndex
                     + " Cell_X = " + cellX + " Cell_Y = " + cellY);
-            ActivityBean activityBean = activityBeanList.get(i);
+            ActivityModel activityModel = activityModelList.get(i);
             IconEntity iconEntity = new IconEntity(layoutName, screenIndex, cellX, cellY, 1,
-                    1, activityBean.getPackageName(), activityBean.getActivityName());
+                    1, activityModel.getPackageName(), activityModel.getActivityName());
             iconEntityList.add(iconEntity);
             cellX++;
             if (cellX >= numColumn) {

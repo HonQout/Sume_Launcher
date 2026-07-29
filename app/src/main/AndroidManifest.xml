@@ -53,7 +53,7 @@
         android:theme="@style/Theme.SumeLauncher">
 
         <activity
-            android:name=".launcher.ui.LauncherActivity"
+            android:name=".ui.launcher.activity.LauncherActivity"
             android:clearTaskOnLaunch="true"
             android:configChanges="keyboard|keyboardHidden|mcc|mnc|navigation|orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="true"

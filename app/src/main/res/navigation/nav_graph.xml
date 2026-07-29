@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/launcher_dest"
-        android:name="com.qch.sumelauncher.fragment.LauncherFragment"
+        android:name="com.qch.sumelauncher.ui.launcher.fragment.LauncherFragment"
         android:label=""
         tools:layout="@layout/fragment_launcher">
 
@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/drawer_dest"
-        android:name="com.qch.sumelauncher.drawer.DrawerFragment"
+        android:name="com.qch.sumelauncher.ui.drawer.fragment.DrawerFragment"
         android:label="@string/app_drawer"
         tools:layout="@layout/fragment_drawer" />
 </navigation>

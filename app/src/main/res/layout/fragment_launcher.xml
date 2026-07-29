@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.LauncherFragment">
+    tools:context=".ui.launcher.fragment.LauncherFragment">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/f_launcher_vp2"

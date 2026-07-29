@@ -20,7 +20,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.qch.sumelauncher.bean.ActivityBean;
+import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -189,7 +189,7 @@ public class ApplicationUtils {
         try {
             return pm.getActivityInfo(new ComponentName(packageName, activityName), 0);
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Cannot get activityInfo. Activity " + activityName + " of package "
+            Log.e(TAG, "Failed to get activityInfo. Activity " + activityName + " of package "
                     + packageName + " doesn't exist.", e);
         }
         return null;
@@ -210,7 +210,7 @@ public class ApplicationUtils {
         try {
             return pm.getActivityIcon(new ComponentName(packageName, activityName));
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Cannot get activity icon. Activity " + activityName + " of package "
+            Log.e(TAG, "Failed to get activity icon. Activity " + activityName + " of package "
                     + packageName + " doesn't exist.", e);
         }
         return pm.getDefaultActivityIcon();
@@ -224,12 +224,13 @@ public class ApplicationUtils {
         return context.getPackageManager().getDefaultActivityIcon();
     }
 
+    /**
+     * Return the id of icon of the activity specified by the given ActivityInfo, or 0 if the given
+     * ActivityInfo is null.
+     */
     @DrawableRes
-    public static int getActivityIconId(ActivityInfo activityInfo) {
-        if (activityInfo != null) {
-            return activityInfo.icon;
-        }
-        return 0;
+    public static int getActivityIconId(@Nullable ActivityInfo activityInfo) {
+        return activityInfo == null ? 0 : activityInfo.icon;
     }
 
     @DrawableRes
@@ -296,23 +297,26 @@ public class ApplicationUtils {
         return null;
     }
 
-    private static List<ActivityBean> getActivityBeanList(Context context,
-                                                          List<ResolveInfo> intentActivityList) {
-        List<ActivityBean> list = new ArrayList<>();
+    private static List<ActivityModel> getActivityBeanList(Context context,
+                                                           List<ResolveInfo> intentActivityList) {
+        List<ActivityModel> list = new ArrayList<>();
         for (ResolveInfo resolveInfo : intentActivityList) {
-            list.add(new ActivityBean(context, resolveInfo));
+            if (resolveInfo == null || resolveInfo.activityInfo == null) {
+                continue;
+            }
+            list.add(new ActivityModel(context, resolveInfo.activityInfo));
         }
         return list;
     }
 
     /**
-     * Get a list of ActivityBean of all launchable activity of certain application(s).
+     * Get a list of ActivityModel of all launchable activity of certain application(s).
      *
      * @param packageName Specify which package should these ActivityBeans belong to. Passing null
      *                    or empty string ("") to get all ActivityBeans of all installed packages.
      */
-    public static List<ActivityBean> getActivityBeanList(@NonNull Context context,
-                                                         @Nullable String packageName) {
+    public static List<ActivityModel> getActivityBeanList(@NonNull Context context,
+                                                          @Nullable String packageName) {
         List<ResolveInfo> list = getIntentActivityList(context, packageName);
         return getActivityBeanList(context, list);
     }

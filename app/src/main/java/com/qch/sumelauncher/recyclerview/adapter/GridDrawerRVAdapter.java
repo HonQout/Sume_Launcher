@@ -1,41 +1,33 @@
 package com.qch.sumelauncher.recyclerview.adapter;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.bean.ActivityBean;
-import com.qch.sumelauncher.utils.DrawableUtils;
+import com.qch.sumelauncher.data.model.launcher.ActivityModel;
+import com.qch.sumelauncher.ui.launcher.item.IconView;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class GridDrawerRVAdapter extends FilterableListAdapter<ActivityBean, GridDrawerRVAdapter.ViewHolder> {
+public class GridDrawerRVAdapter extends FilterableListAdapter<ActivityModel, GridDrawerRVAdapter.ViewHolder> {
     private static final String TAG = "GridDrawerRVAdapter";
 
-    public static final DiffUtil.ItemCallback<ActivityBean> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
+    public static final DiffUtil.ItemCallback<ActivityModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
-        public boolean areItemsTheSame(@NonNull ActivityBean oldItem, @NonNull ActivityBean newItem) {
+        public boolean areItemsTheSame(@NonNull ActivityModel oldItem, @NonNull ActivityModel newItem) {
             boolean isPackageNameTheSame = Objects.equals(oldItem.getPackageName(), newItem.getActivityName());
             boolean isActivityNameTheSame = Objects.equals(oldItem.getActivityName(), newItem.getActivityName());
             return isPackageNameTheSame && isActivityNameTheSame;
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull ActivityBean oldItem, @NonNull ActivityBean newItem) {
+        public boolean areContentsTheSame(@NonNull ActivityModel oldItem, @NonNull ActivityModel newItem) {
             boolean isIconTheSame = Objects.equals(oldItem.getIconRes(), newItem.getIconRes());
             boolean isLabelTheSame = Objects.equals(oldItem.getLabel(), newItem.getLabel());
             return isIconTheSame && isLabelTheSame;
@@ -43,75 +35,52 @@ public class GridDrawerRVAdapter extends FilterableListAdapter<ActivityBean, Gri
     };
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView icon;
-        private final TextView label;
+        private final IconView iconView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            icon = (ImageView) itemView.findViewById(R.id.item_app_grid_icon);
-            label = (TextView) itemView.findViewById(R.id.item_app_grid_label);
+            iconView = (IconView) itemView;
             itemView.setOnClickListener(v -> {
                 int position = getBindingAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
-                    ActivityBean item = getItem(position);
+                    ActivityModel item = getItem(position);
                     onItemClickListener.onItemClick(item, v);
                 }
             });
             itemView.setOnLongClickListener(v -> {
                 int position = getBindingAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
-                    ActivityBean item = getItem(position);
+                    ActivityModel item = getItem(position);
                     return onItemClickListener.onItemLongClick(item, v);
                 }
                 return false;
             });
         }
-
-        public ImageView getIcon() {
-            return icon;
-        }
-
-        public TextView getLabel() {
-            return label;
-        }
     }
 
-    public GridDrawerRVAdapter(List<ActivityBean> activityBeanList) {
-        super(DIFF_CALLBACK, activityBeanList);
+    public GridDrawerRVAdapter(List<ActivityModel> activityModelList) {
+        super(DIFF_CALLBACK, activityModelList);
     }
 
     @NonNull
     @Override
     public GridDrawerRVAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_app_grid, parent, false);
-        return new ViewHolder(view);
+        IconView iconView = new IconView(parent.getContext());
+        return new ViewHolder(iconView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull GridDrawerRVAdapter.ViewHolder holder, int position) {
-        Context context = holder.itemView.getContext();
-        ActivityBean activityBean = getItem(position);
-        Drawable defIconDrawable = context.getPackageManager().getDefaultActivityIcon();
-        Bitmap defIconBitmap = DrawableUtils.toBitmap(defIconDrawable);
-        try {
-            Glide.with(context)
-                    .asBitmap()
-                    .load(activityBean)
-                    .placeholder(defIconDrawable)
-                    .error(defIconDrawable)
-                    .into(holder.icon);
-        } catch (Exception e) {
-            holder.getIcon().setImageBitmap(defIconBitmap);
-        }
-        holder.getLabel().setText(activityBean.getLabel());
+        ActivityModel activityModel = getItem(position);
+        holder.iconView.setActivityModel(activityModel);
     }
 
     @NonNull
     @Override
-    protected List<ActivityBean> performFiltering(List<ActivityBean> list, CharSequence constraint) {
-        List<ActivityBean> resultList = new ArrayList<>();
+    protected List<ActivityModel> performFiltering(List<ActivityModel> list, CharSequence constraint) {
+        List<ActivityModel> resultList = new ArrayList<>();
         CharSequence cs = constraint.toString().toLowerCase(Locale.ROOT);
-        for (ActivityBean item : list) {
+        for (ActivityModel item : list) {
             boolean isLabelMatch = item.getLabel().toLowerCase(Locale.ROOT).contains(cs);
             if (isLabelMatch) {
                 resultList.add(item);

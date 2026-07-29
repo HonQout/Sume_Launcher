@@ -1,7 +1,7 @@
 package com.qch.sumelauncher.glide.modelloader;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,9 +12,9 @@ import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.load.model.ModelLoaderFactory;
 import com.bumptech.glide.load.model.MultiModelLoaderFactory;
 import com.qch.sumelauncher.glide.datafetcher.LauncherIconDataFetcher;
-import com.qch.sumelauncher.room.entity.IconEntity;
+import com.qch.sumelauncher.data.model.launcher.IconModel;
 
-public class LauncherIconModelLoader implements ModelLoader<IconEntity, Bitmap> {
+public class LauncherIconModelLoader implements ModelLoader<IconModel, Drawable> {
     private final Context context;
 
     public LauncherIconModelLoader(Context context) {
@@ -23,17 +23,17 @@ public class LauncherIconModelLoader implements ModelLoader<IconEntity, Bitmap> 
 
     @Nullable
     @Override
-    public LoadData<Bitmap> buildLoadData(@NonNull IconEntity iconEntity, int width, int height,
-                                          @NonNull Options options) {
-        return new LoadData<>(new GlideUrl(iconEntity.getKey()), new LauncherIconDataFetcher(context, iconEntity));
+    public LoadData<Drawable> buildLoadData(@NonNull IconModel iconModel, int width, int height,
+                                            @NonNull Options options) {
+        return new LoadData<>(new GlideUrl(iconModel.getKey()), new LauncherIconDataFetcher(context, iconModel));
     }
 
     @Override
-    public boolean handles(@NonNull IconEntity iconEntity) {
+    public boolean handles(@NonNull IconModel iconModel) {
         return true;
     }
 
-    public static class Factory implements ModelLoaderFactory<IconEntity, Bitmap> {
+    public static class Factory implements ModelLoaderFactory<IconModel, Drawable> {
         private final Context context;
 
         public Factory(Context context) {
@@ -42,7 +42,7 @@ public class LauncherIconModelLoader implements ModelLoader<IconEntity, Bitmap> 
 
         @NonNull
         @Override
-        public ModelLoader<IconEntity, Bitmap> build(@NonNull MultiModelLoaderFactory multiFactory) {
+        public ModelLoader<IconModel, Drawable> build(@NonNull MultiModelLoaderFactory multiFactory) {
             return new LauncherIconModelLoader(context);
         }
 
