@@ -49,8 +49,6 @@ public class LauncherLayout extends ViewGroup {
     private int numRows = GridSize.DEFAULT_NUM_ROW;
     private int borderHorizontalPaddingPx;
     private int borderVerticalPaddingPx;
-    private int gridHorizontalPaddingPx;
-    private int gridVerticalPaddingPx;
     private boolean showGrid = false;
     private boolean isEditMode = false;
     private Map<Coordinate, IconModel> iconMap = new ConcurrentHashMap<>();
@@ -95,14 +93,8 @@ public class LauncherLayout extends ViewGroup {
                           int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         // Get sizes
-        borderHorizontalPaddingPx = UnitUtils.dpToPx(context,
-                context.getResources().getDimensionPixelSize(R.dimen.launcher_layout_horizontal_padding));
-        borderVerticalPaddingPx = UnitUtils.dpToPx(context,
-                context.getResources().getDimensionPixelSize(R.dimen.launcher_layout_vertical_padding));
-        gridHorizontalPaddingPx = UnitUtils.dpToPx(context,
-                context.getResources().getDimensionPixelSize(R.dimen.grid_horizontal_padding));
-        gridVerticalPaddingPx = UnitUtils.dpToPx(context,
-                context.getResources().getDimensionPixelSize(R.dimen.grid_vertical_padding));
+        borderHorizontalPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.launcher_layout_horizontal_padding);
+        borderVerticalPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.launcher_layout_vertical_padding);
         // Initialize painters
         gridPaint = new Paint();
         gridPaint.setColor(Color.LTGRAY);
@@ -388,37 +380,6 @@ public class LauncherLayout extends ViewGroup {
         }
     }
 
-    public void setGridPadding(int gridHorizontalPaddingDp, int gridVerticalPaddingDp) {
-        if (gridHorizontalPaddingDp >= 0 && gridVerticalPaddingDp >= 0) {
-            this.gridHorizontalPaddingPx = UnitUtils.dpToPx(getContext(), gridHorizontalPaddingDp);
-            this.gridVerticalPaddingPx = UnitUtils.dpToPx(getContext(), gridVerticalPaddingDp);
-            requestLayout();
-            invalidate();
-        } else {
-            throw new IllegalArgumentException("Grid padding cannot be less than 0.");
-        }
-    }
-
-    public void setGridHorizontalPadding(int gridHorizontalPaddingDp) {
-        if (gridHorizontalPaddingDp >= 0) {
-            this.gridHorizontalPaddingPx = UnitUtils.dpToPx(getContext(), gridHorizontalPaddingDp);
-            requestLayout();
-            invalidate();
-        } else {
-            throw new IllegalArgumentException("Grid horizontal padding cannot be less than 0.");
-        }
-    }
-
-    public void setGridVerticalPadding(int gridVerticalPaddingDp) {
-        if (gridVerticalPaddingDp >= 0) {
-            this.gridVerticalPaddingPx = UnitUtils.dpToPx(getContext(), gridVerticalPaddingDp);
-            requestLayout();
-            invalidate();
-        } else {
-            throw new IllegalArgumentException("Grid vertical padding cannot be less than 0.");
-        }
-    }
-
     public void setBorderPadding(int borderHorizontalPaddingDp, int borderVerticalPaddingDp) {
         if (borderHorizontalPaddingDp >= 0 && borderVerticalPaddingDp >= 0) {
             this.borderHorizontalPaddingPx = UnitUtils.dpToPx(getContext(), borderHorizontalPaddingDp);
@@ -472,8 +433,6 @@ public class LauncherLayout extends ViewGroup {
                 iconMap.put(coordinate, iconModel);
                 IconView iconView = new IconView(getContext());
                 iconView.setActivityModel(iconModel.getActivityModel());
-                iconView.setPadding(gridHorizontalPaddingPx, gridVerticalPaddingPx,
-                        gridHorizontalPaddingPx, gridVerticalPaddingPx);
                 iconView.setOnClickListener(v -> {
                     onIconClickListener.onClick(v, iconModel);
                 });

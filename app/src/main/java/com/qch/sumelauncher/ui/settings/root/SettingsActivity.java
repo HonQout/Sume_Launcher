@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.settings.ui;
+package com.qch.sumelauncher.ui.settings.root;
 
 import android.os.Bundle;
 import android.util.Log;

@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.settings.viewmodel;
+package com.qch.sumelauncher.ui.settings.permission;
 
 import android.app.Activity;
 import android.app.Application;
@@ -15,7 +15,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.data.model.permission.PermissionBean;
+import com.qch.sumelauncher.data.model.permission.PermissionModel;
 import com.qch.sumelauncher.data.model.permission.SortedPermissions;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
@@ -37,7 +37,7 @@ public class PermissionViewModel extends AndroidViewModel {
     // data
     private final MutableLiveData<Boolean> mAnimation = new MutableLiveData<>();
     private final MutableLiveData<PackageInfo> mPackageInfo = new MutableLiveData<>();
-    private final MutableLiveData<List<PermissionBean>> mRequestedPermissionBeanList = new MutableLiveData<>();
+    private final MutableLiveData<List<PermissionModel>> mRequestedPermissionModelList = new MutableLiveData<>();
     // multi-thread
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     // persistence
@@ -73,19 +73,19 @@ public class PermissionViewModel extends AndroidViewModel {
             PackageInfo packageInfo = ApplicationUtils.getPackageInfo(context, context.getPackageName());
             mPackageInfo.postValue(packageInfo);
             SortedPermissions sortedPermissions = PackageUtils.getPermissionSorted(context, context.getPackageName());
-            List<PermissionBean> requestedPermissionBeanList = new ArrayList<>();
+            List<PermissionModel> requestedPermissionModelList = new ArrayList<>();
             for (PermissionInfo permissionInfo : sortedPermissions.permissionRequestedList) {
-                requestedPermissionBeanList.add(new PermissionBean(context, permissionInfo));
+                requestedPermissionModelList.add(new PermissionModel(context, permissionInfo));
             }
-            sortPermissionBeanList(requestedPermissionBeanList);
-            mRequestedPermissionBeanList.postValue(requestedPermissionBeanList);
+            sortPermissionModelList(requestedPermissionModelList);
+            mRequestedPermissionModelList.postValue(requestedPermissionModelList);
         });
     }
 
-    public void sortPermissionBeanList(List<PermissionBean> permissionBeanList) {
+    public void sortPermissionModelList(List<PermissionModel> permissionModelList) {
         Collator collator = Collator.getInstance(Locale.getDefault());
-        if (permissionBeanList != null) {
-            Collections.sort(permissionBeanList, (o1, o2) -> {
+        if (permissionModelList != null) {
+            Collections.sort(permissionModelList, (o1, o2) -> {
                 String name1 = o1.getName();
                 String name2 = o2.getName();
                 return collator.compare(name1, name2);
@@ -93,10 +93,10 @@ public class PermissionViewModel extends AndroidViewModel {
         }
     }
 
-    public void showPermissionDetailDialog(@NonNull Activity activity, PermissionBean permissionBean) {
+    public void showPermissionDetailDialog(@NonNull Activity activity, PermissionModel permissionModel) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-                .setTitle(permissionBean.getLabel())
-                .setMessage(permissionBean.getDescription())
+                .setTitle(permissionModel.getLabel())
+                .setMessage(permissionModel.getDescription())
                 .setPositiveButton(R.string.confirm, (dialog, which) -> dialog.dismiss());
         DialogUtils.show(builder, getAnimationValue());
     }
@@ -105,7 +105,7 @@ public class PermissionViewModel extends AndroidViewModel {
         return mAnimation.getValue() == null || mAnimation.getValue();
     }
 
-    public LiveData<List<PermissionBean>> getRequestedPermissionBeanList() {
-        return mRequestedPermissionBeanList;
+    public LiveData<List<PermissionModel>> getRequestedPermissionModelList() {
+        return mRequestedPermissionModelList;
     }
 }

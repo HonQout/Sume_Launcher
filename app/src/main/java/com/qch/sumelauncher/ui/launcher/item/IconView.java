@@ -24,6 +24,8 @@ public class IconView extends AppCompatTextView {
     private final int spaceHeightPx;
     private final int labelWidthPx;
     private final int labelSizePx;
+    private final int horizontalPaddingPx;
+    private final int verticalPaddingPx;
     private ActivityModel activityModel;
     private boolean isContentLoaded = false;
 
@@ -37,10 +39,12 @@ public class IconView extends AppCompatTextView {
 
     public IconView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        iconSizePx = Math.round(context.getResources().getDimension(R.dimen.app_icon_size));
-        spaceHeightPx = Math.round(context.getResources().getDimension(R.dimen.app_icon_padding));
-        labelWidthPx = Math.round(context.getResources().getDimension(R.dimen.app_label_width));
-        labelSizePx = Math.round(context.getResources().getDimension(R.dimen.app_label_size));
+        iconSizePx = context.getResources().getDimensionPixelSize(R.dimen.app_icon_size);
+        spaceHeightPx = context.getResources().getDimensionPixelSize(R.dimen.icon_view_space);
+        labelWidthPx = context.getResources().getDimensionPixelSize(R.dimen.app_label_width);
+        labelSizePx = context.getResources().getDimensionPixelSize(R.dimen.app_label_size);
+        horizontalPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.icon_view_horizontal_padding);
+        verticalPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.icon_view_vertical_padding);
         initView();
         // Set a placeholder
         Drawable defaultIcon = context.getPackageManager().getDefaultActivityIcon();
@@ -93,6 +97,8 @@ public class IconView extends AppCompatTextView {
         setGravity(Gravity.CENTER_HORIZONTAL);
         setMaxLines(1);
         setCompoundDrawablePadding(spaceHeightPx);
+        setPadding(horizontalPaddingPx, verticalPaddingPx,
+                horizontalPaddingPx, verticalPaddingPx);
     }
 
     public void loadContent() {

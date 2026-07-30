@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 
-public class PermissionBean {
+public class PermissionModel {
     private final String name;
     private final String label;
     private final String description;
 
-    public PermissionBean(Context context, PermissionInfo permissionInfo) {
+    public PermissionModel(Context context, PermissionInfo permissionInfo) {
         this.name = permissionInfo.name;
         PackageManager pm = context.getPackageManager();
         this.label = permissionInfo.loadLabel(pm).toString();

@@ -66,7 +66,7 @@ public abstract class LauncherItemDatabase extends RoomDatabase {
                                                               @NonNull LayoutEntity layoutEntity) {
         List<IconEntity> iconEntityList = new ArrayList<>();
         List<ActivityModel> activityModelList
-                = ApplicationUtils.getActivityBeanList(context, null);
+                = ApplicationUtils.getActivityModelList(context, null);
         String layoutName = layoutEntity.getName();
         int numColumn = layoutEntity.getNumColumns();
         int numRow = layoutEntity.getNumRows();

@@ -17,7 +17,7 @@
             app:title="@string/display_top_bar" />
 
         <Preference
-            app:fragment="com.qch.sumelauncher.settings.ui.TopBarIconFragment"
+            app:fragment="com.qch.sumelauncher.ui.settings.topbar.TopBarIconFragment"
             app:iconSpaceReserved="false"
             app:key="top_bar_icon"
             app:title="@string/top_bar_icon" />
@@ -63,7 +63,7 @@
         app:title="@string/header_privacy">
 
         <Preference
-            app:fragment="com.qch.sumelauncher.settings.ui.PermissionFragment"
+            app:fragment="com.qch.sumelauncher.ui.settings.permission.PermissionFragment"
             app:iconSpaceReserved="false"
             app:key="permission"
             app:title="@string/permission" />

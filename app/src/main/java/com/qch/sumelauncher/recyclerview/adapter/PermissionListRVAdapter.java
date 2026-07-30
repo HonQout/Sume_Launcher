@@ -10,26 +10,26 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.qch.sumelauncher.R;
-import com.qch.sumelauncher.data.model.permission.PermissionBean;
+import com.qch.sumelauncher.data.model.permission.PermissionModel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class PermissionListRVAdapter extends FilterableListAdapter<PermissionBean, PermissionListRVAdapter.ViewHolder> {
+public class PermissionListRVAdapter extends FilterableListAdapter<PermissionModel, PermissionListRVAdapter.ViewHolder> {
     private static final String TAG = "PermissionListRVAdapter";
 
-    public static final DiffUtil.ItemCallback<PermissionBean> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
+    public static final DiffUtil.ItemCallback<PermissionModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
-        public boolean areItemsTheSame(@NonNull PermissionBean oldItem, @NonNull PermissionBean newItem) {
+        public boolean areItemsTheSame(@NonNull PermissionModel oldItem, @NonNull PermissionModel newItem) {
             boolean isNameTheSame = Objects.equals(oldItem.getName(), newItem.getName());
             boolean isLabelTheSame = Objects.equals(oldItem.getLabel(), newItem.getLabel());
             return isNameTheSame && isLabelTheSame;
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull PermissionBean oldItem, @NonNull PermissionBean newItem) {
+        public boolean areContentsTheSame(@NonNull PermissionModel oldItem, @NonNull PermissionModel newItem) {
             boolean isNameTheSame = Objects.equals(oldItem.getName(), newItem.getName());
             boolean isLabelTheSame = Objects.equals(oldItem.getLabel(), newItem.getLabel());
             return isNameTheSame && isLabelTheSame;
@@ -47,14 +47,14 @@ public class PermissionListRVAdapter extends FilterableListAdapter<PermissionBea
             itemView.setOnClickListener(v -> {
                 int position = getBindingAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
-                    PermissionBean item = getItem(position);
+                    PermissionModel item = getItem(position);
                     onItemClickListener.onItemClick(item, v);
                 }
             });
             itemView.setOnLongClickListener(v -> {
                 int position = getBindingAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
-                    PermissionBean item = getItem(position);
+                    PermissionModel item = getItem(position);
                     return onItemClickListener.onItemLongClick(item, v);
                 }
                 return false;
@@ -70,8 +70,8 @@ public class PermissionListRVAdapter extends FilterableListAdapter<PermissionBea
         }
     }
 
-    public PermissionListRVAdapter(List<PermissionBean> permissionBeanList) {
-        super(DIFF_CALLBACK, permissionBeanList);
+    public PermissionListRVAdapter(List<PermissionModel> permissionModelList) {
+        super(DIFF_CALLBACK, permissionModelList);
     }
 
     @NonNull
@@ -83,17 +83,17 @@ public class PermissionListRVAdapter extends FilterableListAdapter<PermissionBea
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        PermissionBean permissionBean = getItem(position);
-        holder.getTitle().setText(permissionBean.getName());
-        holder.getContent().setText(permissionBean.getLabel());
+        PermissionModel permissionModel = getItem(position);
+        holder.getTitle().setText(permissionModel.getName());
+        holder.getContent().setText(permissionModel.getLabel());
     }
 
     @NonNull
     @Override
-    protected List<PermissionBean> performFiltering(List<PermissionBean> list, CharSequence constraint) {
-        List<PermissionBean> resultList = new ArrayList<>();
+    protected List<PermissionModel> performFiltering(List<PermissionModel> list, CharSequence constraint) {
+        List<PermissionModel> resultList = new ArrayList<>();
         CharSequence cs = constraint.toString().toLowerCase(Locale.ROOT);
-        for (PermissionBean item : list) {
+        for (PermissionModel item : list) {
             boolean isNameMatch = item.getName().toLowerCase(Locale.ROOT).contains(cs);
             boolean isLabelMatch = item.getLabel().toLowerCase(Locale.ROOT).contains(cs);
             if (isNameMatch || isLabelMatch) {

@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.settings.ui;
+package com.qch.sumelauncher.ui.settings.topbar;
 
 import android.os.Bundle;
 

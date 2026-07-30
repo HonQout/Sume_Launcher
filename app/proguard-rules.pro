@@ -19,6 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
--keep class com.qch.sumelauncher.settings.ui.** extends androidx.fragment.app.Fragment {
+-keep class com.qch.sumelauncher.ui.** extends androidx.fragment.app.Fragment {
     public <init>();
 }
