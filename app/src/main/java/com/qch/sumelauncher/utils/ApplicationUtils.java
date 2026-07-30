@@ -297,8 +297,8 @@ public class ApplicationUtils {
         return null;
     }
 
-    private static List<ActivityModel> getActivityBeanList(Context context,
-                                                           List<ResolveInfo> intentActivityList) {
+    private static List<ActivityModel> getActivityModelList(Context context,
+                                                            List<ResolveInfo> intentActivityList) {
         List<ActivityModel> list = new ArrayList<>();
         for (ResolveInfo resolveInfo : intentActivityList) {
             if (resolveInfo == null || resolveInfo.activityInfo == null) {
@@ -312,12 +312,12 @@ public class ApplicationUtils {
     /**
      * Get a list of ActivityModel of all launchable activity of certain application(s).
      *
-     * @param packageName Specify which package should these ActivityBeans belong to. Passing null
-     *                    or empty string ("") to get all ActivityBeans of all installed packages.
+     * @param packageName Specify which package should these ActivityModels belong to. Passing null
+     *                    or empty string ("") to get all ActivityModels of all installed packages.
      */
-    public static List<ActivityModel> getActivityBeanList(@NonNull Context context,
-                                                          @Nullable String packageName) {
+    public static List<ActivityModel> getActivityModelList(@NonNull Context context,
+                                                           @Nullable String packageName) {
         List<ResolveInfo> list = getIntentActivityList(context, packageName);
-        return getActivityBeanList(context, list);
+        return getActivityModelList(context, list);
     }
 }

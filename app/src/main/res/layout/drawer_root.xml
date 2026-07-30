@@ -1,44 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground"
-    tools:context=".ui.drawer.fragment.DrawerFragment">
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/f_drawer_abl"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/f_drawer_mt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:windowBackground"
-            app:navigationIcon="@drawable/baseline_arrow_back_24"
-            app:navigationIconTint="?android:textColorPrimary"
-            app:title="@string/app_drawer"
-            app:titleTextColor="?android:textColorPrimary" />
-
-    </com.google.android.material.appbar.AppBarLayout>
+    android:background="?android:attr/windowBackground">
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/f_drawer_ll"
+        android:id="@+id/drawer_ll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingHorizontal="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/f_drawer_abl">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.SearchView
-            android:id="@+id/f_drawer_sv"
+            android:id="@+id/drawer_sv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -46,7 +24,7 @@
             app:queryHint="@string/search_for_apps" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/f_drawer_btn_quit"
+            android:id="@+id/drawer_btn_quit"
             style="@style/CustomButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,7 +34,7 @@
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/f_drawer_rv"
+        android:id="@+id/drawer_rv"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:paddingHorizontal="20dp"
@@ -64,6 +42,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/f_drawer_ll" />
+        app:layout_constraintTop_toBottomOf="@id/drawer_ll" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

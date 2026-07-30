@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.settings.ui;
+package com.qch.sumelauncher.ui.settings.permission;
 
 import android.os.Bundle;
 
@@ -11,11 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.qch.sumelauncher.data.model.permission.PermissionBean;
+import com.qch.sumelauncher.data.model.permission.PermissionModel;
 import com.qch.sumelauncher.databinding.FragmentPermissionBinding;
 import com.qch.sumelauncher.recyclerview.adapter.FilterableListAdapter;
 import com.qch.sumelauncher.recyclerview.adapter.PermissionListRVAdapter;
-import com.qch.sumelauncher.settings.viewmodel.PermissionViewModel;
 
 import java.util.ArrayList;
 
@@ -42,17 +41,17 @@ public class PermissionFragment extends Fragment {
         PermissionListRVAdapter adapter = new PermissionListRVAdapter(new ArrayList<>());
         adapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
             @Override
-            public void onItemClick(PermissionBean item, View view) {
+            public void onItemClick(PermissionModel item, View view) {
                 viewModel.showPermissionDetailDialog(requireActivity(), item);
             }
 
             @Override
-            public boolean onItemLongClick(PermissionBean item, View view) {
+            public boolean onItemLongClick(PermissionModel item, View view) {
                 return false;
             }
         });
         binding.fPermissionRv.setAdapter(adapter);
-        viewModel.getRequestedPermissionBeanList().observe(getViewLifecycleOwner(), adapter::setList);
+        viewModel.getRequestedPermissionModelList().observe(getViewLifecycleOwner(), adapter::setList);
         return binding.getRoot();
     }
 }

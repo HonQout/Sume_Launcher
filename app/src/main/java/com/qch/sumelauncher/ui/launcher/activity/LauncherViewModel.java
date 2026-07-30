@@ -42,7 +42,7 @@ public class LauncherViewModel extends AndroidViewModel {
     private static final String TAG = "LauncherViewModel";
 
     public enum LauncherState {
-        NORMAL, EDIT, APPS
+        LAUNCHER, APPS
     }
 
     public enum AppListOp {
@@ -53,10 +53,10 @@ public class LauncherViewModel extends AndroidViewModel {
     private LiveData<Integer> numScreen;
     private LiveData<Map<Integer, List<IconEntity>>> iconEntityMap;
     private LiveData<Map<Integer, List<IconModel>>> iconModelMap;
-    private final MutableLiveData<LauncherState> mLauncherState = new MutableLiveData<>(LauncherState.NORMAL);
+    private final MutableLiveData<LauncherState> mLauncherState = new MutableLiveData<>(LauncherState.LAUNCHER);
     private final MutableLiveData<GridSize> mGridSize = new MutableLiveData<>(new GridSize(5, 5));
     private final MutableLiveData<Integer> mCurrentScreenIndex = new MutableLiveData<>();
-    private final MutableLiveData<List<ActivityModel>> mActivityBeanList = new MutableLiveData<>();
+    private final MutableLiveData<List<ActivityModel>> mActivityModelList = new MutableLiveData<>();
 
     // multi-thread
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -101,7 +101,7 @@ public class LauncherViewModel extends AndroidViewModel {
         localeBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                updateActivityBeanList(AppListOp.INIT, null);
+                updateActivityModelList(AppListOp.INIT, null);
             }
         };
 
@@ -150,7 +150,7 @@ public class LauncherViewModel extends AndroidViewModel {
                             if (data != null) {
                                 packageName = data.getSchemeSpecificPart();
                                 if (packageName != null) {
-                                    updateActivityBeanList(AppListOp.ADD, packageName);
+                                    updateActivityModelList(AppListOp.ADD, packageName);
                                 }
                             }
                         }
@@ -167,7 +167,7 @@ public class LauncherViewModel extends AndroidViewModel {
                             if (data != null) {
                                 packageName = data.getSchemeSpecificPart();
                                 if (packageName != null) {
-                                    updateActivityBeanList(AppListOp.REMOVE, packageName);
+                                    updateActivityModelList(AppListOp.REMOVE, packageName);
                                 }
                             }
                         }
@@ -180,7 +180,7 @@ public class LauncherViewModel extends AndroidViewModel {
                         if (data != null) {
                             packageName = data.getSchemeSpecificPart();
                             if (packageName != null) {
-                                updateActivityBeanList(AppListOp.REPLACE, packageName);
+                                updateActivityModelList(AppListOp.REPLACE, packageName);
                             }
                         }
                         break;
@@ -217,14 +217,14 @@ public class LauncherViewModel extends AndroidViewModel {
                 .subscribe(string -> {
                             GridSize gridSize = GridSize.parse(string, new GridSize(5, 5));
                             mGridSize.postValue(gridSize);
-                            updateActivityBeanList(AppListOp.INIT, null);
+                            updateActivityModelList(AppListOp.INIT, null);
                         },
                         throwable -> Log.e(TAG, "Cannot get value of key grid_size.", throwable)
                 );
         compositeDisposable.add(disposable);
     }
 
-    private void sortActivityBeanList(List<ActivityModel> list) {
+    private void sortActivityModelList(List<ActivityModel> list) {
         Collator collator = Collator.getInstance();
         if (list != null) {
             Collections.sort(list, (o1, o2) -> {
@@ -235,33 +235,33 @@ public class LauncherViewModel extends AndroidViewModel {
         }
     }
 
-    private void updateActivityBeanList(AppListOp op, @Nullable String packageName) {
+    private void updateActivityModelList(AppListOp op, @Nullable String packageName) {
         executorService.execute(() -> {
             List<ActivityModel> list;
-            if (mActivityBeanList.getValue() == null || op == AppListOp.INIT) {
+            if (mActivityModelList.getValue() == null || op == AppListOp.INIT) {
                 // initialize
-                list = new ArrayList<>(ApplicationUtils.getActivityBeanList(getApplication(), null));
-                sortActivityBeanList(list);
+                list = new ArrayList<>(ApplicationUtils.getActivityModelList(getApplication(), null));
+                sortActivityModelList(list);
             } else {
-                list = new ArrayList<>(mActivityBeanList.getValue());
+                list = new ArrayList<>(mActivityModelList.getValue());
             }
             if (packageName != null) {
-                // Update ActivityBeanList
+                // Update ActivityModelList
                 if (op == AppListOp.REMOVE || op == AppListOp.REPLACE) {
                     try {
                         CollectionCompat.removeIf(list,
                                 item -> Objects.equals(packageName, item.getPackageName()));
                     } catch (Exception e) {
-                        Log.e(TAG, "Cannot remove activity beans of " + packageName);
+                        Log.e(TAG, "Cannot remove activity models of " + packageName);
                     }
                 }
                 if (op == AppListOp.ADD || op == AppListOp.REPLACE) {
                     try {
-                        list.addAll(ApplicationUtils.getActivityBeanList(getApplication(), packageName));
+                        list.addAll(ApplicationUtils.getActivityModelList(getApplication(), packageName));
                     } catch (Exception e) {
-                        Log.e(TAG, "Cannot add activity beans of " + packageName);
+                        Log.e(TAG, "Cannot add activity models of " + packageName);
                     }
-                    sortActivityBeanList(list);
+                    sortActivityModelList(list);
                 }
                 // Update Database
                 if (op == AppListOp.REMOVE) {
@@ -276,7 +276,7 @@ public class LauncherViewModel extends AndroidViewModel {
             if (isUpdatingList.compareAndSet(false, true)) {
                 try {
                     synchronized (updateListLock) {
-                        mActivityBeanList.postValue(list);
+                        mActivityModelList.postValue(list);
                     }
                 } finally {
                     isUpdatingList.set(false);
@@ -291,6 +291,10 @@ public class LauncherViewModel extends AndroidViewModel {
 
     public LiveData<LauncherState> getLauncherState() {
         return mLauncherState;
+    }
+
+    public LauncherState getLauncherStateValue() {
+        return mLauncherState.getValue() == null ? LauncherState.LAUNCHER : mLauncherState.getValue();
     }
 
     public LiveData<GridSize> getGridSize() {
@@ -312,7 +316,6 @@ public class LauncherViewModel extends AndroidViewModel {
     }
 
     public void setCurrentScreenIndex(int newValue) {
-        Log.i(TAG, "Current screen index set to " + newValue);
         mCurrentScreenIndex.postValue(newValue);
     }
 
@@ -324,8 +327,8 @@ public class LauncherViewModel extends AndroidViewModel {
         return mCurrentScreenIndex.getValue() == null ? 0 : mCurrentScreenIndex.getValue();
     }
 
-    public LiveData<List<ActivityModel>> getActivityBeanList() {
-        return mActivityBeanList;
+    public LiveData<List<ActivityModel>> getActivityModelList() {
+        return mActivityModelList;
     }
 
     public LiveData<Map<Integer, List<IconEntity>>> getIconEntityMap() {
