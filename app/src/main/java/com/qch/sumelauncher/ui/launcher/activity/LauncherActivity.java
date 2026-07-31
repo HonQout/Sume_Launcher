@@ -25,9 +25,9 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -43,18 +43,18 @@ import com.qch.sumelauncher.ui.launcher.page.LauncherLayout;
 import com.qch.sumelauncher.ui.launcher.page.LauncherPageAdapter;
 import com.qch.sumelauncher.ui.settings.root.SettingsActivity;
 import com.qch.sumelauncher.ui.settings.root.SettingsViewModel;
-import com.qch.sumelauncher.ui.topbar.view.TopBarView;
-import com.qch.sumelauncher.ui.topbar.viewmodel.RingerModeViewModel;
+import com.qch.sumelauncher.ui.topbar.TopBarView;
+import com.qch.sumelauncher.ui.topbar.RingerModeViewModel;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
 import com.qch.sumelauncher.utils.PermissionUtils;
 import com.qch.sumelauncher.utils.UIUtils;
-import com.qch.sumelauncher.ui.topbar.viewmodel.AirplaneModeViewModel;
-import com.qch.sumelauncher.ui.topbar.viewmodel.BatteryViewModel;
-import com.qch.sumelauncher.ui.topbar.viewmodel.BluetoothViewModel;
-import com.qch.sumelauncher.ui.topbar.viewmodel.TimeViewModel;
-import com.qch.sumelauncher.ui.topbar.viewmodel.WifiViewModel;
+import com.qch.sumelauncher.ui.topbar.AirplaneModeViewModel;
+import com.qch.sumelauncher.ui.topbar.BatteryViewModel;
+import com.qch.sumelauncher.ui.topbar.BluetoothViewModel;
+import com.qch.sumelauncher.ui.topbar.TimeViewModel;
+import com.qch.sumelauncher.ui.topbar.WifiViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +96,8 @@ public class LauncherActivity extends AppCompatActivity {
                 UIUtils.forceHandleStatusBarVisibility(getWindow(), b == null || b));
         settingsViewModel.getDisplayTopBar().observe(this, displayTopBar ->
                 binding.aLauncherTopBar.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
+        settingsViewModel.getDisplayDate().observe(this, shouldDisplay ->
+                binding.aLauncherTopBar.setDateTextVisibility(shouldDisplay));
         settingsViewModel.getDisplayRingerMode().observe(this, shouldDisplay -> {
             if (shouldDisplay) {
                 ringerModeViewModel.restoreIconState();

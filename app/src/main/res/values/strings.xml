@@ -74,6 +74,8 @@
     <string name="version">Version</string>
     <string name="view_github_page">View GitHub page</string>
     <string name="github_address" translatable="false">https://github.com/HonQout/Sume_Launcher</string>
+    <string name="date_and_time">Date and time</string>
+    <string name="date">Date</string>
     <string name="audio">Audio</string>
     <string name="ringer_mode">Ringer mode</string>
     <string name="connectivity">Connectivity</string>

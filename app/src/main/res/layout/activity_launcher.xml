@@ -7,7 +7,7 @@
     android:background="?android:windowBackground"
     tools:context=".ui.launcher.activity.LauncherActivity">
 
-    <com.qch.sumelauncher.ui.topbar.view.TopBarView
+    <com.qch.sumelauncher.ui.topbar.TopBarView
         android:id="@+id/a_launcher_top_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.ui.topbar.view;
+package com.qch.sumelauncher.ui.topbar;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -118,6 +118,15 @@ public class TopBarView extends LinearLayoutCompat {
             return;
         }
         textView.setText(dateText);
+    }
+
+    public void setDateTextVisibility(boolean visible) {
+        AppCompatTextView textView = binding.topBarLeftPart.findViewById(R.id.top_bar_tv_date);
+        if (textView == null) {
+            Log.e(TAG, "Cannot find TextView of date.");
+            return;
+        }
+        textView.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     /**
