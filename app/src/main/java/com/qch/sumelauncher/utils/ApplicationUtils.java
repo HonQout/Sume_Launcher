@@ -110,6 +110,12 @@ public class ApplicationUtils {
         return null;
     }
 
+    @Nullable
+    public static String getVersionName(Context context, String packageName) {
+        PackageInfo packageInfo = getPackageInfo(context, packageName);
+        return packageInfo == null ? null : packageInfo.versionName;
+    }
+
     public static ApplicationType getApplicationType(@NonNull Context context, String packageName) {
         ApplicationInfo applicationInfo = getApplicationInfo(context, packageName);
         if (applicationInfo != null) {

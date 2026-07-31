@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -37,7 +38,7 @@ import com.qch.sumelauncher.data.model.launcher.IconModel;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
 import com.qch.sumelauncher.recyclerview.adapter.FilterableListAdapter;
 import com.qch.sumelauncher.recyclerview.adapter.GridDrawerRVAdapter;
-import com.qch.sumelauncher.recyclerview.decoration.GridDecoration;
+import com.qch.sumelauncher.recyclerview.decoration.VerticalGridDecoration;
 import com.qch.sumelauncher.ui.launcher.page.LauncherLayout;
 import com.qch.sumelauncher.ui.launcher.page.LauncherPageAdapter;
 import com.qch.sumelauncher.ui.settings.root.SettingsActivity;
@@ -92,7 +93,7 @@ public class LauncherActivity extends AppCompatActivity {
         batteryViewModel = viewModelProvider.get(BatteryViewModel.class);
         // Observe
         settingsViewModel.getDisplayStatusBar().observe(this, b ->
-                UIUtils.handleStatusBarVisibility(getWindow(), b == null || b));
+                UIUtils.forceHandleStatusBarVisibility(getWindow(), b == null || b));
         settingsViewModel.getDisplayTopBar().observe(this, displayTopBar ->
                 binding.aLauncherTopBar.setVisibility(displayTopBar ? View.VISIBLE : View.GONE));
         settingsViewModel.getDisplayRingerMode().observe(this, shouldDisplay -> {
@@ -287,7 +288,7 @@ public class LauncherActivity extends AppCompatActivity {
         launcherViewModel.getLauncherState().observe(this, launcherState -> {
             if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
                 if (launcherState == LauncherViewModel.LauncherState.LAUNCHER) {
-                    Log.i(TAG, "Launcher state is NORMAL. ");
+                    Log.i(TAG, "Launcher state is LAUNCHER. ");
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 } else if (launcherState == LauncherViewModel.LauncherState.APPS) {
                     Log.i(TAG, "Launcher state is APPS. ");
@@ -399,10 +400,11 @@ public class LauncherActivity extends AppCompatActivity {
                 return true;
             }
         });
-        GridDecoration gridDecoration = new GridDecoration(getResources().getInteger(R.integer.grid_column_count), 0);
+        VerticalGridDecoration verticalGridDecoration = new VerticalGridDecoration(
+                getResources().getInteger(R.integer.grid_column_count), 0, 0);
         binding.aLauncherDrawer.drawerRv.setLayoutManager(gridLayoutManager);
         binding.aLauncherDrawer.drawerRv.setAdapter(gridDrawerRVAdapter);
-        binding.aLauncherDrawer.drawerRv.addItemDecoration(gridDecoration);
+        binding.aLauncherDrawer.drawerRv.addItemDecoration(verticalGridDecoration);
         binding.aLauncherDrawer.drawerSv.setOnQueryTextFocusChangeListener((v, hasFocus) ->
                 binding.aLauncherDrawer.drawerBtnQuit.setVisibility(View.VISIBLE));
         binding.aLauncherDrawer.drawerSv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -450,8 +452,11 @@ public class LauncherActivity extends AppCompatActivity {
             case KeyEvent.KEYCODE_VOLUME_UP: {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     if (settingsViewModel.getVolumeKeySwitchPageValue()) {
-                        launcherPageUp();
-                        return true;
+                        LauncherViewModel.LauncherState launcherState = launcherViewModel.getLauncherStateValue();
+                        if (launcherState == LauncherViewModel.LauncherState.LAUNCHER) {
+                            launcherPageUp();
+                            return true;
+                        }
                     }
                 }
                 break;
@@ -459,8 +464,11 @@ public class LauncherActivity extends AppCompatActivity {
             case KeyEvent.KEYCODE_VOLUME_DOWN: {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     if (settingsViewModel.getVolumeKeySwitchPageValue()) {
-                        launcherPageDown();
-                        return true;
+                        LauncherViewModel.LauncherState launcherState = launcherViewModel.getLauncherStateValue();
+                        if (launcherState == LauncherViewModel.LauncherState.LAUNCHER) {
+                            launcherPageDown();
+                            return true;
+                        }
                     }
                 }
                 break;
@@ -540,7 +548,6 @@ public class LauncherActivity extends AppCompatActivity {
         popupMenu.setOnMenuItemClickListener(menuItem -> {
             int menuId = menuItem.getItemId();
             if (menuId == R.id.remove_icon) {
-                binding.aLauncherRoot.launcherVp2.getAdapter();
                 launcherViewModel.removeIcon(iconModel.toIconEntity());
                 return true;
             } else if (menuId == R.id.uninstall) {

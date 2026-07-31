@@ -16,7 +16,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.persistence.PreferenceDataStoreBridge;
-import com.qch.sumelauncher.utils.ConfigUtils;
+import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
 
 import java.util.Objects;
@@ -41,8 +41,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         // Set versionName
         Preference versionPref = findPreference("version");
         if (versionPref != null) {
-            String versionName = ConfigUtils.getVersionName(requireContext());
-            versionPref.setSummary(versionName);
+            String versionName = ApplicationUtils.getVersionName(requireContext(),
+                    requireContext().getPackageName());
+            versionPref.setSummary(versionName == null ? "" : versionName);
         }
     }
 

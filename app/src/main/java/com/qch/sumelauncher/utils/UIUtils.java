@@ -2,8 +2,10 @@ package com.qch.sumelauncher.utils;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.core.graphics.Insets;
@@ -34,7 +36,7 @@ public class UIUtils {
         }
     }
 
-    private static void handleNavigationBarVisibility(@NonNull Window window, boolean visible) {
+    public static void handleNavigationBarVisibility(@NonNull Window window, boolean visible) {
         WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(window, window.getDecorView());
         if (visible) {
             controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_DEFAULT);
@@ -42,6 +44,32 @@ public class UIUtils {
         } else {
             controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             controller.hide(WindowInsetsCompat.Type.navigationBars());
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public static void handleSystemBarVisibility(@NonNull Window window, boolean visible) {
+        if (!visible) {
+            window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+    }
+
+    public static void forceHandleStatusBarVisibility(@NonNull Window window, boolean visible) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            handleStatusBarVisibility(window, visible);
+        } else {
+            handleSystemBarVisibility(window, visible);
+        }
+    }
+
+    public static void forceHandleNavigationBarVisibility(@NonNull Window window, boolean visible) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            handleNavigationBarVisibility(window, visible);
+        } else {
+            handleSystemBarVisibility(window, visible);
         }
     }
 

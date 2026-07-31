@@ -159,7 +159,7 @@ public class TopBarView extends LinearLayoutCompat {
                         context.getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size),
                         context.getResources().getDimensionPixelSize(R.dimen.top_bar_icon_size)
                 );
-                layoutParams.setMargins(2, 2, 2, 2);
+                layoutParams.setMargins(4, 0, 4, 0);
                 imageView.setLayoutParams(layoutParams);
 
                 addChildViewInternal(container, imageView, viewTag);
