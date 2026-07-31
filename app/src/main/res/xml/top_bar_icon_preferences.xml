@@ -3,6 +3,19 @@
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
+        app:title="@string/date_and_time">
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:icon="@drawable/baseline_calendar_month_24"
+            app:iconSpaceReserved="true"
+            app:key="date"
+            app:title="@string/date" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
         app:title="@string/audio">
 
         <SwitchPreferenceCompat

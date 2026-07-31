@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.ui.topbar.viewmodel;
+package com.qch.sumelauncher.ui.topbar;
 
 import android.app.Application;
 import android.bluetooth.BluetoothAdapter;

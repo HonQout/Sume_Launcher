@@ -22,6 +22,7 @@ public class SettingsViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> mScrollToSwitchPage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mVolumeKeySwitchPage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mAskForPermFineLocation = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mDisplayDate = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayRingerMode = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayAirplaneMode = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayWlan = new MutableLiveData<>();
@@ -92,40 +93,47 @@ public class SettingsViewModel extends AndroidViewModel {
                 );
         compositeDisposable.add(disposable6);
         Disposable disposable7 = MyApplication.getPreferenceDataStore()
+                .getBooleanFlowable("date", true)
+                .subscribe(
+                        mDisplayDate::postValue,
+                        throwable -> Log.e(TAG, "Cannot get value of key date.", throwable)
+                );
+        compositeDisposable.add(disposable7);
+        Disposable disposable8 = MyApplication.getPreferenceDataStore()
                 .getBooleanFlowable("ringer_mode", true)
                 .subscribe(
                         mDisplayRingerMode::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key ringer_mode.", throwable)
                 );
-        compositeDisposable.add(disposable7);
-        Disposable disposable8 = MyApplication.getPreferenceDataStore()
+        compositeDisposable.add(disposable8);
+        Disposable disposable9 = MyApplication.getPreferenceDataStore()
                 .getBooleanFlowable("airplane_mode", true)
                 .subscribe(
                         mDisplayAirplaneMode::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key airplane_mode.", throwable)
                 );
-        compositeDisposable.add(disposable8);
-        Disposable disposable9 = MyApplication.getPreferenceDataStore()
+        compositeDisposable.add(disposable9);
+        Disposable disposable10 = MyApplication.getPreferenceDataStore()
                 .getBooleanFlowable("wlan", true)
                 .subscribe(
                         mDisplayWlan::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key wlan.", throwable)
                 );
-        compositeDisposable.add(disposable9);
-        Disposable disposable10 = MyApplication.getPreferenceDataStore()
+        compositeDisposable.add(disposable10);
+        Disposable disposable11 = MyApplication.getPreferenceDataStore()
                 .getBooleanFlowable("bluetooth", true)
                 .subscribe(
                         mDisplayBluetooth::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key bluetooth.", throwable)
                 );
-        compositeDisposable.add(disposable10);
-        Disposable disposable11 = MyApplication.getPreferenceDataStore()
+        compositeDisposable.add(disposable11);
+        Disposable disposable12 = MyApplication.getPreferenceDataStore()
                 .getBooleanFlowable("battery_percentage", true)
                 .subscribe(
                         mDisplayBatteryPct::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key battery_percentage.", throwable)
                 );
-        compositeDisposable.add(disposable11);
+        compositeDisposable.add(disposable12);
     }
 
     public LiveData<Boolean> getDisplayStatusBar() {
@@ -150,6 +158,14 @@ public class SettingsViewModel extends AndroidViewModel {
 
     public boolean getAskForPermFineLocationValue() {
         return mAskForPermFineLocation.getValue() == null || mAskForPermFineLocation.getValue();
+    }
+
+    public LiveData<Boolean> getDisplayDate() {
+        return mDisplayDate;
+    }
+
+    public boolean getDisplayDateValue() {
+        return mDisplayDate.getValue() == null || mDisplayDate.getValue();
     }
 
     public LiveData<Boolean> getDisplayRingerMode() {

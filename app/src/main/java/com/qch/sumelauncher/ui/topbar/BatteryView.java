@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.ui.topbar.view;
+package com.qch.sumelauncher.ui.topbar;
 
 import android.content.Context;
 import android.graphics.Canvas;
