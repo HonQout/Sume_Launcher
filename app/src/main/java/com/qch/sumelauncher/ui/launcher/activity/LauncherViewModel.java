@@ -54,7 +54,8 @@ public class LauncherViewModel extends AndroidViewModel {
     private LiveData<Map<Integer, List<IconEntity>>> iconEntityMap;
     private LiveData<Map<Integer, List<IconModel>>> iconModelMap;
     private final MutableLiveData<LauncherState> mLauncherState = new MutableLiveData<>(LauncherState.LAUNCHER);
-    private final MutableLiveData<GridSize> mGridSize = new MutableLiveData<>(new GridSize(5, 5));
+    private final MutableLiveData<GridSize> mGridSize
+            = new MutableLiveData<>(new GridSize(GridSize.DEFAULT_NUM_ROW, GridSize.DEFAULT_NUM_COLUMN));
     private final MutableLiveData<Integer> mCurrentScreenIndex = new MutableLiveData<>();
     private final MutableLiveData<List<ActivityModel>> mActivityModelList = new MutableLiveData<>();
 
@@ -215,7 +216,8 @@ public class LauncherViewModel extends AndroidViewModel {
         Disposable disposable = MyApplication.getPreferenceDataStore()
                 .getStringFlowable("grid_size", "5,5")
                 .subscribe(string -> {
-                            GridSize gridSize = GridSize.parse(string, new GridSize(5, 5));
+                            GridSize gridSize = GridSize.parse(string,
+                                    new GridSize(GridSize.DEFAULT_NUM_ROW, GridSize.DEFAULT_NUM_COLUMN));
                             mGridSize.postValue(gridSize);
                             updateActivityModelList(AppListOp.INIT, null);
                         },

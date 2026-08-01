@@ -361,17 +361,14 @@ public class LauncherActivity extends AppCompatActivity {
         settingsViewModel.getScrollToSwitchPage().observe(this, scrollToSwitchPage ->
                 binding.aLauncherRoot.launcherVp2.setUserInputEnabled(scrollToSwitchPage));
         // Set button callback
+        // Apps button
+        binding.aLauncherRoot.launcherBtnApps.setOnClickListener(v ->
+                launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.APPS));
         // Settings button
         binding.aLauncherRoot.launcherBtnSettings.setOnClickListener(v -> {
             Intent intent = new Intent(LauncherActivity.this, SettingsActivity.class);
             startActivity(intent);
         });
-        // Edit button
-        binding.aLauncherRoot.launcherBtnEdit.setOnClickListener(v -> {
-        });
-        // Apps button
-        binding.aLauncherRoot.launcherBtnApps.setOnClickListener(v ->
-                launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.APPS));
         // Prev page button
         binding.aLauncherRoot.launcherBtnPrevPage.setOnClickListener(v -> launcherPageUp());
         // Next page button

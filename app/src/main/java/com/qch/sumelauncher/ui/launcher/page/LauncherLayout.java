@@ -2,8 +2,6 @@ package com.qch.sumelauncher.ui.launcher.page;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -41,17 +39,13 @@ public class LauncherLayout extends ViewGroup {
     private int contentWidth;
     private int contentHeight;
 
-    // Painter
-    private final Paint gridPaint;
-
     // Data
     private int numColumns = GridSize.DEFAULT_NUM_COLUMN;
     private int numRows = GridSize.DEFAULT_NUM_ROW;
     private int borderHorizontalPaddingPx;
     private int borderVerticalPaddingPx;
-    private boolean showGrid = false;
     private boolean isEditMode = false;
-    private Map<Coordinate, IconModel> iconMap = new ConcurrentHashMap<>();
+    private Map<Coordinate, IconModel> iconModelMap = new ConcurrentHashMap<>();
     private Map<Coordinate, IconView> iconViewMap = new ConcurrentHashMap<>();
 
     // listener interface
@@ -95,11 +89,6 @@ public class LauncherLayout extends ViewGroup {
         // Get sizes
         borderHorizontalPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.launcher_layout_horizontal_padding);
         borderVerticalPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.launcher_layout_vertical_padding);
-        // Initialize painters
-        gridPaint = new Paint();
-        gridPaint.setColor(Color.LTGRAY);
-        gridPaint.setStyle(Paint.Style.STROKE);
-        gridPaint.setStrokeWidth(1);
         // Initialize interaction
         ViewConfiguration viewConfiguration = ViewConfiguration.get(context);
         longPressTimeout = ViewConfiguration.getLongPressTimeout();
@@ -111,16 +100,15 @@ public class LauncherLayout extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Log.i(TAG, "onMeasure");
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        int maxWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int maxHeight = MeasureSpec.getSize(heightMeasureSpec);
         int measuredWidth;
         int measuredHeight;
 
-        cellWidth = (widthSize - 2 * borderHorizontalPaddingPx) / numColumns;
-        cellHeight = (heightSize - 2 * borderVerticalPaddingPx) / numRows;
+        cellWidth = (maxWidth - 2 * borderHorizontalPaddingPx) / numColumns;
+        cellHeight = (maxHeight - 2 * borderVerticalPaddingPx) / numRows;
 
         contentWidth = numColumns * cellWidth;
         contentHeight = numRows * cellHeight;
@@ -130,25 +118,29 @@ public class LauncherLayout extends ViewGroup {
 
         switch (widthMode) {
             case MeasureSpec.EXACTLY: {
-                measuredWidth = widthSize;
+                measuredWidth = maxWidth;
+                break;
             }
             case MeasureSpec.AT_MOST: {
-                measuredWidth = Math.min(measuredWidth, widthSize);
+                measuredWidth = Math.min(measuredWidth, maxWidth);
+                break;
             }
             case MeasureSpec.UNSPECIFIED: {
-
+                break;
             }
         }
 
         switch (heightMode) {
             case MeasureSpec.EXACTLY: {
-                measuredHeight = heightSize;
+                measuredHeight = maxHeight;
+                break;
             }
             case MeasureSpec.AT_MOST: {
-                measuredHeight = Math.min(measuredHeight, heightSize);
+                measuredHeight = Math.min(measuredHeight, maxHeight);
+                break;
             }
             case MeasureSpec.UNSPECIFIED: {
-
+                break;
             }
         }
 
@@ -156,15 +148,15 @@ public class LauncherLayout extends ViewGroup {
 
         // Measure all child views
         for (IconView item : iconViewMap.values()) {
-            int childWidthSpec = MeasureSpec.makeMeasureSpec(cellWidth, MeasureSpec.EXACTLY);
-            int childHeightSpec = MeasureSpec.makeMeasureSpec(cellHeight, MeasureSpec.EXACTLY);
+            int childWidthSpec = MeasureSpec.makeMeasureSpec(cellWidth, MeasureSpec.AT_MOST);
+            int childHeightSpec = MeasureSpec.makeMeasureSpec(cellHeight, MeasureSpec.AT_MOST);
             item.measure(childWidthSpec, childHeightSpec);
         }
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if (MapCompat.isNullOrEmpty(iconMap) || MapCompat.isNullOrEmpty(iconViewMap)) {
+        if (MapCompat.isNullOrEmpty(iconModelMap) || MapCompat.isNullOrEmpty(iconViewMap)) {
             return;
         }
         for (Map.Entry<Coordinate, IconView> entry : iconViewMap.entrySet()) {
@@ -202,9 +194,6 @@ public class LauncherLayout extends ViewGroup {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
-        if (isEditMode) {
-
-        }
     }
 
     @Override
@@ -291,8 +280,8 @@ public class LauncherLayout extends ViewGroup {
     protected void onRestoreInstanceState(Parcelable state) {
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
-            numColumns = bundle.getInt(NUM_COLUMNS, 5);
-            numRows = bundle.getInt(NUM_ROWS, 5);
+            numColumns = bundle.getInt(NUM_COLUMNS, GridSize.DEFAULT_NUM_COLUMN);
+            numRows = bundle.getInt(NUM_ROWS, GridSize.DEFAULT_NUM_ROW);
             Parcelable parcelable = BundleCompat.getParcelable(bundle, PARCELABLE, Parcelable.class);
             super.onRestoreInstanceState(parcelable);
             postInvalidate();
@@ -321,7 +310,7 @@ public class LauncherLayout extends ViewGroup {
 
     @Nullable
     public Coordinate getItemCoordinateAtPosition(float x, float y) {
-        // If touching point is out of bound, return -1
+        // If touching point is out of bound, return null
         if (x < borderHorizontalPaddingPx
                 || y < borderVerticalPaddingPx
                 || x > getWidth() - borderHorizontalPaddingPx
@@ -331,7 +320,7 @@ public class LauncherLayout extends ViewGroup {
         // Try to get column and row
         int col = (int) ((x - borderHorizontalPaddingPx) / cellWidth);
         int row = (int) ((y - borderVerticalPaddingPx) / cellHeight);
-        // If column or row is out of bound, return -1
+        // If column or row is out of bound, return null
         if (col >= numColumns || row >= numRows) {
             return null;
         }
@@ -345,7 +334,7 @@ public class LauncherLayout extends ViewGroup {
         if (coordinate == null) {
             return null;
         }
-        return iconMap.get(coordinate);
+        return iconModelMap.get(coordinate);
     }
 
     public void setNumColumns(int numColumns) {
@@ -413,24 +402,24 @@ public class LauncherLayout extends ViewGroup {
 
     public void setEditMode(boolean isEditMode) {
         this.isEditMode = isEditMode;
-        invalidate();
+        postInvalidate();
     }
 
-    public void setIconList(List<IconModel> iconList) {
+    public void setItems(List<IconModel> itemList) {
         removeAllViews();
         iconViewMap.clear();
-        if (iconList == null) {
-            this.iconMap = new ConcurrentHashMap<>();
-            Log.i(TAG, "Cleared iconMap through passing null to setIconList().");
+        if (itemList == null) {
+            this.iconViewMap = new ConcurrentHashMap<>();
+            Log.i(TAG, "Cleared iconViewMap through passing null to setItems().");
         } else {
-            Log.i(TAG, "Size of new list is " + iconList.size());
-            for (int i = 0; i < iconList.size(); i++) {
-                IconModel iconModel = iconList.get(i);
+            Log.i(TAG, "Size of new list is " + itemList.size());
+            for (int i = 0; i < itemList.size(); i++) {
+                IconModel iconModel = itemList.get(i);
                 if (iconModel == null) {
                     continue;
                 }
                 Coordinate coordinate = new Coordinate(iconModel.getCellX(), iconModel.getCellY());
-                iconMap.put(coordinate, iconModel);
+                iconModelMap.put(coordinate, iconModel);
                 IconView iconView = new IconView(getContext());
                 iconView.setActivityModel(iconModel.getActivityModel());
                 iconView.setOnClickListener(v -> {
@@ -440,7 +429,7 @@ public class LauncherLayout extends ViewGroup {
                     return onIconClickListener.onLongClick(v, iconModel);
                 });
                 iconViewMap.put(coordinate, iconView);
-                MarginLayoutParams lp = new MarginLayoutParams(
+                LayoutParams lp = new LayoutParams(
                         LayoutParams.WRAP_CONTENT,
                         LayoutParams.WRAP_CONTENT
                 );
