@@ -1,6 +1,8 @@
 package com.qch.sumelauncher.ui.launcher.activity;
 
 import android.Manifest;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -33,6 +35,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.application.MyApplication;
+import com.qch.sumelauncher.br.MyDeviceAdminReceiver;
 import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 import com.qch.sumelauncher.data.model.launcher.IconModel;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
@@ -46,6 +49,7 @@ import com.qch.sumelauncher.ui.settings.root.SettingsViewModel;
 import com.qch.sumelauncher.ui.topbar.TopBarView;
 import com.qch.sumelauncher.ui.topbar.RingerModeViewModel;
 import com.qch.sumelauncher.utils.ApplicationUtils;
+import com.qch.sumelauncher.utils.DeviceAdminUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
 import com.qch.sumelauncher.utils.PermissionUtils;
@@ -368,6 +372,20 @@ public class LauncherActivity extends AppCompatActivity {
         binding.aLauncherRoot.launcherBtnSettings.setOnClickListener(v -> {
             Intent intent = new Intent(LauncherActivity.this, SettingsActivity.class);
             startActivity(intent);
+        });
+        // Lock button
+        binding.aLauncherRoot.launcherBtnLock.setOnClickListener(v -> {
+            DevicePolicyManager manager = DeviceAdminUtils.getDevicePolicyManager(LauncherActivity.this);
+            ComponentName adminComponent = new ComponentName(LauncherActivity.this, MyDeviceAdminReceiver.class);
+            if (manager.isAdminActive(adminComponent)) {
+                manager.lockNow();
+            } else {
+                Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+                intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent);
+                intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                        ContextCompat.getString(LauncherActivity.this, R.string.add_device_admin_reason));
+                startActivity(intent);
+            }
         });
         // Prev page button
         binding.aLauncherRoot.launcherBtnPrevPage.setOnClickListener(v -> launcherPageUp());

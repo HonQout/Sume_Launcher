@@ -17,10 +17,11 @@ public class RingerModeUtils {
 
     @Nullable
     public static AudioManager getAudioManager(@NonNull Context context) {
+        Context appContext = context.getApplicationContext();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return context.getSystemService(AudioManager.class);
+            return appContext.getSystemService(AudioManager.class);
         } else {
-            return (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            return (AudioManager) appContext.getSystemService(Context.AUDIO_SERVICE);
         }
     }
 

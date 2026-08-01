@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+
 public class BatteryUtils {
     private static final String TAG = "BatteryUtils";
 
@@ -15,11 +17,12 @@ public class BatteryUtils {
     }
 
     @SuppressLint("ObsoleteSdkInt")
-    public static BatteryManager getBatteryManager(Context context) {
+    public static BatteryManager getBatteryManager(@NonNull Context context) {
+        Context appContext = context.getApplicationContext();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.getSystemService(BatteryManager.class);
+            return appContext.getSystemService(BatteryManager.class);
         } else {
-            return (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
+            return (BatteryManager) appContext.getSystemService(Context.BATTERY_SERVICE);
         }
     }
 

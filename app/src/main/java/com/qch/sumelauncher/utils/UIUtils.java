@@ -74,8 +74,8 @@ public class UIUtils {
     }
 
     public static boolean isDarkMode(Context context) {
-        int nightMode = context.getApplicationContext().getResources().getConfiguration().uiMode
-                & Configuration.UI_MODE_NIGHT_MASK;
+        Context appContext = context.getApplicationContext();
+        int nightMode = appContext.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         return nightMode == Configuration.UI_MODE_NIGHT_YES;
     }
 }

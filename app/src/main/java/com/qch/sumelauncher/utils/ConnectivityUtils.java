@@ -15,10 +15,11 @@ public class ConnectivityUtils {
     @SuppressLint("ObsoleteSdkInt")
     @Nullable
     public static ConnectivityManager getConnectivityManager(@NonNull Context context) {
+        Context appContext = context.getApplicationContext();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.getSystemService(ConnectivityManager.class);
+            return appContext.getSystemService(ConnectivityManager.class);
         } else {
-            return (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            return (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         }
     }
 
