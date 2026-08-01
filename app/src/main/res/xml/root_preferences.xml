@@ -86,6 +86,11 @@
             app:key="default_app"
             app:title="@string/default_app" />
 
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="deactivate_device_manager"
+            app:title="@string/deactivate_device_manager" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

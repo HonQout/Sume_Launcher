@@ -5,6 +5,8 @@
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
     <string name="deny">Deny</string>
+    <string name="success">Success</string>
+    <string name="fail">Fail</string>
     <string name="hint">Hint</string>
 
     <!-- Title -->
@@ -43,7 +45,7 @@
     <string name="uri_is_empty">Uri is empty.</string>
     <string name="no_matching_activity">No activity can open this link.</string>
     <string name="insist_uninstall_system_app">This is a system app, which is usually not recommended and not allowed to uninstall. \nHowever, in some 3rd-party Android systems, this kind of app is allowed to uninstall. \nIf you want to try to uninstall this app, press \"Uninstall\". This operation is not guaranteed to be successful.</string>
-    <string name="insist_uninstall_this_app">Before uninstalling Sume Launcher, please make sure that you have other launcher application installed, otherwise your device will not work properly after uninstallation.</string>
+    <string name="insist_uninstall_this_app">"Before uninstalling Sume Launcher, please make sure that:\n1. You have other launcher application installed. Otherwise, your device will not work properly after uninstallation.\n2. You haven't activated or have deactivated device manager. Otherwise, uninstallation will not proceed normally due to the limitation of Android system. "</string>
     <string name="uninstall_app_failed">Failed to uninstall app.</string>
 
     <!-- Preference Headers -->
@@ -63,6 +65,7 @@
     <string name="volume_key_switch_page">Use volume key to switch page</string>
     <string name="volume_key_switch_page_summary">PageUp and PageDown key are also regarded as volume keys</string>
     <string name="default_app">Default app</string>
+    <string name="deactivate_device_manager">Deactivate device manager</string>
     <string name="permission">Permission</string>
     <string name="ask_for_perm_fine_location">Ask for permission to access fine location</string>
     <string name="ask_for_perm_fine_location_summary">Allow this app to ask for permission to access fine location</string>
