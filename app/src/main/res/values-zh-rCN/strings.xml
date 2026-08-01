@@ -6,6 +6,7 @@
     <string name="cancel">取消</string>
     <string name="confirm">确定</string>
     <string name="deny">拒绝</string>
+    <string name="fail">失败</string>
     <string name="hint">提示</string>
 
     <!-- Title -->
@@ -44,7 +45,7 @@
     <string name="uri_is_empty">统一资源标识符为空。</string>
     <string name="no_matching_activity">没有找到可以打开链接的应用程序。</string>
     <string name="insist_uninstall_system_app">这是一个系统应用，通常不建议、也不能够卸载。\n不过，在一些第三方Android系统中，这类应用也被允许卸载。\n如果您希望尝试卸载此应用，请点击“卸载”。不保证此操作可以成功。</string>
-    <string name="insist_uninstall_this_app">卸载秀墨启动器之前，请确认您已经安装了其它的启动器应用；否则，卸载之后，您的设备将会无法正常工作。</string>
+    <string name="insist_uninstall_this_app">卸载秀墨启动器之前，请确认以下事项：\n1. 您已经安装了其它的启动器应用。否则，卸载之后，您的设备将会无法正常工作。\n2. 您未激活或已经反激活了设备管理器。否则，由于Android系统的限制，将无法卸载此应用。</string>
     <string name="uninstall_app_failed">卸载应用失败。</string>
 
     <!-- Preference Headers -->
@@ -64,6 +65,7 @@
     <string name="volume_key_switch_page">音量键翻页</string>
     <string name="volume_key_switch_page_summary">翻页键也被视为音量键</string>
     <string name="default_app">默认应用</string>
+    <string name="deactivate_device_manager">反激活设备管理器</string>
     <string name="permission">权限</string>
     <string name="ask_for_perm_fine_location">请求获取精确位置的权限</string>
     <string name="ask_for_perm_fine_location_summary">允许此应用请求获取精确位置的权限</string>
@@ -88,5 +90,6 @@
     <string name="battery_percentage">电池百分比</string>
     <string name="add_device_admin_reason">此应用需要这个权限以锁定屏幕。</string>
     <string name="device_not_support_this_function">您的设备不支持此功能。</string>
+    <string name="success">成功</string>
 
 </resources>
