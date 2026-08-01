@@ -28,16 +28,11 @@
     <string name="wifi_icon">Wifi icon</string>
     <string name="bluetooth_icon">Bluetooth icon</string>
     <string name="battery_icon">Battery icon</string>
-    <string name="app_icon">App icon</string>
-    <string name="back_icon">Back icon</string>
     <string name="settings_icon">Settings icon</string>
-    <string name="edit_icon">Edit icon</string>
     <string name="apps_icon">Apps icon</string>
-    <string name="menu_icon">Menu icon</string>
+    <string name="lock_icon">Lock icon</string>
     <string name="prev_page_icon">Previous page icon</string>
     <string name="next_page_icon">Next page icon</string>
-    <string name="grid_icon">Grid icon</string>
-    <string name="list_icon">List icon</string>
 
     <!-- Hint -->
     <string name="cannot_find_package">Cannot find package.</string>
@@ -94,5 +89,7 @@
     <string name="require_following_permission">This application requires the following permission(s):</string>
     <string name="num_items">%d item(s)</string>
     <string name="search_for_apps">Search for apps</string>
+    <string name="add_device_admin_reason">This app needs this permission to lock the screen.</string>
+    <string name="device_not_support_this_function">Your device does not support this function.</string>
 
 </resources>

@@ -18,10 +18,11 @@ public class BluetoothUtils {
     }
 
     public static BluetoothManager getBluetoothManager(Context context) {
+        Context appContext = context.getApplicationContext();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.getSystemService(BluetoothManager.class);
+            return appContext.getSystemService(BluetoothManager.class);
         } else {
-            return (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+            return (BluetoothManager) appContext.getSystemService(Context.BLUETOOTH_SERVICE);
         }
     }
 

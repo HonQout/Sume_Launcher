@@ -3,11 +3,14 @@ package com.qch.sumelauncher.ui.settings.topbar;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.persistence.PreferenceDataStoreBridge;
+import com.qch.sumelauncher.utils.BluetoothUtils;
+import com.qch.sumelauncher.utils.WifiUtils;
 
 public class TopBarIconFragment extends PreferenceFragmentCompat {
     private static final String TAG = "TopBarIconFragment";
@@ -23,5 +26,25 @@ public class TopBarIconFragment extends PreferenceFragmentCompat {
         preferenceDataStoreBridge = new PreferenceDataStoreBridge(MyApplication.getPreferenceDataStore());
         getPreferenceManager().setPreferenceDataStore(preferenceDataStoreBridge);
         setPreferencesFromResource(R.xml.top_bar_icon_preferences, rootKey);
+
+        Preference wlanPref = findPreference("wlan");
+        if (wlanPref != null) {
+            boolean isWlanSupported = WifiUtils.isWifiSupported(requireContext());
+            if (!isWlanSupported) {
+                wlanPref.setEnabled(false);
+                wlanPref.setDefaultValue(false);
+                wlanPref.setSummary(R.string.device_not_support_this_function);
+            }
+        }
+
+        Preference btPref = findPreference("bluetooth");
+        if (btPref != null) {
+            boolean isBtSupported = BluetoothUtils.isBluetoothSupported(requireContext());
+            if (!isBtSupported) {
+                btPref.setEnabled(false);
+                btPref.setDefaultValue(false);
+                btPref.setSummary(R.string.device_not_support_this_function);
+            }
+        }
     }
 }

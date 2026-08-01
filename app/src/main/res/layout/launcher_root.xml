@@ -49,6 +49,15 @@
                 android:src="@drawable/baseline_settings_24"
                 android:tint="?android:textColorPrimary" />
 
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/launcher_btn_lock"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="@dimen/image_icon_size"
+                android:layout_height="@dimen/image_icon_size"
+                android:contentDescription="@string/lock_icon"
+                android:src="@drawable/baseline_lock_24"
+                android:tint="?android:textColorPrimary" />
+
         </com.qch.sumelauncher.view.SingleTouchLinearLayoutCompat>
 
         <Space

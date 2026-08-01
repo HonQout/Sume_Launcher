@@ -55,10 +55,11 @@ public class WifiUtils {
             Log.e(TAG, "Wifi is not supported.");
             return null;
         }
+        Context appContext = context.getApplicationContext();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return context.getSystemService(WifiManager.class);
+            return appContext.getSystemService(WifiManager.class);
         } else {
-            return (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            return (WifiManager) appContext.getSystemService(Context.WIFI_SERVICE);
         }
     }
 

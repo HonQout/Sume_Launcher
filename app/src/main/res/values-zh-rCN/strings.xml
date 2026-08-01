@@ -29,16 +29,11 @@
     <string name="wifi_icon">无线局域网图标</string>
     <string name="bluetooth_icon">蓝牙图标</string>
     <string name="battery_icon">电池图标</string>
-    <string name="app_icon">应用图标</string>
-    <string name="back_icon">返回图标</string>
     <string name="settings_icon">设置图标</string>
-    <string name="edit_icon">编辑图标</string>
-    <string name="apps_icon">所有应用图标</string>
-    <string name="menu_icon">菜单图标</string>
+    <string name="apps_icon">全部应用图标</string>
+    <string name="lock_icon">锁定图标</string>
     <string name="prev_page_icon">上一页图标</string>
     <string name="next_page_icon">下一页图标</string>
-    <string name="grid_icon">网格图标</string>
-    <string name="list_icon">列表图标</string>
 
     <!-- Hint -->
     <string name="cannot_find_package">找不到应用包。</string>
@@ -91,5 +86,7 @@
     <string name="battery">电池</string>
     <string name="airplane_mode">飞行模式</string>
     <string name="battery_percentage">电池百分比</string>
+    <string name="add_device_admin_reason">此应用需要这个权限以锁定屏幕。</string>
+    <string name="device_not_support_this_function">您的设备不支持此功能。</string>
 
 </resources>
