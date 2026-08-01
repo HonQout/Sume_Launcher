@@ -1,6 +1,7 @@
 package com.qch.sumelauncher.ui.launcher.item;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -39,13 +40,22 @@ public class IconView extends AppCompatTextView {
 
     public IconView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        // Get sizes
         iconSizePx = context.getResources().getDimensionPixelSize(R.dimen.app_icon_size);
         spaceHeightPx = context.getResources().getDimensionPixelSize(R.dimen.icon_view_space);
         labelWidthPx = context.getResources().getDimensionPixelSize(R.dimen.app_label_width);
         labelSizePx = context.getResources().getDimensionPixelSize(R.dimen.app_label_size);
         horizontalPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.icon_view_horizontal_padding);
         verticalPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.icon_view_vertical_padding);
-        initView();
+        // Initialize
+        setWidth(labelWidthPx);
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, labelSizePx);
+        setEllipsize(TextUtils.TruncateAt.END);
+        setGravity(Gravity.CENTER_HORIZONTAL);
+        setMaxLines(1);
+        setCompoundDrawablePadding(spaceHeightPx);
+        setPadding(horizontalPaddingPx, verticalPaddingPx,
+                horizontalPaddingPx, verticalPaddingPx);
         // Set a placeholder
         Drawable defaultIcon = context.getPackageManager().getDefaultActivityIcon();
         defaultIcon.setBounds(0, 0, iconSizePx, iconSizePx);
@@ -54,7 +64,48 @@ public class IconView extends AppCompatTextView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int maxWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int maxHeight = MeasureSpec.getSize(heightMeasureSpec);
+
+        int measuredWidth = Math.max(iconSizePx, labelWidthPx) + 2 * horizontalPaddingPx;
+
+        Paint paint = getPaint();
+        paint.setTextSize(labelSizePx);
+        Paint.FontMetrics fontMetrics = paint.getFontMetrics();
+        float textHeight = fontMetrics.descent - fontMetrics.ascent;
+        int measuredHeight = iconSizePx + Math.round(textHeight) + labelSizePx + 2 * verticalPaddingPx;
+
+        switch (widthMode) {
+            case MeasureSpec.EXACTLY: {
+                measuredWidth = maxWidth;
+                break;
+            }
+            case MeasureSpec.AT_MOST: {
+                measuredWidth = Math.min(measuredWidth, maxWidth);
+                break;
+            }
+            case MeasureSpec.UNSPECIFIED: {
+                break;
+            }
+        }
+
+        switch (heightMode) {
+            case MeasureSpec.EXACTLY: {
+                measuredHeight = maxHeight;
+                break;
+            }
+            case MeasureSpec.AT_MOST: {
+                measuredHeight = Math.min(measuredHeight, maxHeight);
+                break;
+            }
+            case MeasureSpec.UNSPECIFIED: {
+                break;
+            }
+        }
+
+        setMeasuredDimension(measuredWidth, measuredHeight);
     }
 
     @Override
@@ -88,17 +139,6 @@ public class IconView extends AppCompatTextView {
     @Nullable
     public ActivityModel getActivityModel() {
         return activityModel;
-    }
-
-    public void initView() {
-        setWidth(labelWidthPx);
-        setTextSize(TypedValue.COMPLEX_UNIT_PX, labelSizePx);
-        setEllipsize(TextUtils.TruncateAt.END);
-        setGravity(Gravity.CENTER_HORIZONTAL);
-        setMaxLines(1);
-        setCompoundDrawablePadding(spaceHeightPx);
-        setPadding(horizontalPaddingPx, verticalPaddingPx,
-                horizontalPaddingPx, verticalPaddingPx);
     }
 
     public void loadContent() {

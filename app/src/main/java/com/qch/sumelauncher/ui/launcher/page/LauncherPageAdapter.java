@@ -57,7 +57,7 @@ public class LauncherPageAdapter extends RecyclerView.Adapter<LauncherPageAdapte
             // Set arguments
             launcherLayout.setNumColumns(gridSize.getColumn());
             launcherLayout.setNumRows(gridSize.getRow());
-            launcherLayout.setIconList(list);
+            launcherLayout.setItems(list);
             launcherLayout.setOnIconClickListener(onIconClickListener);
             launcherLayout.setOnBlankClickListener(onBlankAreaClickListener);
         }
