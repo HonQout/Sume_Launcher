@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.qch.sumelauncher.data.model.controlcenter.ControlCenterItemModel;
-import com.qch.sumelauncher.ui.controlcenter.view.ControlCenterShortcutView;
+import com.qch.sumelauncher.ui.launcher.fragment.controlcenter.view.ControlCenterShortcutView;
 
 import java.util.List;
 import java.util.Objects;

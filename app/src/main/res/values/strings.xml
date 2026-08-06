@@ -98,5 +98,6 @@
     <string name="add_device_admin_reason">This app needs this permission to lock the screen.</string>
     <string name="device_not_support_this_function">Your device does not support this function.</string>
     <string name="delete_screen_fail_reason">The last page cannot be deleted.</string>
+    <string name="choose_an_activity">Choose an activity</string>
 
 </resources>

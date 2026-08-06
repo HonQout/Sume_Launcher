@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.ui.controlcenter;
+package com.qch.sumelauncher.ui.launcher.fragment.controlcenter;
 
 import android.app.Application;
 import android.provider.Settings;

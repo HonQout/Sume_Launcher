@@ -14,8 +14,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -36,10 +34,11 @@ import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 import com.qch.sumelauncher.data.model.launcher.IconModel;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
-import com.qch.sumelauncher.recyclerview.adapter.DrawerListAdapter;
+import com.qch.sumelauncher.recyclerview.adapter.AppGridAdapter;
 import com.qch.sumelauncher.recyclerview.adapter.FilterableListAdapter;
 import com.qch.sumelauncher.recyclerview.decoration.VerticalGridDecoration;
-import com.qch.sumelauncher.ui.controlcenter.ControlCenter;
+import com.qch.sumelauncher.ui.launcher.fragment.activitypicker.ActivityPicker;
+import com.qch.sumelauncher.ui.launcher.fragment.controlcenter.ControlCenter;
 import com.qch.sumelauncher.ui.launcher.page.LauncherLayout;
 import com.qch.sumelauncher.ui.launcher.page.LauncherPageAdapter;
 import com.qch.sumelauncher.ui.settings.root.SettingsViewModel;
@@ -72,7 +71,7 @@ public class LauncherActivity extends AppCompatActivity {
     private BatteryViewModel batteryViewModel;
     private BottomSheetBehavior<View> bottomSheetBehavior;
     private ActivityResultLauncher<String> requestPermissionLauncher;
-    private ActivityResultLauncher<Intent> selectAppLauncher;
+    private ActivityResultLauncher<Intent> appPickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -371,7 +370,7 @@ public class LauncherActivity extends AppCompatActivity {
             ControlCenter controlCenter = ControlCenter.newInstance();
             controlCenter.show(getSupportFragmentManager(), "CONTROL_CENTER");
         });
-        // Lock button
+        // Edit button
         binding.aLauncherRoot.launcherBtnEdit.setOnClickListener(v -> {
 
         });
@@ -388,10 +387,12 @@ public class LauncherActivity extends AppCompatActivity {
                 });
 
         // Drawer
-        int gridColumnCount = getResources().getInteger(R.integer.grid_column_count);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, gridColumnCount);
-        DrawerListAdapter drawerListAdapter = new DrawerListAdapter(new ArrayList<>());
-        drawerListAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,
+                getResources().getInteger(R.integer.grid_column_count));
+        binding.aLauncherDrawer.drawerRv.setLayoutManager(gridLayoutManager);
+
+        AppGridAdapter appGridAdapter = new AppGridAdapter(new ArrayList<>());
+        appGridAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
             @Override
             public void onItemClick(ActivityModel item, View view) {
                 IntentUtils.launchActivity(LauncherActivity.this, item.getPackageName(),
@@ -404,11 +405,12 @@ public class LauncherActivity extends AppCompatActivity {
                 return true;
             }
         });
+        binding.aLauncherDrawer.drawerRv.setAdapter(appGridAdapter);
+
         VerticalGridDecoration verticalGridDecoration = new VerticalGridDecoration(
                 getResources().getInteger(R.integer.grid_column_count), 0, 0);
-        binding.aLauncherDrawer.drawerRv.setLayoutManager(gridLayoutManager);
-        binding.aLauncherDrawer.drawerRv.setAdapter(drawerListAdapter);
         binding.aLauncherDrawer.drawerRv.addItemDecoration(verticalGridDecoration);
+
         binding.aLauncherDrawer.drawerSv.setOnQueryTextFocusChangeListener((v, hasFocus) ->
                 binding.aLauncherDrawer.drawerBtnQuit.setVisibility(View.VISIBLE));
         binding.aLauncherDrawer.drawerSv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -419,7 +421,7 @@ public class LauncherActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                DrawerListAdapter adapter = (DrawerListAdapter) binding.aLauncherDrawer.drawerRv.getAdapter();
+                AppGridAdapter adapter = (AppGridAdapter) binding.aLauncherDrawer.drawerRv.getAdapter();
                 if (adapter != null) {
                     adapter.getFilter().filter(newText);
                 }
@@ -431,25 +433,7 @@ public class LauncherActivity extends AppCompatActivity {
             binding.aLauncherDrawer.drawerSv.clearFocus();
             binding.aLauncherDrawer.drawerBtnQuit.setVisibility(View.GONE);
         });
-        launcherViewModel.getActivityModelList().observe(LauncherActivity.this, drawerListAdapter::setList);
-        // Handle result of selecting app
-        selectAppLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-            @Override
-            public void onActivityResult(ActivityResult activityResult) {
-                if (activityResult == null) {
-                    Log.e(TAG, "Activity result of selecting app is null.");
-                    return;
-                }
-
-                Intent data = activityResult.getData();
-                if (data == null) {
-                    Log.e(TAG, "Data of activity result of selecting app is null.");
-                    return;
-                }
-
-                // Handle
-            }
-        });
+        launcherViewModel.getActivityModelList().observe(LauncherActivity.this, appGridAdapter::setList);
     }
 
     @Override
@@ -653,6 +637,9 @@ public class LauncherActivity extends AppCompatActivity {
                 }
                 return true;
             } else if (menuId == R.id.modify_item) {
+                ActivityPicker activityPicker = ActivityPicker.newInstance(activityModel ->
+                        launcherViewModel.insertIcon(cellX, cellY, activityModel.getPackageName(), activityModel.getActivityName()));
+                activityPicker.show(getSupportFragmentManager(), "ACTIVITY_PICKER");
                 return true;
             }
             return false;

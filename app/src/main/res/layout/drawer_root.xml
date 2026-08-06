@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground">
+    android:background="?android:attr/windowBackground"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/drawer_horizontal_padding"
+    android:paddingVertical="@dimen/drawer_vertical_padding">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/drawer_ll"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingHorizontal="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:orientation="horizontal">
 
         <androidx.appcompat.widget.SearchView
             android:id="@+id/drawer_sv"
@@ -33,15 +32,14 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="20dp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/drawer_rv"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/drawer_ll" />
+        android:layout_weight="1" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>
