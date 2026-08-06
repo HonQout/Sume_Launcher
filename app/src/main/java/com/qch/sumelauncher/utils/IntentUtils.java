@@ -104,8 +104,8 @@ public class IntentUtils {
             Log.e(TAG, "Cannot uninstall app. The given packageName is empty.");
             return LaunchIntentResult.URI_IS_EMPTY;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-                && PermissionUtils.isPermissionGranted(context, Manifest.permission.REQUEST_DELETE_PACKAGES)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+                && !PermissionUtils.isPermissionGranted(context, Manifest.permission.REQUEST_DELETE_PACKAGES)) {
             Log.e(TAG, "Failed to uninstall app. This operation requires permission "
                     + Manifest.permission.REQUEST_DELETE_PACKAGES + " since Android 9.0.");
             return LaunchIntentResult.REQUIRE_EXTRA_PERMISSION;

@@ -192,27 +192,10 @@ public class LauncherIconRepository {
         appExecutors.diskIO().execute(() -> dao.insertIconList(iconEntityList));
     }
 
-    public void moveIconToNewScreen(IconEntity iconEntity) {
-        appExecutors.diskIO().execute(() -> {
-            LiveData<Integer> numScreensLD = getNumScreens(iconEntity.getLayoutName());
-            if (numScreensLD == null) {
-                return;
-            }
-            if (numScreensLD.getValue() == null) {
-                return;
-            }
-            int numScreens = numScreensLD.getValue();
-            iconEntity.setScreenIndex(numScreens);
-            iconEntity.setCellX(0);
-            iconEntity.setCellY(0);
-            int indexUpdated = dao.updateIcon(iconEntity);
-            Log.i(TAG, "Updated record #" + indexUpdated);
-        });
-    }
-
     public void deleteIcon(IconEntity iconEntity, boolean collapse) {
         appExecutors.diskIO().execute(() -> {
-            dao.deleteIcon(iconEntity);
+            dao.deleteIconByPosition(iconEntity.getLayoutName(), iconEntity.getScreenIndex(),
+                    iconEntity.getCellX(), iconEntity.getCellY());
             if (collapse) {
                 dao.collapseAfterDeleting(iconEntity.getLayoutName(), iconEntity.getScreenIndex());
             }
@@ -238,14 +221,12 @@ public class LauncherIconRepository {
         });
     }
 
-    public void collapseAfterDeleting(String layoutName, int screenIndex) {
-        appExecutors.diskIO().execute(() -> dao.collapseAfterDeleting(layoutName, screenIndex));
-    }
-
     public void updateIcon(IconEntity iconEntity) {
         appExecutors.diskIO().execute(() -> {
-            int indexUpdated = dao.updateIcon(iconEntity);
-            Log.i(TAG, "Updated record #" + indexUpdated);
+            dao.updateIcon(iconEntity);
+            Log.i(TAG, "Updated icon at (" + iconEntity.getCellX() + "," + iconEntity.getCellY()
+                    + ") on screen " + iconEntity.getScreenIndex() + "in layout "
+                    + iconEntity.getLayoutName() + ".");
         });
     }
 }
