@@ -7,12 +7,12 @@
     <dimen name="top_bar_battery_height">15dp</dimen>
     <dimen name="launcher_layout_horizontal_padding">20dp</dimen>
     <dimen name="launcher_layout_vertical_padding">20dp</dimen>
-    <dimen name="icon_view_horizontal_padding">6dp</dimen>
-    <dimen name="icon_view_vertical_padding">6dp</dimen>
+    <dimen name="icon_view_horizontal_padding">4dp</dimen>
+    <dimen name="icon_view_vertical_padding">4dp</dimen>
     <dimen name="icon_view_space">5dp</dimen>
     <dimen name="app_icon_size">50dp</dimen>
     <dimen name="app_label_size">12sp</dimen>
-    <dimen name="app_label_width">60dp</dimen>
+    <dimen name="app_label_width">72dp</dimen>
     <dimen name="image_icon_size">50dp</dimen>
     <dimen name="menu_icon_size">50dp</dimen>
     <dimen name="shortcut_icon_size">40dp</dimen>
