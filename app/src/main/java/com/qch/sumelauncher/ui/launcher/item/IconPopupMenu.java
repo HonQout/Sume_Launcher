@@ -26,7 +26,7 @@ public class IconPopupMenu {
                 break;
             }
             case APP_DRAWER: {
-                menuRes = R.menu.app_op_menu;
+                menuRes = R.menu.drawer_icon_menu;
                 break;
             }
             default: {

@@ -61,6 +61,10 @@ public interface LauncherIconDao {
     @Delete
     void deleteIcon(IconEntity iconEntity);
 
+    @Query("DELETE FROM icons WHERE layout_name = :layoutName AND screen_index = :screenIndex " +
+            "AND cell_x = :cellX AND cell_y = :cellY")
+    void deleteIconByPosition(String layoutName, int screenIndex, int cellX, int cellY);
+
     @Query("DELETE FROM icons WHERE package_name = :packageName")
     void deleteIconsByPackage(String packageName);
 

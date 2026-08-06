@@ -662,7 +662,7 @@ public class LauncherActivity extends AppCompatActivity {
 
     private void showGridIconMenu(@NonNull View view, @NonNull ActivityModel item) {
         PopupMenu popupMenu = new PopupMenu(LauncherActivity.this, view);
-        popupMenu.getMenuInflater().inflate(R.menu.app_op_menu, popupMenu.getMenu());
+        popupMenu.getMenuInflater().inflate(R.menu.drawer_icon_menu, popupMenu.getMenu());
         int baseIndex = popupMenu.getMenu().size();
         List<ShortcutInfo> shortcutInfoList;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
