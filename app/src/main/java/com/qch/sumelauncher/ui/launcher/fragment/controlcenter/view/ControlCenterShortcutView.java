@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.ui.controlcenter.view;
+package com.qch.sumelauncher.ui.launcher.fragment.controlcenter.view;
 
 import android.content.Context;
 import android.graphics.Color;

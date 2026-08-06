@@ -299,6 +299,10 @@ public class LauncherViewModel extends AndroidViewModel {
         return mGridSize;
     }
 
+    public String getGridSizeStr() {
+        return mGridSize.getValue() == null ? null : mGridSize.getValue().toString();
+    }
+
     public int getNumScreenValue() {
         if (numScreen != null) {
             Integer value = numScreen.getValue();
@@ -318,7 +322,7 @@ public class LauncherViewModel extends AndroidViewModel {
     }
 
     public int getCurrentScreenIndexValue() {
-        return mCurrentScreenIndex.getValue() == null ? 0 : mCurrentScreenIndex.getValue();
+        return mCurrentScreenIndex.getValue() == null ? -1 : mCurrentScreenIndex.getValue();
     }
 
     public LiveData<List<ActivityModel>> getActivityModelList() {
@@ -341,25 +345,47 @@ public class LauncherViewModel extends AndroidViewModel {
         repository.insertIcon(iconEntity);
     }
 
+    public void insertIcon(String layoutName, int screenIndex, int cellX, int cellY,
+                           String packageName, String activityName) {
+        repository.insertIcon(layoutName, screenIndex, cellX, cellY, packageName, activityName);
+    }
+
+    public void insertIcon(int cellX, int cellY, String packageName, String activityName) {
+        String layoutName = getGridSizeStr();
+        if (layoutName == null) {
+            return;
+        }
+
+        int screenIndex = getCurrentScreenIndexValue();
+        if (screenIndex < 0) {
+            return;
+        }
+
+        repository.insertIcon(layoutName, screenIndex, cellX, cellY, packageName, activityName);
+    }
+
     public void removeIcon(@NonNull IconEntity iconEntity) {
         repository.deleteIcon(iconEntity, true);
     }
 
-    public void removeIconsByPackageName(@NonNull String packageName) {
+    public void removeIconsByPackage(@NonNull String packageName) {
         repository.deleteIconsByPackage(packageName);
     }
 
+    public void updateIcon() {
+
+    }
+
     public boolean deleteScreen() {
-        if (mGridSize == null) {
+        String layoutName = getGridSizeStr();
+        if (layoutName == null) {
             return false;
         }
-        GridSize gridSize = mGridSize.getValue();
-        if (gridSize == null) {
-            return false;
-        }
-        String layoutName = gridSize.toString();
 
         int screenIndex = getCurrentScreenIndexValue();
+        if (screenIndex < 0) {
+            return false;
+        }
 
         return deleteScreen(layoutName, screenIndex);
     }

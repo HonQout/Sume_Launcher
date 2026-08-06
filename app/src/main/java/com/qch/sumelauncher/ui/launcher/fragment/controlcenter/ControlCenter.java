@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.ui.controlcenter;
+package com.qch.sumelauncher.ui.launcher.fragment.controlcenter;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
@@ -56,8 +55,11 @@ public class ControlCenter extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = ControlCenterBinding.inflate(inflater, container, false);
-        binding.controlCenterRv.setLayoutManager(new GridLayoutManager(
-                getContext(), getResources().getInteger(R.integer.control_center_column_count)));
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),
+                getResources().getInteger(R.integer.control_center_column_count));
+        binding.controlCenterRv.setLayoutManager(gridLayoutManager);
+
         ControlCenterListAdapter adapter = new ControlCenterListAdapter(new ArrayList<>());
         adapter.setOnItemClickListener(new ClickableListAdapter.OnItemClickListener<>() {
             @Override
@@ -101,10 +103,12 @@ public class ControlCenter extends BottomSheetDialogFragment {
             }
         });
         binding.controlCenterRv.setAdapter(adapter);
+
         VerticalGridDecoration verticalGridDecoration = new VerticalGridDecoration(
                 getResources().getInteger(R.integer.control_center_column_count), 20, 20
         );
         binding.controlCenterRv.addItemDecoration(verticalGridDecoration);
+
         controlCenterViewModel.getItemList().observe(getViewLifecycleOwner(), adapter::setList);
         settingsViewModel.getDisplayStatusBar().observe(getViewLifecycleOwner(), display -> {
             if (display == null) {
@@ -114,6 +118,7 @@ public class ControlCenter extends BottomSheetDialogFragment {
                 UIUtils.forceHandleStatusBarVisibility(getDialog().getWindow(), display);
             }
         });
+
         return binding.getRoot();
     }
 }

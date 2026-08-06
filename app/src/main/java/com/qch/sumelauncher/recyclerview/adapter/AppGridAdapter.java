@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class DrawerListAdapter extends FilterableListAdapter<ActivityModel, DrawerListAdapter.ViewHolder> {
-    private static final String TAG = "DrawerListAdapter";
+public class AppGridAdapter extends FilterableListAdapter<ActivityModel, AppGridAdapter.ViewHolder> {
+    private static final String TAG = "AppGridAdapter";
 
     private static final DiffUtil.ItemCallback<ActivityModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
@@ -56,19 +56,19 @@ public class DrawerListAdapter extends FilterableListAdapter<ActivityModel, Draw
         }
     }
 
-    public DrawerListAdapter(List<ActivityModel> activityModelList) {
+    public AppGridAdapter(List<ActivityModel> activityModelList) {
         super(DIFF_CALLBACK, activityModelList);
     }
 
     @NonNull
     @Override
-    public DrawerListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public AppGridAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         IconView iconView = new IconView(parent.getContext());
         return new ViewHolder(iconView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DrawerListAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull AppGridAdapter.ViewHolder holder, int position) {
         ActivityModel activityModel = getItem(position);
         holder.iconView.setActivityModel(activityModel);
     }

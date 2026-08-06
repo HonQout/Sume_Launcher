@@ -184,6 +184,12 @@ public class LauncherIconRepository {
         appExecutors.diskIO().execute(() -> dao.insertIcon(iconEntity));
     }
 
+    public void insertIcon(String layoutName, int screenIndex, int cellX, int cellY,
+                           String packageName, String activityName) {
+        IconEntity iconEntity = new IconEntity(layoutName, screenIndex, cellX, cellY, 1, 1, packageName, activityName);
+        insertIcon(iconEntity);
+    }
+
     public void insertIconArray(IconEntity[] iconEntityArray) {
         appExecutors.diskIO().execute(() -> dao.insertIconArray(iconEntityArray));
     }
