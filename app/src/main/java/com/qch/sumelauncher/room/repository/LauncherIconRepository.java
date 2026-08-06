@@ -17,12 +17,10 @@ import com.qch.sumelauncher.room.entity.LayoutEntity;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 public class LauncherIconRepository {
     private static final String TAG = "LauncherIconRepository";
@@ -71,26 +69,6 @@ public class LauncherIconRepository {
         appExecutors.diskIO().execute(() -> dao.insertLayout(layoutEntity));
     }
 
-    // screens
-    public List<IconEntity> compactScreens(List<IconEntity> iconEntityList) {
-        TreeSet<Integer> oldScreenIndexes = new TreeSet<>();
-        for (IconEntity iconEntity : iconEntityList) {
-            oldScreenIndexes.add(iconEntity.getScreenIndex());
-        }
-        Map<Integer, Integer> indexMapping = new HashMap<>();
-        int newIndex = 0;
-        for (Integer oldIndex : oldScreenIndexes) {
-            indexMapping.put(oldIndex, newIndex++);
-        }
-        for (IconEntity iconEntity : iconEntityList) {
-            Integer newScreenIndexInteger = indexMapping.get(iconEntity.getScreenIndex());
-            if (newScreenIndexInteger != null) {
-                iconEntity.setScreenIndex(newScreenIndexInteger);
-            }
-        }
-        return iconEntityList;
-    }
-
     // icons
     public LiveData<List<IconEntity>> getIconListInLayout(String layoutName) {
         return dao.getIconListInLayout(layoutName);
@@ -99,11 +77,9 @@ public class LauncherIconRepository {
     public LiveData<Map<Integer, List<IconEntity>>> getIconEntityMapInLayout(String layoutName) {
         LiveData<List<IconEntity>> list = getIconListInLayout(layoutName);
         return Transformations.map(list, iconEntities -> {
-            // error correction
-            List<IconEntity> compactedList = compactScreens(iconEntities);
             // place IconEntity items into map
             Map<Integer, List<IconEntity>> map = new TreeMap<>();
-            for (IconEntity iconEntity : compactedList) {
+            for (IconEntity iconEntity : iconEntities) {
                 // check if this record is significant
                 String packageName = iconEntity.getPackageName();
                 String activityName = iconEntity.getActivityName();
@@ -132,11 +108,9 @@ public class LauncherIconRepository {
     public LiveData<Map<Integer, List<IconModel>>> getIconModelMapInLayout(String layoutName) {
         LiveData<List<IconEntity>> list = getIconListInLayout(layoutName);
         return Transformations.map(list, iconEntities -> {
-            // error correction
-            List<IconEntity> compactedList = compactScreens(iconEntities);
             // place IconEntity items into map
             Map<Integer, List<IconModel>> map = new TreeMap<>();
-            for (IconEntity iconEntity : compactedList) {
+            for (IconEntity iconEntity : iconEntities) {
                 // check if this record is significant
                 String packageName = iconEntity.getPackageName();
                 String activityName = iconEntity.getActivityName();
@@ -240,7 +214,7 @@ public class LauncherIconRepository {
         appExecutors.diskIO().execute(() -> {
             dao.deleteIcon(iconEntity);
             if (collapse) {
-                dao.collapseAfterDeleting(iconEntity);
+                dao.collapseAfterDeleting(iconEntity.getLayoutName(), iconEntity.getScreenIndex());
             }
         });
     }
@@ -257,8 +231,15 @@ public class LauncherIconRepository {
         appExecutors.diskIO().execute(() -> dao.deleteIconsOnScreen(layoutName, screenIndex));
     }
 
-    public void collapseAfterDeleting(IconEntity iconEntity) {
-        appExecutors.diskIO().execute(() -> dao.collapseAfterDeleting(iconEntity));
+    public void deleteScreen(String layoutName, int screenIndex) {
+        appExecutors.diskIO().execute(() -> {
+            dao.deleteIconsOnScreen(layoutName, screenIndex);
+            dao.shiftScreenLeft(layoutName, screenIndex);
+        });
+    }
+
+    public void collapseAfterDeleting(String layoutName, int screenIndex) {
+        appExecutors.diskIO().execute(() -> dao.collapseAfterDeleting(layoutName, screenIndex));
     }
 
     public void updateIcon(IconEntity iconEntity) {

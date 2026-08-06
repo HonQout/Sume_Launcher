@@ -75,10 +75,10 @@ public interface LauncherIconDao {
     void shiftScreenLeft(String layoutName, int deletedScreenIndex);
 
     @Transaction
-    default void collapseAfterDeleting(IconEntity iconEntity) {
-        int count = getIconCountOnScreen(iconEntity.getLayoutName(), iconEntity.getScreenIndex());
+    default void collapseAfterDeleting(String layoutName, int screenIndex) {
+        int count = getIconCountOnScreen(layoutName, screenIndex);
         if (count == 0) {
-            shiftScreenLeft(iconEntity.getLayoutName(), iconEntity.getScreenIndex());
+            shiftScreenLeft(layoutName, screenIndex);
         }
     }
 

@@ -83,12 +83,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         if (settingsViewModel.getAnimationValue()) {
             flags |= Intent.FLAG_ACTIVITY_NO_ANIMATION;
         }
-        IntentUtils.handleLaunchIntentResult(
+        IntentUtils.openNetAddress(
                 requireActivity(),
-                IntentUtils.openNetAddress(
-                        requireActivity(),
-                        ContextCompat.getString(requireContext(), R.string.github_address),
-                        flags)
+                ContextCompat.getString(requireContext(), R.string.github_address),
+                flags
         );
     }
 }

@@ -35,7 +35,10 @@ public class GridSize {
     }
 
     @NonNull
-    public static GridSize parse(String string, @NonNull GridSize defaultValue) {
+    public static GridSize parse(String string, GridSize defaultValue) {
+        if (defaultValue == null) {
+            defaultValue = new GridSize(DEFAULT_NUM_ROW, DEFAULT_NUM_COLUMN);
+        }
         if (TextUtils.isEmpty(string)) {
             return defaultValue;
         }

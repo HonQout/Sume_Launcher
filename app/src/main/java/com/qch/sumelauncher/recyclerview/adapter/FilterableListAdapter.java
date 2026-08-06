@@ -1,29 +1,20 @@
 package com.qch.sumelauncher.recyclerview.adapter;
 
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Filter;
 import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class FilterableListAdapter<T, VH extends RecyclerView.ViewHolder>
-        extends ListAdapter<T, VH> implements Filterable {
-    protected List<T> list;
-    protected OnItemClickListener<T> onItemClickListener;
+        extends ClickableListAdapter<T, VH>
+        implements Filterable {
     protected ListFilter listFilter;
-
-    public interface OnItemClickListener<T> {
-        void onItemClick(T item, View view);
-
-        boolean onItemLongClick(T item, View view);
-    }
 
     protected class ListFilter extends Filter {
         @Override
@@ -56,18 +47,7 @@ public abstract class FilterableListAdapter<T, VH extends RecyclerView.ViewHolde
     }
 
     public FilterableListAdapter(@NonNull DiffUtil.ItemCallback<T> diffCallback, List<T> list) {
-        super(diffCallback);
-        setList(list);
-    }
-
-    public void setList(List<T> list) {
-        List<T> mList = list == null ? new ArrayList<>() : new ArrayList<>(list);
-        submitList(mList);
-        this.list = mList;
-    }
-
-    public void setOnItemClickListener(@NonNull OnItemClickListener<T> onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
+        super(diffCallback, list);
     }
 
     @Override

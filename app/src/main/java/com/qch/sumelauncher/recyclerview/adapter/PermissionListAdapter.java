@@ -12,20 +12,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.data.model.permission.PermissionModel;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
-public class PermissionListRVAdapter extends FilterableListAdapter<PermissionModel, PermissionListRVAdapter.ViewHolder> {
-    private static final String TAG = "PermissionListRVAdapter";
+public class PermissionListAdapter extends ClickableListAdapter<PermissionModel, PermissionListAdapter.ViewHolder> {
+    private static final String TAG = "PermissionListAdapter";
 
     public static final DiffUtil.ItemCallback<PermissionModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
         public boolean areItemsTheSame(@NonNull PermissionModel oldItem, @NonNull PermissionModel newItem) {
-            boolean isNameTheSame = Objects.equals(oldItem.getName(), newItem.getName());
-            boolean isLabelTheSame = Objects.equals(oldItem.getLabel(), newItem.getLabel());
-            return isNameTheSame && isLabelTheSame;
+            return Objects.equals(oldItem, newItem);
         }
 
         @Override
@@ -70,7 +66,7 @@ public class PermissionListRVAdapter extends FilterableListAdapter<PermissionMod
         }
     }
 
-    public PermissionListRVAdapter(List<PermissionModel> permissionModelList) {
+    public PermissionListAdapter(List<PermissionModel> permissionModelList) {
         super(DIFF_CALLBACK, permissionModelList);
     }
 
@@ -86,20 +82,5 @@ public class PermissionListRVAdapter extends FilterableListAdapter<PermissionMod
         PermissionModel permissionModel = getItem(position);
         holder.getTitle().setText(permissionModel.getName());
         holder.getContent().setText(permissionModel.getLabel());
-    }
-
-    @NonNull
-    @Override
-    protected List<PermissionModel> performFiltering(List<PermissionModel> list, CharSequence constraint) {
-        List<PermissionModel> resultList = new ArrayList<>();
-        CharSequence cs = constraint.toString().toLowerCase(Locale.ROOT);
-        for (PermissionModel item : list) {
-            boolean isNameMatch = item.getName().toLowerCase(Locale.ROOT).contains(cs);
-            boolean isLabelMatch = item.getLabel().toLowerCase(Locale.ROOT).contains(cs);
-            if (isNameMatch || isLabelMatch) {
-                resultList.add(item);
-            }
-        }
-        return resultList;
     }
 }
