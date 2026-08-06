@@ -26,7 +26,6 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewpager2.widget.ViewPager2;
@@ -275,27 +274,31 @@ public class LauncherActivity extends AppCompatActivity {
         bottomSheetBehavior = BottomSheetBehavior.from(binding.aLauncherFl);
         bottomSheetBehavior.setSkipCollapsed(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View view, int i) {
+                Log.i(TAG, "BottomSheetBehavior onStateChanged. New state: " + i);
+                if (i == BottomSheetBehavior.STATE_EXPANDED) {
+                    launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.APPS);
+                } else if (i == BottomSheetBehavior.STATE_HIDDEN) {
+                    launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.LAUNCHER);
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View view, float v) {
+
+            }
+        });
         OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Log.i(TAG, "State of BottomSheetBehavior is " + bottomSheetBehavior.getState());
                 if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-                    launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.LAUNCHER);
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 }
             }
         };
         getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
-        launcherViewModel.getLauncherState().observe(this, launcherState -> {
-            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
-                if (launcherState == LauncherViewModel.LauncherState.LAUNCHER) {
-                    Log.i(TAG, "Launcher state is LAUNCHER. ");
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                } else if (launcherState == LauncherViewModel.LauncherState.APPS) {
-                    Log.i(TAG, "Launcher state is APPS. ");
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                }
-            }
-        });
         launcherViewModel.getGridSize().observe(this, gridSize -> {
             if (gridSize == null) {
                 Log.e(TAG, "Grid size is null.");
@@ -362,7 +365,7 @@ public class LauncherActivity extends AppCompatActivity {
         // Set button callback
         // Apps button
         binding.aLauncherRoot.launcherBtnApps.setOnClickListener(v ->
-                launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.APPS));
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED));
         // Settings button
         binding.aLauncherRoot.launcherBtnSettings.setOnClickListener(v -> {
             ControlCenter controlCenter = ControlCenter.newInstance();
@@ -471,7 +474,7 @@ public class LauncherActivity extends AppCompatActivity {
             case KeyEvent.KEYCODE_VOLUME_UP: {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     if (settingsViewModel.getVolumeKeySwitchPageValue()) {
-                        LauncherViewModel.LauncherState launcherState = launcherViewModel.getLauncherStateValue();
+                        LauncherViewModel.LauncherState launcherState = launcherViewModel.getLauncherState();
                         if (launcherState == LauncherViewModel.LauncherState.LAUNCHER) {
                             launcherPageUp();
                             return true;
@@ -483,7 +486,7 @@ public class LauncherActivity extends AppCompatActivity {
             case KeyEvent.KEYCODE_VOLUME_DOWN: {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     if (settingsViewModel.getVolumeKeySwitchPageValue()) {
-                        LauncherViewModel.LauncherState launcherState = launcherViewModel.getLauncherStateValue();
+                        LauncherViewModel.LauncherState launcherState = launcherViewModel.getLauncherState();
                         if (launcherState == LauncherViewModel.LauncherState.LAUNCHER) {
                             launcherPageDown();
                             return true;
