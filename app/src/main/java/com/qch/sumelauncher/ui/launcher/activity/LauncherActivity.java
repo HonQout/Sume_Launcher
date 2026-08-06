@@ -280,7 +280,6 @@ public class LauncherActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 Log.i(TAG, "State of BottomSheetBehavior is " + bottomSheetBehavior.getState());
                 if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                     launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.LAUNCHER);
                 }
             }
