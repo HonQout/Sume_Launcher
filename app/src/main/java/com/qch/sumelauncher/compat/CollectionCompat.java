@@ -19,13 +19,15 @@ public class CollectionCompat {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return collection.removeIf(predicate::satisfyCondition);
         } else {
+            boolean removed = false;
             Iterator<T> iterator = collection.iterator();
             while (iterator.hasNext()) {
                 if (predicate.satisfyCondition(iterator.next())) {
                     iterator.remove();
+                    removed = true;
                 }
             }
-            return true;
+            return removed;
         }
     }
 }

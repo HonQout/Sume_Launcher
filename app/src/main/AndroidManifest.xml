@@ -52,7 +52,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SumeLauncher">
-
         <activity
             android:name=".ui.launcher.activity.LauncherActivity"
             android:clearTaskOnLaunch="true"
@@ -62,9 +61,7 @@
             android:resizeableActivity="true"
             android:resumeWhilePausing="true"
             android:stateNotNeeded="true"
-            android:theme="@style/Theme.SumeLauncher"
-            tools:targetApi="24">
-
+            android:theme="@style/Theme.SumeLauncher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -72,25 +69,32 @@
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
         </activity>
-
         <activity
             android:name=".ui.settings.root.SettingsActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:enabled="true"
             android:exported="true"
-            android:label="@string/settings">
-
+            android:label="@string/settings"
+            android:theme="@style/Theme.SumeLauncher">
             <intent-filter>
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
         </activity>
+        <activity
+            android:name=".ui.launcher.activity.SelectApp"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:enabled="true"
+            android:exported="false"
+            android:label="@string/select_app"
+            android:theme="@style/Theme.SumeLauncher"
+            android:windowSoftInputMode="adjustResize" />
 
         <receiver
             android:name=".br.MyDeviceAdminReceiver"
+            android:enabled="true"
             android:exported="false"
             android:permission="android.permission.BIND_DEVICE_ADMIN">
             <meta-data
@@ -100,9 +104,12 @@
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
-
         </receiver>
 
+        <activity
+            android:name=".ui.launcher.activity.AddPage"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

@@ -1,7 +1,6 @@
 package com.qch.sumelauncher.ui.launcher.item;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -22,7 +21,7 @@ import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 public class IconView extends AppCompatTextView {
     private static final String TAG = "IconView";
     private final int iconSizePx;
-    private final int spaceHeightPx;
+    private final int spacePx;
     private final int labelWidthPx;
     private final int labelSizePx;
     private final int horizontalPaddingPx;
@@ -41,71 +40,24 @@ public class IconView extends AppCompatTextView {
     public IconView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         // Get sizes
-        iconSizePx = context.getResources().getDimensionPixelSize(R.dimen.app_icon_size);
-        spaceHeightPx = context.getResources().getDimensionPixelSize(R.dimen.icon_view_space);
-        labelWidthPx = context.getResources().getDimensionPixelSize(R.dimen.app_label_width);
-        labelSizePx = context.getResources().getDimensionPixelSize(R.dimen.app_label_size);
-        horizontalPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.icon_view_horizontal_padding);
-        verticalPaddingPx = context.getResources().getDimensionPixelSize(R.dimen.icon_view_vertical_padding);
+        iconSizePx = Math.round(context.getResources().getDimension(R.dimen.app_icon_size));
+        spacePx = Math.round(context.getResources().getDimension(R.dimen.icon_view_space));
+        labelWidthPx = Math.round(context.getResources().getDimension(R.dimen.app_label_width));
+        labelSizePx = Math.round(context.getResources().getDimension(R.dimen.app_label_size));
+        horizontalPaddingPx = Math.round(context.getResources().getDimension(R.dimen.icon_view_horizontal_padding));
+        verticalPaddingPx = Math.round(context.getResources().getDimension(R.dimen.icon_view_vertical_padding));
         // Initialize
         setWidth(labelWidthPx);
         setTextSize(TypedValue.COMPLEX_UNIT_PX, labelSizePx);
         setEllipsize(TextUtils.TruncateAt.END);
         setGravity(Gravity.CENTER_HORIZONTAL);
         setMaxLines(1);
-        setCompoundDrawablePadding(spaceHeightPx);
-        setPadding(horizontalPaddingPx, verticalPaddingPx,
-                horizontalPaddingPx, verticalPaddingPx);
+        setCompoundDrawablePadding(spacePx);
+        setPadding(horizontalPaddingPx, verticalPaddingPx, horizontalPaddingPx, verticalPaddingPx);
         // Set a placeholder
         Drawable defaultIcon = context.getPackageManager().getDefaultActivityIcon();
         defaultIcon.setBounds(0, 0, iconSizePx, iconSizePx);
         setCompoundDrawables(null, defaultIcon, null, null);
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int maxWidth = MeasureSpec.getSize(widthMeasureSpec);
-        int maxHeight = MeasureSpec.getSize(heightMeasureSpec);
-
-        int measuredWidth = Math.max(iconSizePx, labelWidthPx) + 2 * horizontalPaddingPx;
-
-        Paint paint = getPaint();
-        paint.setTextSize(labelSizePx);
-        Paint.FontMetrics fontMetrics = paint.getFontMetrics();
-        float textHeight = fontMetrics.descent - fontMetrics.ascent;
-        int measuredHeight = iconSizePx + Math.round(textHeight) + labelSizePx + 2 * verticalPaddingPx;
-
-        switch (widthMode) {
-            case MeasureSpec.EXACTLY: {
-                measuredWidth = maxWidth;
-                break;
-            }
-            case MeasureSpec.AT_MOST: {
-                measuredWidth = Math.min(measuredWidth, maxWidth);
-                break;
-            }
-            case MeasureSpec.UNSPECIFIED: {
-                break;
-            }
-        }
-
-        switch (heightMode) {
-            case MeasureSpec.EXACTLY: {
-                measuredHeight = maxHeight;
-                break;
-            }
-            case MeasureSpec.AT_MOST: {
-                measuredHeight = Math.min(measuredHeight, maxHeight);
-                break;
-            }
-            case MeasureSpec.UNSPECIFIED: {
-                break;
-            }
-        }
-
-        setMeasuredDimension(measuredWidth, measuredHeight);
     }
 
     @Override
@@ -131,9 +83,9 @@ public class IconView extends AppCompatTextView {
         if (this.activityModel != activityModel) {
             cancelLoadingContent();
             isContentLoaded = false;
+            this.activityModel = activityModel;
+            reloadContentIfNeeded();
         }
-        this.activityModel = activityModel;
-        reloadContentIfNeeded();
     }
 
     @Nullable
@@ -148,7 +100,6 @@ public class IconView extends AppCompatTextView {
         // Set icon
         Drawable defaultIcon = getContext().getPackageManager().getDefaultActivityIcon();
         defaultIcon.setBounds(0, 0, iconSizePx, iconSizePx);
-
         Glide.with(this)
                 .asDrawable()
                 .load(activityModel)
@@ -188,9 +139,7 @@ public class IconView extends AppCompatTextView {
     }
 
     public void reloadContentIfNeeded() {
-        if (getMeasuredWidth() > 0 && getMeasuredHeight() > 0 && activityModel != null && !isContentLoaded) {
-            loadContent();
-        }
+        reloadContentIfNeeded(getMeasuredWidth(), getMeasuredHeight());
     }
 
     public void reloadContentIfNeeded(int width, int height) {

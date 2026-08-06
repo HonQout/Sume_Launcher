@@ -31,7 +31,22 @@ public class ApplicationUtils {
     private static final String TAG = "ApplicationUtils";
 
     public enum ApplicationType {
-        UNKNOWN, SYSTEM, UPDATED_SYSTEM, USER
+        /**
+         * Unknown application type.
+         */
+        UNKNOWN,
+        /**
+         * System application.
+         */
+        SYSTEM,
+        /**
+         * Updated system application.
+         */
+        UPDATED_SYSTEM,
+        /**
+         * User application.
+         */
+        USER
     }
 
     @Nullable

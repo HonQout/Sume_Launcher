@@ -22,6 +22,7 @@ import com.qch.sumelauncher.data.model.launcher.GridSize;
 import com.qch.sumelauncher.data.model.launcher.IconModel;
 import com.qch.sumelauncher.ui.launcher.item.IconView;
 import com.qch.sumelauncher.utils.UnitUtils;
+import com.qch.sumelauncher.utils.ViewUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class LauncherLayout extends ViewGroup {
     public interface OnBlankAreaClickListener {
         void onClick(int x, int y);
 
-        boolean onLongClick(int x, int y);
+        boolean onLongClick(View anchorView, float x, float y, int cellX, int cellY);
     }
 
     // interaction
@@ -298,7 +299,14 @@ public class LauncherLayout extends ViewGroup {
             boolean handledBySystem = super.performLongClick();
             Log.i(TAG, "Long press handled by system: " + handledBySystem);
             if (onBlankAreaClickListener != null) {
-                onBlankAreaClickListener.onLongClick(cellX, cellY);
+                View anchorView = ViewUtils.getDummyAnchorView(LauncherLayout.this);
+                if (anchorView == null) {
+                    Log.e(TAG, "Failed to get dummy anchor view.");
+                    return;
+                }
+                anchorView.setX(x);
+                anchorView.setY(y);
+                onBlankAreaClickListener.onLongClick(anchorView, x, y, cellX, cellY);
             }
         };
         postDelayed(longPressRunnable, longPressTimeout);

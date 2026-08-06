@@ -27,13 +27,13 @@ public class TopBarIconFragment extends PreferenceFragmentCompat {
         getPreferenceManager().setPreferenceDataStore(preferenceDataStoreBridge);
         setPreferencesFromResource(R.xml.top_bar_icon_preferences, rootKey);
 
-        Preference wlanPref = findPreference("wlan");
-        if (wlanPref != null) {
-            boolean isWlanSupported = WifiUtils.isWifiSupported(requireContext());
-            if (!isWlanSupported) {
-                wlanPref.setEnabled(false);
-                wlanPref.setDefaultValue(false);
-                wlanPref.setSummary(R.string.device_not_support_this_function);
+        Preference wifiPref = findPreference("wifi");
+        if (wifiPref != null) {
+            boolean isWifiSupported = WifiUtils.isWifiSupported(requireContext());
+            if (!isWifiSupported) {
+                wifiPref.setEnabled(false);
+                wifiPref.setDefaultValue(false);
+                wifiPref.setSummary(R.string.device_not_support_this_function);
             }
         }
 

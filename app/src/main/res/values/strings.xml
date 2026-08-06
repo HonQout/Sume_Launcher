@@ -10,29 +10,26 @@
     <string name="hint">Hint</string>
 
     <!-- Title -->
-    <string name="edit">Edit</string>
     <string name="settings">Settings</string>
     <string name="app_drawer">App drawer</string>
+    <string name="select_app">Select App</string>
 
     <!-- Button -->
-    <string name="grid">Grid</string>
-    <string name="list">List</string>
     <string name="quit">Quit</string>
 
     <!-- Menu -->
-    <string name="remove_icon">Remove icon</string>
+    <string name="remove">Remove</string>
     <string name="uninstall">Uninstall</string>
     <string name="app_info">App info</string>
     <string name="app_market">App market</string>
+    <string name="add_page">Add page</string>
+    <string name="delete_page">Delete page</string>
+    <string name="modify_item">Add item</string>
 
     <!-- Content Description -->
-    <string name="airplane_mode_icon">Airplane mode icon</string>
-    <string name="wifi_icon">Wifi icon</string>
-    <string name="bluetooth_icon">Bluetooth icon</string>
-    <string name="battery_icon">Battery icon</string>
-    <string name="settings_icon">Settings icon</string>
     <string name="apps_icon">Apps icon</string>
-    <string name="lock_icon">Lock icon</string>
+    <string name="settings_icon">Settings icon</string>
+    <string name="edit_icon">Edit icon</string>
     <string name="prev_page_icon">Previous page icon</string>
     <string name="next_page_icon">Next page icon</string>
 
@@ -78,11 +75,17 @@
     <string name="ringer_mode">Ringer mode</string>
     <string name="connectivity">Connectivity</string>
     <string name="airplane_mode">Airplane mode</string>
-    <string name="wifi" translatable="false">Wi-Fi</string>
-    <string name="wlan">WLAN</string>
+    <string name="wifi">Wi-Fi</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="battery">Battery</string>
     <string name="battery_percentage">Battery percentage</string>
+
+    <!-- Control Center Items -->
+    <string name="network">Network</string>
+    <string name="sound">Sound</string>
+    <string name="display">Display</string>
+    <string name="launcher_settings">Launcher settings</string>
+    <string name="lock_screen">Lock screen</string>
 
     <!-- Others -->
     <string name="battery_percentage_format" translatable="false">%d%%</string>
@@ -94,5 +97,6 @@
     <string name="search_for_apps">Search for apps</string>
     <string name="add_device_admin_reason">This app needs this permission to lock the screen.</string>
     <string name="device_not_support_this_function">Your device does not support this function.</string>
+    <string name="delete_screen_fail_reason">The last page cannot be deleted.</string>
 
 </resources>

@@ -1,8 +1,6 @@
 package com.qch.sumelauncher.ui.launcher.activity;
 
 import android.Manifest;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -16,6 +14,8 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -27,7 +27,6 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewpager2.widget.ViewPager2;
@@ -35,21 +34,19 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.application.MyApplication;
-import com.qch.sumelauncher.br.MyDeviceAdminReceiver;
 import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 import com.qch.sumelauncher.data.model.launcher.IconModel;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
+import com.qch.sumelauncher.recyclerview.adapter.DrawerListAdapter;
 import com.qch.sumelauncher.recyclerview.adapter.FilterableListAdapter;
-import com.qch.sumelauncher.recyclerview.adapter.GridDrawerRVAdapter;
 import com.qch.sumelauncher.recyclerview.decoration.VerticalGridDecoration;
+import com.qch.sumelauncher.ui.controlcenter.ControlCenter;
 import com.qch.sumelauncher.ui.launcher.page.LauncherLayout;
 import com.qch.sumelauncher.ui.launcher.page.LauncherPageAdapter;
-import com.qch.sumelauncher.ui.settings.root.SettingsActivity;
 import com.qch.sumelauncher.ui.settings.root.SettingsViewModel;
 import com.qch.sumelauncher.ui.topbar.TopBarView;
 import com.qch.sumelauncher.ui.topbar.RingerModeViewModel;
 import com.qch.sumelauncher.utils.ApplicationUtils;
-import com.qch.sumelauncher.utils.DeviceAdminUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.IntentUtils;
 import com.qch.sumelauncher.utils.PermissionUtils;
@@ -74,9 +71,9 @@ public class LauncherActivity extends AppCompatActivity {
     private WifiViewModel wifiViewModel;
     private BluetoothViewModel bluetoothViewModel;
     private BatteryViewModel batteryViewModel;
-    private ActivityResultLauncher<String> requestPermissionLauncher;
     private BottomSheetBehavior<View> bottomSheetBehavior;
-    private OnBackPressedCallback onBackPressedCallback;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
+    private ActivityResultLauncher<Intent> selectAppLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +117,7 @@ public class LauncherActivity extends AppCompatActivity {
                 airplaneModeViewModel.setIconState(AirplaneModeViewModel.AirplaneModeIconState.HIDDEN);
             }
         });
-        settingsViewModel.getDisplayWlan().observe(this, shouldDisplay -> {
+        settingsViewModel.getDisplayWifi().observe(this, shouldDisplay -> {
             if (shouldDisplay) {
                 wifiViewModel.restoreIconState();
                 wifiViewModel.setIconVisible(true);
@@ -148,12 +145,10 @@ public class LauncherActivity extends AppCompatActivity {
                 binding.aLauncherTopBar.removeChildView(TopBarView.ViewTag.BATTERY_PCT);
             }
         });
-        timeViewModel.getCurrentTimeText().observe(this, currentTimeText -> {
-            binding.aLauncherTopBar.setTimeText(currentTimeText);
-        });
-        timeViewModel.getCurrentDateText().observe(this, currentDateText -> {
-            binding.aLauncherTopBar.setDateText(currentDateText);
-        });
+        timeViewModel.getCurrentTimeText().observe(this, currentTimeText ->
+                binding.aLauncherTopBar.setTimeText(currentTimeText));
+        timeViewModel.getCurrentDateText().observe(this, currentDateText ->
+                binding.aLauncherTopBar.setDateText(currentDateText));
         ringerModeViewModel.getIconState().observe(this, state -> {
             if (state == null) {
                 Log.e(TAG, "Failed to get state of ringer mode icon.");
@@ -280,7 +275,7 @@ public class LauncherActivity extends AppCompatActivity {
         bottomSheetBehavior = BottomSheetBehavior.from(binding.aLauncherFl);
         bottomSheetBehavior.setSkipCollapsed(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        onBackPressedCallback = new OnBackPressedCallback(true) {
+        OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 Log.i(TAG, "State of BottomSheetBehavior is " + bottomSheetBehavior.getState());
@@ -319,7 +314,7 @@ public class LauncherActivity extends AppCompatActivity {
                 @Override
                 public void onClick(@Nullable View view, IconModel item) {
                     if (view == null) {
-                        Log.e(TAG, "Clicked IconModel is null.");
+                        Log.e(TAG, "Clicked View is null.");
                         return;
                     }
                     IntentUtils.launchActivity(LauncherActivity.this, item.getPackageName(),
@@ -329,7 +324,7 @@ public class LauncherActivity extends AppCompatActivity {
                 @Override
                 public boolean onLongClick(@Nullable View view, IconModel item) {
                     if (view == null) {
-                        Log.e(TAG, "Long clicked IconModel is null.");
+                        Log.e(TAG, "Long clicked View is null.");
                         return false;
                     }
                     showLauncherIconMenu(view, item);
@@ -343,8 +338,9 @@ public class LauncherActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public boolean onLongClick(int x, int y) {
-                    Log.i(TAG, "Long clicked blank cell " + x + "," + y);
+                public boolean onLongClick(View anchorView, float x, float y, int cellX, int cellY) {
+                    Log.i(TAG, "Long clicked blank cell " + cellX + "," + cellY);
+                    showLauncherBlankAreaMenu(anchorView, x, y, cellX, cellY);
                     return true;
                 }
             });
@@ -370,22 +366,12 @@ public class LauncherActivity extends AppCompatActivity {
                 launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.APPS));
         // Settings button
         binding.aLauncherRoot.launcherBtnSettings.setOnClickListener(v -> {
-            Intent intent = new Intent(LauncherActivity.this, SettingsActivity.class);
-            startActivity(intent);
+            ControlCenter controlCenter = ControlCenter.newInstance();
+            controlCenter.show(getSupportFragmentManager(), "CONTROL_CENTER");
         });
         // Lock button
-        binding.aLauncherRoot.launcherBtnLock.setOnClickListener(v -> {
-            DevicePolicyManager manager = DeviceAdminUtils.getDevicePolicyManager(LauncherActivity.this);
-            ComponentName adminComponent = new ComponentName(LauncherActivity.this, MyDeviceAdminReceiver.class);
-            if (manager.isAdminActive(adminComponent)) {
-                manager.lockNow();
-            } else {
-                Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-                intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent);
-                intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                        ContextCompat.getString(LauncherActivity.this, R.string.add_device_admin_reason));
-                startActivity(intent);
-            }
+        binding.aLauncherRoot.launcherBtnEdit.setOnClickListener(v -> {
+
         });
         // Prev page button
         binding.aLauncherRoot.launcherBtnPrevPage.setOnClickListener(v -> launcherPageUp());
@@ -402,13 +388,12 @@ public class LauncherActivity extends AppCompatActivity {
         // Drawer
         int gridColumnCount = getResources().getInteger(R.integer.grid_column_count);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, gridColumnCount);
-        GridDrawerRVAdapter gridDrawerRVAdapter = new GridDrawerRVAdapter(new ArrayList<>());
-        gridDrawerRVAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
+        DrawerListAdapter drawerListAdapter = new DrawerListAdapter(new ArrayList<>());
+        drawerListAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
             @Override
             public void onItemClick(ActivityModel item, View view) {
-                IntentUtils.handleLaunchActivityResult(LauncherActivity.this,
-                        IntentUtils.launchActivity(LauncherActivity.this,
-                                item.getPackageName(), item.getActivityName(), true));
+                IntentUtils.launchActivity(LauncherActivity.this, item.getPackageName(),
+                        item.getActivityName(), true);
             }
 
             @Override
@@ -420,7 +405,7 @@ public class LauncherActivity extends AppCompatActivity {
         VerticalGridDecoration verticalGridDecoration = new VerticalGridDecoration(
                 getResources().getInteger(R.integer.grid_column_count), 0, 0);
         binding.aLauncherDrawer.drawerRv.setLayoutManager(gridLayoutManager);
-        binding.aLauncherDrawer.drawerRv.setAdapter(gridDrawerRVAdapter);
+        binding.aLauncherDrawer.drawerRv.setAdapter(drawerListAdapter);
         binding.aLauncherDrawer.drawerRv.addItemDecoration(verticalGridDecoration);
         binding.aLauncherDrawer.drawerSv.setOnQueryTextFocusChangeListener((v, hasFocus) ->
                 binding.aLauncherDrawer.drawerBtnQuit.setVisibility(View.VISIBLE));
@@ -432,7 +417,7 @@ public class LauncherActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                GridDrawerRVAdapter adapter = (GridDrawerRVAdapter) binding.aLauncherDrawer.drawerRv.getAdapter();
+                DrawerListAdapter adapter = (DrawerListAdapter) binding.aLauncherDrawer.drawerRv.getAdapter();
                 if (adapter != null) {
                     adapter.getFilter().filter(newText);
                 }
@@ -444,7 +429,25 @@ public class LauncherActivity extends AppCompatActivity {
             binding.aLauncherDrawer.drawerSv.clearFocus();
             binding.aLauncherDrawer.drawerBtnQuit.setVisibility(View.GONE);
         });
-        launcherViewModel.getActivityModelList().observe(LauncherActivity.this, gridDrawerRVAdapter::setList);
+        launcherViewModel.getActivityModelList().observe(LauncherActivity.this, drawerListAdapter::setList);
+        // Handle result of selecting app
+        selectAppLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult activityResult) {
+                if (activityResult == null) {
+                    Log.e(TAG, "Activity result of selecting app is null.");
+                    return;
+                }
+
+                Intent data = activityResult.getData();
+                if (data == null) {
+                    Log.e(TAG, "Data of activity result of selecting app is null.");
+                    return;
+                }
+
+                // Handle
+            }
+        });
     }
 
     @Override
@@ -530,6 +533,42 @@ public class LauncherActivity extends AppCompatActivity {
         }
     }
 
+    private static void handleLaunchActivityResult(@NonNull Context context,
+                                                   IntentUtils.LaunchActivityResult result) {
+        switch (result) {
+            case NOT_EXPORTED: {
+                Toast.makeText(context, R.string.cannot_access_unexported_activity, Toast.LENGTH_SHORT).show();
+                break;
+            }
+            case REQUIRE_EXTRA_PERMISSION: {
+                Toast.makeText(context, R.string.activity_requires_extra_permission, Toast.LENGTH_SHORT).show();
+                break;
+            }
+            case NOT_FOUND: {
+                Toast.makeText(context, R.string.cannot_find_activity, Toast.LENGTH_SHORT).show();
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    public static void handleLaunchIntentResult(Context context, IntentUtils.LaunchIntentResult result) {
+        switch (result) {
+            case URI_IS_EMPTY: {
+                Toast.makeText(context, R.string.uri_is_empty, Toast.LENGTH_SHORT).show();
+                break;
+            }
+            case NO_MATCHING_ACTIVITY: {
+                Toast.makeText(context, R.string.no_matching_activity, Toast.LENGTH_SHORT).show();
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
     private void showLauncherIconMenu(@NonNull View view, @NonNull IconModel iconModel) {
         Context context = view.getContext();
 
@@ -545,7 +584,7 @@ public class LauncherActivity extends AppCompatActivity {
         ActivityModel activityModel = new ActivityModel(context, activityInfo);
 
         PopupMenu popupMenu = new PopupMenu(context, view);
-        popupMenu.getMenuInflater().inflate(R.menu.launcher_icon_op_menu, popupMenu.getMenu());
+        popupMenu.getMenuInflater().inflate(R.menu.launcher_icon_menu, popupMenu.getMenu());
         int baseIndex = popupMenu.getMenu().size();
         List<ShortcutInfo> shortcutInfoList;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -564,34 +603,20 @@ public class LauncherActivity extends AppCompatActivity {
         }
         popupMenu.setOnMenuItemClickListener(menuItem -> {
             int menuId = menuItem.getItemId();
-            if (menuId == R.id.remove_icon) {
+            if (menuId == R.id.remove) {
                 launcherViewModel.removeIcon(iconModel.toIconEntity());
                 return true;
             } else if (menuId == R.id.uninstall) {
-                ApplicationUtils.ApplicationType type = ApplicationUtils.getApplicationType(
-                        LauncherActivity.this, activityModel.getPackageName());
-                if (getPackageName().equals(activityModel.getPackageName())) {
-                    showUninstallThisAppDialog();
-                } else if (type == ApplicationUtils.ApplicationType.UPDATED_SYSTEM
-                        || type == ApplicationUtils.ApplicationType.USER) {
-                    IntentUtils.handleLaunchIntentResult(
-                            LauncherActivity.this,
-                            IntentUtils.requireUninstallApp(LauncherActivity.this, activityModel.getPackageName())
-                    );
-                } else if (type == ApplicationUtils.ApplicationType.SYSTEM) {
-                    showUninstallSystemAppDialog(activityModel.getPackageName());
-                } else {
-                    Toast.makeText(this, R.string.cannot_uninstall_app, Toast.LENGTH_SHORT).show();
-                }
+                requestUninstallApp(activityModel.getPackageName());
                 return true;
             } else if (menuId == R.id.app_info) {
-                IntentUtils.handleLaunchIntentResult(
+                handleLaunchIntentResult(
                         this,
                         IntentUtils.openAppDetailsPage(LauncherActivity.this, activityModel.getPackageName())
                 );
                 return true;
             } else if (menuId == R.id.app_market) {
-                IntentUtils.handleLaunchIntentResult(
+                handleLaunchIntentResult(
                         this,
                         IntentUtils.openAppInMarket(LauncherActivity.this, activityModel.getPackageName())
                 );
@@ -608,6 +633,27 @@ public class LauncherActivity extends AppCompatActivity {
             } else {
                 return false;
             }
+        });
+        popupMenu.show();
+    }
+
+    private void showLauncherBlankAreaMenu(View anchorView, float x, float y, int cellX, int cellY) {
+        PopupMenu popupMenu = new PopupMenu(LauncherActivity.this, anchorView);
+        getMenuInflater().inflate(R.menu.launcher_blank_area_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int menuId = item.getItemId();
+            if (menuId == R.id.add_page) {
+                return true;
+            } else if (menuId == R.id.delete_page) {
+                boolean result = launcherViewModel.deleteScreen();
+                if (!result) {
+                    Toast.makeText(LauncherActivity.this, R.string.delete_screen_fail_reason, Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            } else if (menuId == R.id.modify_item) {
+                return true;
+            }
+            return false;
         });
         popupMenu.show();
     }
@@ -630,33 +676,16 @@ public class LauncherActivity extends AppCompatActivity {
         popupMenu.setOnMenuItemClickListener(menuItem -> {
             int menuId = menuItem.getItemId();
             if (menuId == R.id.app_info) {
-                IntentUtils.handleLaunchIntentResult(
+                handleLaunchIntentResult(
                         LauncherActivity.this,
                         IntentUtils.openAppDetailsPage(LauncherActivity.this, item.getPackageName())
                 );
                 return true;
             } else if (menuId == R.id.uninstall) {
-                ApplicationUtils.ApplicationType type = ApplicationUtils.getApplicationType(
-                        LauncherActivity.this, item.getPackageName());
-                if (getPackageName().equals(item.getPackageName())) {
-                    showUninstallThisAppDialog();
-                } else if (type == ApplicationUtils.ApplicationType.UPDATED_SYSTEM
-                        || type == ApplicationUtils.ApplicationType.USER) {
-                    IntentUtils.handleLaunchIntentResult(
-                            LauncherActivity.this,
-                            IntentUtils.requireUninstallApp(LauncherActivity.this, item.getPackageName())
-                    );
-                } else if (type == ApplicationUtils.ApplicationType.SYSTEM) {
-                    showUninstallSystemAppDialog(item.getPackageName());
-                } else {
-                    Toast.makeText(LauncherActivity.this, R.string.cannot_uninstall_app, Toast.LENGTH_SHORT).show();
-                }
+                requestUninstallApp(item.getPackageName());
                 return true;
             } else if (menuId == R.id.app_market) {
-                IntentUtils.handleLaunchIntentResult(
-                        LauncherActivity.this,
-                        IntentUtils.openAppInMarket(LauncherActivity.this, item.getPackageName())
-                );
+                IntentUtils.openAppInMarket(LauncherActivity.this, item.getPackageName());
                 return true;
             } else if (menuId >= baseIndex) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -674,14 +703,43 @@ public class LauncherActivity extends AppCompatActivity {
         popupMenu.show();
     }
 
+    private void requestUninstallApp(String packageName) {
+        IntentUtils.requestUninstallApp(LauncherActivity.this, packageName, new IntentUtils.OnRequestUninstallApp() {
+            @Override
+            public void uninstallThisApp() {
+                showUninstallThisAppDialog();
+            }
+
+            @Override
+            public void uninstallSystemApp(String packageName) {
+                showUninstallSystemAppDialog(packageName);
+            }
+
+            @Override
+            public void uninstallUpdatedSystemApp(String packageName) {
+                IntentUtils.uninstallApp(LauncherActivity.this, packageName);
+            }
+
+            @Override
+            public void uninstallUserApp(String packageName) {
+                IntentUtils.uninstallApp(LauncherActivity.this, packageName);
+            }
+
+            @Override
+            public void onError(String packageName) {
+                Toast.makeText(LauncherActivity.this, R.string.cannot_uninstall_app, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void showUninstallSystemAppDialog(String packageName) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.hint)
                 .setMessage(R.string.insist_uninstall_system_app)
                 .setPositiveButton(R.string.uninstall, (dialog, which) ->
-                        IntentUtils.handleLaunchIntentResult(
+                        handleLaunchIntentResult(
                                 this,
-                                IntentUtils.requireUninstallApp(this, packageName)
+                                IntentUtils.uninstallApp(this, packageName)
                         ))
                 .setNegativeButton(R.string.cancel, null);
         DialogUtils.show(builder, settingsViewModel.getAnimationValue());
@@ -692,9 +750,9 @@ public class LauncherActivity extends AppCompatActivity {
                 .setTitle(R.string.hint)
                 .setMessage(R.string.insist_uninstall_this_app)
                 .setPositiveButton(R.string.uninstall, (dialog, which) ->
-                        IntentUtils.handleLaunchIntentResult(
+                        handleLaunchIntentResult(
                                 this,
-                                IntentUtils.requireUninstallApp(this, getPackageName())
+                                IntentUtils.uninstallApp(this, getPackageName())
                         ))
                 .setNegativeButton(R.string.cancel, null);
         DialogUtils.show(builder, settingsViewModel.getAnimationValue());

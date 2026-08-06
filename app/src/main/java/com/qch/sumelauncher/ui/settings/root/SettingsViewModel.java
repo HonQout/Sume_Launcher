@@ -25,7 +25,7 @@ public class SettingsViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> mDisplayDate = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayRingerMode = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayAirplaneMode = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> mDisplayWlan = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mDisplayWifi = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayBluetooth = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayBatteryPct = new MutableLiveData<>();
 
@@ -114,10 +114,10 @@ public class SettingsViewModel extends AndroidViewModel {
                 );
         compositeDisposable.add(disposable9);
         Disposable disposable10 = MyApplication.getPreferenceDataStore()
-                .getBooleanFlowable("wlan", true)
+                .getBooleanFlowable("wifi", true)
                 .subscribe(
-                        mDisplayWlan::postValue,
-                        throwable -> Log.e(TAG, "Cannot get value of key wlan.", throwable)
+                        mDisplayWifi::postValue,
+                        throwable -> Log.e(TAG, "Cannot get value of key wifi.", throwable)
                 );
         compositeDisposable.add(disposable10);
         Disposable disposable11 = MyApplication.getPreferenceDataStore()
@@ -164,47 +164,23 @@ public class SettingsViewModel extends AndroidViewModel {
         return mDisplayDate;
     }
 
-    public boolean getDisplayDateValue() {
-        return mDisplayDate.getValue() == null || mDisplayDate.getValue();
-    }
-
     public LiveData<Boolean> getDisplayRingerMode() {
         return mDisplayRingerMode;
-    }
-
-    public boolean getDisplayRingerModeValue() {
-        return mDisplayRingerMode.getValue() == null || mDisplayRingerMode.getValue();
     }
 
     public LiveData<Boolean> getDisplayAirplaneMode() {
         return mDisplayAirplaneMode;
     }
 
-    public boolean getDisplayAirplaneModeValue() {
-        return mDisplayAirplaneMode.getValue() != null && mDisplayAirplaneMode.getValue();
-    }
-
-    public LiveData<Boolean> getDisplayWlan() {
-        return mDisplayWlan;
-    }
-
-    public boolean getDisplayWlanValue() {
-        return mDisplayWlan.getValue() != null && mDisplayWlan.getValue();
+    public LiveData<Boolean> getDisplayWifi() {
+        return mDisplayWifi;
     }
 
     public LiveData<Boolean> getDisplayBluetooth() {
         return mDisplayBluetooth;
     }
 
-    public boolean getDisplayBluetoothValue() {
-        return mDisplayBluetooth.getValue() != null && mDisplayBluetooth.getValue();
-    }
-
     public LiveData<Boolean> getDisplayBatteryPct() {
         return mDisplayBatteryPct;
-    }
-
-    public boolean getDisplayBatteryPctValue() {
-        return mDisplayBatteryPct.getValue() != null && mDisplayBatteryPct.getValue();
     }
 }

@@ -303,10 +303,6 @@ public class LauncherViewModel extends AndroidViewModel {
         return mGridSize;
     }
 
-    public int getNumColumnValue() {
-        return mGridSize.getValue() == null ? GridSize.DEFAULT_NUM_COLUMN : mGridSize.getValue().getColumn();
-    }
-
     public int getNumScreenValue() {
         if (numScreen != null) {
             Integer value = numScreen.getValue();
@@ -349,15 +345,35 @@ public class LauncherViewModel extends AndroidViewModel {
         repository.insertIcon(iconEntity);
     }
 
-    public void moveIconToNewScreen(@NonNull IconEntity iconEntity) {
-        repository.moveIconToNewScreen(iconEntity);
-    }
-
     public void removeIcon(@NonNull IconEntity iconEntity) {
         repository.deleteIcon(iconEntity, true);
     }
 
     public void removeIconsByPackageName(@NonNull String packageName) {
         repository.deleteIconsByPackage(packageName);
+    }
+
+    public boolean deleteScreen() {
+        if (mGridSize == null) {
+            return false;
+        }
+        GridSize gridSize = mGridSize.getValue();
+        if (gridSize == null) {
+            return false;
+        }
+        String layoutName = gridSize.toString();
+
+        int screenIndex = getCurrentScreenIndexValue();
+
+        return deleteScreen(layoutName, screenIndex);
+    }
+
+    public boolean deleteScreen(String layoutName, int screenIndex) {
+        if (getNumScreenValue() > 1) {
+            repository.deleteScreen(layoutName, screenIndex);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

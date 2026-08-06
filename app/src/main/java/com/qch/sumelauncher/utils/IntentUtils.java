@@ -1,48 +1,48 @@
 package com.qch.sumelauncher.utils;
 
+import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import com.qch.sumelauncher.R;
+import java.util.Objects;
 
 public class IntentUtils {
     private static final String TAG = "IntentUtils";
 
     public enum LaunchIntentResult {
-        SUCCESS, URI_IS_EMPTY, NO_MATCHING_ACTIVITY
+        SUCCESS,
+        URI_IS_EMPTY,
+        NO_MATCHING_ACTIVITY,
+        REQUIRE_EXTRA_PERMISSION
     }
 
     public enum LaunchActivityResult {
-        SUCCESS, NOT_EXPORTED, REQUIRE_PERMISSION, NOT_FOUND
+        SUCCESS,
+        NOT_FOUND,
+        NOT_EXPORTED,
+        REQUIRE_EXTRA_PERMISSION
     }
 
-    public static void handleLaunchActivityResult(@NonNull Context context,
-                                                  LaunchActivityResult result) {
-        switch (result) {
-            case NOT_EXPORTED: {
-                Toast.makeText(context, R.string.cannot_access_unexported_activity, Toast.LENGTH_SHORT).show();
-                break;
-            }
-            case REQUIRE_PERMISSION: {
-                Toast.makeText(context, R.string.activity_requires_extra_permission, Toast.LENGTH_SHORT).show();
-                break;
-            }
-            case NOT_FOUND: {
-                Toast.makeText(context, R.string.cannot_find_activity, Toast.LENGTH_SHORT).show();
-                break;
-            }
-            default:
-                break;
-        }
+    public interface OnRequestUninstallApp {
+        void uninstallThisApp();
+
+        void uninstallSystemApp(String packageName);
+
+        void uninstallUpdatedSystemApp(String packageName);
+
+        void uninstallUserApp(String packageName);
+
+        void onError(String packageName);
     }
 
     public static LaunchActivityResult launchActivity(@NonNull Context context,
@@ -54,7 +54,7 @@ public class IntentUtils {
         } else if (!TextUtils.isEmpty(activityInfo.permission)) {
             Log.e(TAG, "Cannot launch activity. Requested activity requires extra permission"
                     + activityInfo.permission + " to start.");
-            return LaunchActivityResult.REQUIRE_PERMISSION;
+            return LaunchActivityResult.REQUIRE_EXTRA_PERMISSION;
         } else {
             String packageName = activityInfo.packageName;
             String activityName = activityInfo.name;
@@ -82,22 +82,6 @@ public class IntentUtils {
                 launchActivity(context, activityInfo, newTask);
     }
 
-    public static void handleLaunchIntentResult(Context context, LaunchIntentResult result) {
-        switch (result) {
-            case URI_IS_EMPTY: {
-                Toast.makeText(context, R.string.uri_is_empty, Toast.LENGTH_SHORT).show();
-                break;
-            }
-            case NO_MATCHING_ACTIVITY: {
-                Toast.makeText(context, R.string.no_matching_activity, Toast.LENGTH_SHORT).show();
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    }
-
     public static LaunchIntentResult openAppDetailsPage(Context context, String packageName) {
         if (packageName == null || TextUtils.isEmpty(packageName)) {
             Log.e(TAG, "Cannot launch activity because the given packageName is null or empty.");
@@ -115,20 +99,56 @@ public class IntentUtils {
         }
     }
 
-    public static LaunchIntentResult requireUninstallApp(@NonNull Context context, String packageName) {
-        if (packageName == null || TextUtils.isEmpty(packageName)) {
-            Log.e(TAG, "Cannot uninstall app because the given packageName is empty.");
+    public static LaunchIntentResult uninstallApp(@NonNull Context context, String packageName) {
+        if (TextUtils.isEmpty(packageName)) {
+            Log.e(TAG, "Cannot uninstall app. The given packageName is empty.");
             return LaunchIntentResult.URI_IS_EMPTY;
         }
-        Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                && PermissionUtils.isPermissionGranted(context, Manifest.permission.REQUEST_DELETE_PACKAGES)) {
+            Log.e(TAG, "Failed to uninstall app. This operation requires permission "
+                    + Manifest.permission.REQUEST_DELETE_PACKAGES + " since Android 9.0.");
+            return LaunchIntentResult.REQUIRE_EXTRA_PERMISSION;
+        }
+        Intent intent = new Intent(Intent.ACTION_DELETE);
         intent.setData(Uri.fromParts("package", packageName, null));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
             context.startActivity(intent);
             return LaunchIntentResult.SUCCESS;
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "Cannot uninstall app because requested package cannot be found.", e);
+            Log.e(TAG, "Failed to uninstall app. Requested activity cannot be found.", e);
             return LaunchIntentResult.NO_MATCHING_ACTIVITY;
+        }
+    }
+
+    public static void requestUninstallApp(@NonNull Context context, @Nullable String packageName,
+                                           OnRequestUninstallApp callback) {
+        if (TextUtils.isEmpty(packageName)) {
+            return;
+        }
+
+        ApplicationUtils.ApplicationType type = ApplicationUtils.getApplicationType(context, packageName);
+        if (Objects.equals(packageName, context.getPackageName())) {
+            callback.uninstallThisApp();
+        } else {
+            switch (type) {
+                case SYSTEM: {
+                    callback.uninstallSystemApp(packageName);
+                    break;
+                }
+                case UPDATED_SYSTEM: {
+                    callback.uninstallUpdatedSystemApp(packageName);
+                    break;
+                }
+                case USER: {
+                    callback.uninstallUserApp(packageName);
+                    break;
+                }
+                default: {
+                    callback.onError(packageName);
+                    break;
+                }
+            }
         }
     }
 

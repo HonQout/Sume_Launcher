@@ -21,8 +21,8 @@ public class VerticalGridDecoration extends RecyclerView.ItemDecoration {
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view,
                                @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         int position = parent.getChildAdapterPosition(view);
+        int row = position / spanCount;
         int column = position % spanCount;
-        int row = position - column * spanCount;
         outRect.left = column == 0 ? 0 : spaceHorizontal / 2;
         outRect.right = column == spanCount - 1 ? 0 : spaceHorizontal / 2;
         outRect.top = row == 0 ? 0 : spaceVertical;

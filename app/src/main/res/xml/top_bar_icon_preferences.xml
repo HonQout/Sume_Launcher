@@ -40,14 +40,14 @@
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            app:icon="@drawable/baseline_wifi_settings_24"
+            app:icon="@drawable/baseline_wifi_day_night_24"
             app:iconSpaceReserved="true"
-            app:key="wlan"
-            app:title="@string/wlan" />
+            app:key="wifi"
+            app:title="@string/wifi" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            app:icon="@drawable/baseline_bluetooth_settings_24"
+            app:icon="@drawable/baseline_bluetooth_day_night_24"
             app:iconSpaceReserved="true"
             app:key="bluetooth"
             app:title="@string/bluetooth" />

@@ -215,8 +215,8 @@ public class TopBarView extends LinearLayoutCompat {
 
                 BatteryView batteryView = new BatteryView(context);
                 LinearLayoutCompat.LayoutParams layoutParams = new LinearLayoutCompat.LayoutParams(
-                        context.getResources().getDimensionPixelSize(R.dimen.top_bar_battery_width),
-                        context.getResources().getDimensionPixelSize(R.dimen.top_bar_battery_height)
+                        Math.round(context.getResources().getDimension(R.dimen.top_bar_battery_width)),
+                        Math.round(context.getResources().getDimension(R.dimen.top_bar_battery_height))
                 );
                 layoutParams.setMargins(2, 2, 2, 2);
                 batteryView.setLayoutParams(layoutParams);

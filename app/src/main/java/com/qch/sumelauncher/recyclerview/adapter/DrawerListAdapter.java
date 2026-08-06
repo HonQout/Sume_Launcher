@@ -15,15 +15,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class GridDrawerRVAdapter extends FilterableListAdapter<ActivityModel, GridDrawerRVAdapter.ViewHolder> {
-    private static final String TAG = "GridDrawerRVAdapter";
+public class DrawerListAdapter extends FilterableListAdapter<ActivityModel, DrawerListAdapter.ViewHolder> {
+    private static final String TAG = "DrawerListAdapter";
 
-    public static final DiffUtil.ItemCallback<ActivityModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
+    private static final DiffUtil.ItemCallback<ActivityModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
         public boolean areItemsTheSame(@NonNull ActivityModel oldItem, @NonNull ActivityModel newItem) {
-            boolean isPackageNameTheSame = Objects.equals(oldItem.getPackageName(), newItem.getActivityName());
-            boolean isActivityNameTheSame = Objects.equals(oldItem.getActivityName(), newItem.getActivityName());
-            return isPackageNameTheSame && isActivityNameTheSame;
+            return Objects.equals(oldItem, newItem);
         }
 
         @Override
@@ -58,19 +56,19 @@ public class GridDrawerRVAdapter extends FilterableListAdapter<ActivityModel, Gr
         }
     }
 
-    public GridDrawerRVAdapter(List<ActivityModel> activityModelList) {
+    public DrawerListAdapter(List<ActivityModel> activityModelList) {
         super(DIFF_CALLBACK, activityModelList);
     }
 
     @NonNull
     @Override
-    public GridDrawerRVAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public DrawerListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         IconView iconView = new IconView(parent.getContext());
         return new ViewHolder(iconView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull GridDrawerRVAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull DrawerListAdapter.ViewHolder holder, int position) {
         ActivityModel activityModel = getItem(position);
         holder.iconView.setActivityModel(activityModel);
     }
