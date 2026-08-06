@@ -50,10 +50,10 @@ public class LauncherViewModel extends AndroidViewModel {
     }
 
     // data
+    private LauncherState launcherState = LauncherState.LAUNCHER;
     private LiveData<Integer> numScreen;
     private LiveData<Map<Integer, List<IconEntity>>> iconEntityMap;
     private LiveData<Map<Integer, List<IconModel>>> iconModelMap;
-    private final MutableLiveData<LauncherState> mLauncherState = new MutableLiveData<>(LauncherState.LAUNCHER);
     private final MutableLiveData<GridSize> mGridSize
             = new MutableLiveData<>(new GridSize(GridSize.DEFAULT_NUM_ROW, GridSize.DEFAULT_NUM_COLUMN));
     private final MutableLiveData<Integer> mCurrentScreenIndex = new MutableLiveData<>();
@@ -287,16 +287,12 @@ public class LauncherViewModel extends AndroidViewModel {
         });
     }
 
-    public void setLauncherState(LauncherState state) {
-        mLauncherState.postValue(state);
+    public void setLauncherState(LauncherState launcherState) {
+        this.launcherState = launcherState;
     }
 
-    public LiveData<LauncherState> getLauncherState() {
-        return mLauncherState;
-    }
-
-    public LauncherState getLauncherStateValue() {
-        return mLauncherState.getValue() == null ? LauncherState.LAUNCHER : mLauncherState.getValue();
+    public LauncherState getLauncherState() {
+        return launcherState;
     }
 
     public LiveData<GridSize> getGridSize() {
