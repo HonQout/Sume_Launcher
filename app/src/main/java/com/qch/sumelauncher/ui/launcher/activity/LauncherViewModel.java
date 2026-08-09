@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
@@ -21,22 +22,26 @@ import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 import com.qch.sumelauncher.compat.CollectionCompat;
 import com.qch.sumelauncher.data.model.launcher.GridSize;
 import com.qch.sumelauncher.data.model.launcher.IconModel;
+import com.qch.sumelauncher.data.model.launcher.PageWithIconModels;
 import com.qch.sumelauncher.room.entity.IconEntity;
-import com.qch.sumelauncher.room.repository.LauncherIconRepository;
+import com.qch.sumelauncher.room.relation.PageWithIconEntities;
+import com.qch.sumelauncher.room.repository.LauncherRepository;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class LauncherViewModel extends AndroidViewModel {
     private static final String TAG = "LauncherViewModel";
@@ -49,24 +54,27 @@ public class LauncherViewModel extends AndroidViewModel {
         INIT, ADD, REMOVE, REPLACE
     }
 
+    public enum InsertPagePosition {
+        BEFORE, AFTER
+    }
+
     // data
-    private LauncherState launcherState = LauncherState.LAUNCHER;
-    private LiveData<Integer> numScreen;
-    private LiveData<Map<Integer, List<IconEntity>>> iconEntityMap;
-    private LiveData<Map<Integer, List<IconModel>>> iconModelMap;
-    private final MutableLiveData<GridSize> mGridSize
-            = new MutableLiveData<>(new GridSize(GridSize.DEFAULT_NUM_ROW, GridSize.DEFAULT_NUM_COLUMN));
-    private final MutableLiveData<Integer> mCurrentScreenIndex = new MutableLiveData<>();
+    private final MutableLiveData<GridSize> mGridSize = new MutableLiveData<>(GridSize.DEFAULT_VALUE);
+    private LiveData<Integer> pageCount;
+    private final MediatorLiveData<List<PageWithIconEntities>> pagedIconEntityList = new MediatorLiveData<>();
+    private final MediatorLiveData<List<PageWithIconModels>> pagedIconModelList = new MediatorLiveData<>();
     private final MutableLiveData<List<ActivityModel>> mActivityModelList = new MutableLiveData<>();
+    private LauncherState launcherState = LauncherState.LAUNCHER;
+    private int currentPageIndex;
 
     // multi-thread
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService executorService = Executors.newFixedThreadPool(2);
     private final AtomicBoolean isUpdatingList = new AtomicBoolean(false);
     private final Object updateListLock = new Object();
 
     // persistence
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
-    private LauncherIconRepository repository;
+    private LauncherRepository repository;
 
     // broadcast receiver
     private BroadcastReceiver localeBroadcastReceiver = null;
@@ -75,6 +83,8 @@ public class LauncherViewModel extends AndroidViewModel {
 
     public LauncherViewModel(@NonNull Application application) {
         super(application);
+        repository = new LauncherRepository(getApplication());
+
         registerLocaleBR();
         registerPackageBR();
         initLauncherLayout();
@@ -202,22 +212,57 @@ public class LauncherViewModel extends AndroidViewModel {
     }
 
     private void initLauncherLayout() {
-        repository = new LauncherIconRepository(getApplication());
-        iconEntityMap = Transformations.switchMap(mGridSize, gridSize ->
-                repository.getIconEntityMapInLayout(gridSize.toString()));
-        iconModelMap = Transformations.switchMap(mGridSize, gridSize ->
-                repository.getIconModelMapInLayout(gridSize.toString()));
-        numScreen = Transformations.switchMap(mGridSize, gridSize ->
-                repository.getNumScreens(gridSize.toString()));
+        LiveData<List<PageWithIconEntities>> rawPagedIconEntityList
+                = Transformations.switchMap(mGridSize, gridSize ->
+                gridSize == null ? new MutableLiveData<>(Collections.emptyList()) :
+                        repository.getPagedIconListInLayout(gridSize.toString())
+        );
+        pagedIconModelList.addSource(rawPagedIconEntityList, rawList -> {
+            if (rawList == null) {
+                pagedIconEntityList.postValue(new ArrayList<>());
+                return;
+            }
+            executorService.execute(() -> {
+                List<PageWithIconEntities> pageWithIconEntitiesList = new ArrayList<>();
+                List<PageWithIconModels> pageWithIconModelsList = new ArrayList<>();
+                List<IconEntity> invalidIcons = new ArrayList<>();
+                for (PageWithIconEntities pageWithIconEntities : rawList) {
+                    List<IconEntity> validIconEntityList = new ArrayList<>();
+                    List<IconModel> validIconModelList = new ArrayList<>();
+                    if (pageWithIconEntities.list != null) {
+                        for (IconEntity iconEntity : pageWithIconEntities.list) {
+                            if (ApplicationUtils.hasActivity(getApplication(),
+                                    iconEntity.getPackageName(), iconEntity.getActivityName())) {
+                                validIconEntityList.add(iconEntity);
+                                validIconModelList.add(new IconModel(getApplication(), iconEntity));
+                            } else {
+                                invalidIcons.add(iconEntity);
+                            }
+                        }
+                    }
+                    PageWithIconEntities cleanedPageWithIconEntities = new PageWithIconEntities();
+                    cleanedPageWithIconEntities.page = pageWithIconEntities.page;
+                    cleanedPageWithIconEntities.list = validIconEntityList;
+                    pageWithIconEntitiesList.add(cleanedPageWithIconEntities);
+                    pageWithIconModelsList.add(new PageWithIconModels(pageWithIconEntities.page, validIconModelList));
+                }
+                pagedIconEntityList.postValue(pageWithIconEntitiesList);
+                pagedIconModelList.postValue(pageWithIconModelsList);
+                if (!invalidIcons.isEmpty()) {
+                    repository.deleteIconListSync(invalidIcons);
+                }
+            });
+        });
+        pageCount = Transformations.switchMap(mGridSize, gridSize ->
+                repository.getPageCount(gridSize.toString()));
     }
 
     private void initDisposable() {
         // grid_size
         Disposable disposable = MyApplication.getPreferenceDataStore()
-                .getStringFlowable("grid_size", "5,5")
+                .getStringFlowable("grid_size", GridSize.DEFAULT_VALUE.toString())
                 .subscribe(string -> {
-                            GridSize gridSize = GridSize.parse(string,
-                                    new GridSize(GridSize.DEFAULT_NUM_ROW, GridSize.DEFAULT_NUM_COLUMN));
+                            GridSize gridSize = GridSize.parse(string, GridSize.DEFAULT_VALUE);
                             mGridSize.postValue(gridSize);
                             updateActivityModelList(AppListOp.INIT, null);
                         },
@@ -267,7 +312,7 @@ public class LauncherViewModel extends AndroidViewModel {
                 }
                 // Update Database
                 if (op == AppListOp.REMOVE) {
-                    repository.deleteIconsByPackage(packageName);
+                    deleteIconsByPackage(packageName);
                 }
                 if (op == AppListOp.REPLACE) {
                     // TODO: Ask LauncherLayout to reload activity if package is updated
@@ -299,13 +344,17 @@ public class LauncherViewModel extends AndroidViewModel {
         return mGridSize;
     }
 
-    public String getGridSizeStr() {
+    public String getGridSizeString() {
         return mGridSize.getValue() == null ? null : mGridSize.getValue().toString();
     }
 
-    public int getNumScreenValue() {
-        if (numScreen != null) {
-            Integer value = numScreen.getValue();
+    public LiveData<Integer> getPageCount() {
+        return pageCount;
+    }
+
+    public int getPageCountValue() {
+        if (pageCount != null) {
+            Integer value = pageCount.getValue();
             if (value != null) {
                 return value;
             }
@@ -313,89 +362,127 @@ public class LauncherViewModel extends AndroidViewModel {
         return 1;
     }
 
-    public void setCurrentScreenIndex(int newValue) {
-        mCurrentScreenIndex.postValue(newValue);
+    public void setCurrentPageIndex(int newValue) {
+        if (newValue >= 0 && newValue < getPageCountValue()) {
+            currentPageIndex = newValue;
+        }
     }
 
-    public LiveData<Integer> getCurrentScreenIndex() {
-        return mCurrentScreenIndex;
-    }
-
-    public int getCurrentScreenIndexValue() {
-        return mCurrentScreenIndex.getValue() == null ? -1 : mCurrentScreenIndex.getValue();
+    public int getCurrentPageIndex() {
+        return currentPageIndex;
     }
 
     public LiveData<List<ActivityModel>> getActivityModelList() {
         return mActivityModelList;
     }
 
-    public LiveData<Map<Integer, List<IconEntity>>> getIconEntityMap() {
-        return iconEntityMap;
+    public LiveData<List<PageWithIconModels>> getPagedIconModelList() {
+        return pagedIconModelList;
     }
 
-    public LiveData<Map<Integer, List<IconModel>>> getIconModelMap() {
-        return iconModelMap;
+    public Completable insertIconAsync(@NonNull IconEntity iconEntity) {
+        return repository.insertIconAsync(iconEntity)
+                .subscribeOn(Schedulers.io());
     }
 
-    public LiveData<Integer> getNumScreen() {
-        return numScreen;
+    public Completable insertIconAsync(int cellX, int cellY, String packageName, String activityName) {
+        String layoutName = getGridSizeString();
+        if (layoutName == null) {
+            throw new IllegalArgumentException("Layout name is null.");
+        }
+
+        int pageRank = getCurrentPageIndex();
+        if (pageRank < 0) {
+            throw new IllegalArgumentException("Current page rank is null.");
+        }
+
+        return repository.insertIconAsync(layoutName, pageRank, cellX, cellY, packageName, activityName)
+                .subscribeOn(Schedulers.io());
     }
 
-    public void insertIcon(@NonNull IconEntity iconEntity) {
-        repository.insertIcon(iconEntity);
+    public void deleteIconAsync(@NonNull IconEntity iconEntity) {
+        repository.deleteIcon(iconEntity)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
-    public void insertIcon(String layoutName, int screenIndex, int cellX, int cellY,
-                           String packageName, String activityName) {
-        repository.insertIcon(layoutName, screenIndex, cellX, cellY, packageName, activityName);
+    public void deleteIconsAsync(@NonNull IconEntity[] iconEntities) {
+        repository.deleteIcons(iconEntities)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
-    public void insertIcon(int cellX, int cellY, String packageName, String activityName) {
-        String layoutName = getGridSizeStr();
+    public void deleteIconByPositionAsync(@NonNull IconEntity iconEntity) {
+        String layoutName = getGridSizeString();
         if (layoutName == null) {
             return;
         }
 
-        int screenIndex = getCurrentScreenIndexValue();
-        if (screenIndex < 0) {
+        int pageRank = getCurrentPageIndex();
+        if (pageRank < 0) {
             return;
         }
 
-        repository.insertIcon(layoutName, screenIndex, cellX, cellY, packageName, activityName);
+        deleteIconByPositionAsync(layoutName, pageRank, iconEntity.getCellX(), iconEntity.getCellY());
     }
 
-    public void removeIcon(@NonNull IconEntity iconEntity) {
-        repository.deleteIcon(iconEntity, true);
+    public void deleteIconByPositionAsync(@NonNull String layoutName, int pageRank, int cellX, int cellY) {
+        repository.deleteIconByPositionAsync(layoutName, pageRank, cellX, cellY)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
-    public void removeIconsByPackage(@NonNull String packageName) {
-        repository.deleteIconsByPackage(packageName);
+    public void deleteIconsByPackage(@NonNull String packageName) {
+        repository.deleteIconsByPackage(packageName)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
-    public void updateIcon() {
-
+    public void insertPage(String layoutName, InsertPagePosition position) {
+        if (getCurrentPageIndex() < 0) {
+            return;
+        }
+        switch (position) {
+            case BEFORE: {
+                repository.insertPageAt(layoutName, getCurrentPageIndex())
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .subscribe();
+                break;
+            }
+            case AFTER: {
+                repository.insertPageAt(layoutName, getCurrentPageIndex() + 1)
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .subscribe();
+                break;
+            }
+            default: {
+                throw new IllegalArgumentException("Argument position is illegal.");
+            }
+        }
     }
 
-    public boolean deleteScreen() {
-        String layoutName = getGridSizeStr();
+    public void insertPage(InsertPagePosition position) {
+        String layoutName = getGridSizeString();
+        insertPage(layoutName, position);
+    }
+
+    public void deletePage() {
+        String layoutName = getGridSizeString();
         if (layoutName == null) {
-            return false;
+            return;
         }
 
-        int screenIndex = getCurrentScreenIndexValue();
-        if (screenIndex < 0) {
-            return false;
+        int pageRank = getCurrentPageIndex();
+        if (pageRank < 0) {
+            return;
         }
 
-        return deleteScreen(layoutName, screenIndex);
+        deletePage(layoutName, pageRank);
     }
 
-    public boolean deleteScreen(String layoutName, int screenIndex) {
-        if (getNumScreenValue() > 1) {
-            repository.deleteScreen(layoutName, screenIndex);
-            return true;
-        } else {
-            return false;
-        }
+    public void deletePage(String layoutName, int pageRank) {
+        repository.deletePageAt(layoutName, pageRank)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 }

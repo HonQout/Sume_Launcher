@@ -10,12 +10,13 @@ public class GridSize {
     public static final int DEFAULT_NUM_COLUMN = 5;
     public static final int DEFAULT_NUM_ROW = 5;
     public static final String SEPARATOR = ",";
+    public static final GridSize DEFAULT_VALUE = new GridSize(DEFAULT_NUM_COLUMN, DEFAULT_NUM_ROW);
     private int column;
     private int row;
 
-    public GridSize(int row, int column) {
-        this.row = row;
+    public GridSize(int column, int row) {
         this.column = column;
+        this.row = row;
     }
 
     public void setColumn(int column) {

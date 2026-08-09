@@ -6,7 +6,7 @@ import android.os.Looper;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class AppExecutors {
+public final class AppExecutors {
     private final Executor diskIO;
     private final Executor networkIO;
     private final Executor mainThread;

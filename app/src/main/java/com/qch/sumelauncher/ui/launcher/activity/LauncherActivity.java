@@ -58,6 +58,8 @@ import com.qch.sumelauncher.ui.topbar.WifiViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+
 public class LauncherActivity extends AppCompatActivity {
     private static final String TAG = "LauncherActivity";
     private ActivityLauncherBinding binding;
@@ -260,12 +262,12 @@ public class LauncherActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 Log.i(TAG, "ViewPager2 onPageSelected position #" + (position + 1));
-                launcherViewModel.setCurrentScreenIndex(position);
+                launcherViewModel.setCurrentPageIndex(position);
                 binding.aLauncherRoot.launcherTvPage.setText(
                         String.format(
                                 ContextCompat.getString(LauncherActivity.this, R.string.page_text),
                                 position + 1,
-                                launcherViewModel.getNumScreenValue()
+                                launcherViewModel.getPageCountValue()
                         ));
             }
         });
@@ -305,12 +307,12 @@ public class LauncherActivity extends AppCompatActivity {
             }
             launcherPageAdapter.setGridSize(gridSize);
         });
-        launcherViewModel.getIconModelMap().observe(this, map -> {
-            if (map == null) {
-                Log.e(TAG, "Map of paged icons is null.");
+        launcherViewModel.getPagedIconModelList().observe(this, list -> {
+            if (list == null) {
+                Log.e(TAG, "List of paged icons is null.");
                 return;
             }
-            launcherPageAdapter.setMap(map);
+            launcherPageAdapter.setList(list);
             launcherPageAdapter.setOnIconClickListener(new LauncherLayout.OnIconClickListener() {
                 @Override
                 public void onClick(@Nullable View view, IconModel item) {
@@ -346,17 +348,19 @@ public class LauncherActivity extends AppCompatActivity {
                 }
             });
         });
-        // Set num screen
-        launcherViewModel.getNumScreen().observe(this, integer -> {
-            if (integer != null) {
-                binding.aLauncherRoot.launcherTvPage.setText(
-                        String.format(
-                                ContextCompat.getString(this, R.string.page_text),
-                                launcherViewModel.getCurrentScreenIndexValue() + 1,
-                                integer
-                        )
-                );
+
+        // Set num page
+        launcherViewModel.getPageCount().observe(this, integer -> {
+            if (integer == null) {
+                return;
             }
+            binding.aLauncherRoot.launcherTvPage.setText(
+                    String.format(
+                            ContextCompat.getString(this, R.string.page_text),
+                            launcherViewModel.getCurrentPageIndex() + 1,
+                            integer
+                    )
+            );
         });
         // Pattern of switching between pages
         settingsViewModel.getScrollToSwitchPage().observe(this, scrollToSwitchPage ->
@@ -372,7 +376,23 @@ public class LauncherActivity extends AppCompatActivity {
         });
         // Edit button
         binding.aLauncherRoot.launcherBtnEdit.setOnClickListener(v -> {
-
+            PopupMenu popupMenu = new PopupMenu(LauncherActivity.this, v);
+            popupMenu.inflate(R.menu.launcher_page_menu);
+            popupMenu.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.insert_page_before) {
+                    launcherViewModel.insertPage(LauncherViewModel.InsertPagePosition.BEFORE);
+                    return true;
+                } else if (id == R.id.insert_page_after) {
+                    launcherViewModel.insertPage(LauncherViewModel.InsertPagePosition.AFTER);
+                    return true;
+                } else if (id == R.id.delete_page) {
+                    launcherViewModel.deletePage();
+                    return true;
+                }
+                return false;
+            });
+            popupMenu.show();
         });
         // Prev page button
         binding.aLauncherRoot.launcherBtnPrevPage.setOnClickListener(v -> launcherPageUp());
@@ -512,7 +532,7 @@ public class LauncherActivity extends AppCompatActivity {
         ViewPager2 viewPager2 = binding.aLauncherRoot.launcherVp2;
         if (viewPager2.getAdapter() != null) {
             int currentItem = viewPager2.getCurrentItem();
-            if (currentItem < launcherViewModel.getNumScreenValue() - 1) {
+            if (currentItem < launcherViewModel.getPageCountValue() - 1) {
                 currentItem += 1;
                 viewPager2.setCurrentItem(currentItem, false);
             }
@@ -570,7 +590,7 @@ public class LauncherActivity extends AppCompatActivity {
         ActivityModel activityModel = new ActivityModel(context, activityInfo);
 
         PopupMenu popupMenu = new PopupMenu(context, view);
-        popupMenu.getMenuInflater().inflate(R.menu.launcher_icon_menu, popupMenu.getMenu());
+        popupMenu.inflate(R.menu.launcher_icon_menu);
         int baseIndex = popupMenu.getMenu().size();
         List<ShortcutInfo> shortcutInfoList;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -590,7 +610,7 @@ public class LauncherActivity extends AppCompatActivity {
         popupMenu.setOnMenuItemClickListener(menuItem -> {
             int menuId = menuItem.getItemId();
             if (menuId == R.id.remove) {
-                launcherViewModel.removeIcon(iconModel.toIconEntity());
+                launcherViewModel.deleteIconByPositionAsync(iconModel.toIconEntity());
                 return true;
             } else if (menuId == R.id.uninstall) {
                 requestUninstallApp(activityModel.getPackageName());
@@ -625,20 +645,15 @@ public class LauncherActivity extends AppCompatActivity {
 
     private void showLauncherBlankAreaMenu(View anchorView, float x, float y, int cellX, int cellY) {
         PopupMenu popupMenu = new PopupMenu(LauncherActivity.this, anchorView);
-        getMenuInflater().inflate(R.menu.launcher_blank_area_menu, popupMenu.getMenu());
+        popupMenu.inflate(R.menu.launcher_blank_area_menu);
         popupMenu.setOnMenuItemClickListener(item -> {
             int menuId = item.getItemId();
-            if (menuId == R.id.add_page) {
-                return true;
-            } else if (menuId == R.id.delete_page) {
-                boolean result = launcherViewModel.deleteScreen();
-                if (!result) {
-                    Toast.makeText(LauncherActivity.this, R.string.delete_screen_fail_reason, Toast.LENGTH_SHORT).show();
-                }
-                return true;
-            } else if (menuId == R.id.modify_item) {
+            if (menuId == R.id.modify_item) {
                 ActivityPicker activityPicker = ActivityPicker.newInstance(activityModel ->
-                        launcherViewModel.insertIcon(cellX, cellY, activityModel.getPackageName(), activityModel.getActivityName()));
+                        launcherViewModel.insertIconAsync(cellX, cellY, activityModel.getPackageName(), activityModel.getActivityName())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe()
+                );
                 activityPicker.show(getSupportFragmentManager(), "ACTIVITY_PICKER");
                 return true;
             }
@@ -649,7 +664,7 @@ public class LauncherActivity extends AppCompatActivity {
 
     private void showGridIconMenu(@NonNull View view, @NonNull ActivityModel item) {
         PopupMenu popupMenu = new PopupMenu(LauncherActivity.this, view);
-        popupMenu.getMenuInflater().inflate(R.menu.drawer_icon_menu, popupMenu.getMenu());
+        popupMenu.inflate(R.menu.drawer_icon_menu);
         int baseIndex = popupMenu.getMenu().size();
         List<ShortcutInfo> shortcutInfoList;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {

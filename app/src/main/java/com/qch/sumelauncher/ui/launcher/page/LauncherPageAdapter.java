@@ -12,15 +12,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.data.model.launcher.GridSize;
 import com.qch.sumelauncher.data.model.launcher.IconModel;
+import com.qch.sumelauncher.data.model.launcher.PageWithIconModels;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class LauncherPageAdapter extends RecyclerView.Adapter<LauncherPageAdapter.PageViewHolder> {
     private static final String TAG = "LauncherPageAdapter";
     private GridSize gridSize;
-    private Map<Integer, List<IconModel>> map = new HashMap<>();
+    private List<PageWithIconModels> list = new ArrayList<>();
     private LauncherLayout.OnIconClickListener onIconClickListener;
     private LauncherLayout.OnBlankAreaClickListener onBlankAreaClickListener;
 
@@ -74,12 +74,13 @@ public class LauncherPageAdapter extends RecyclerView.Adapter<LauncherPageAdapte
 
     @Override
     public void onBindViewHolder(@NonNull LauncherPageAdapter.PageViewHolder holder, int position) {
-        holder.bindData(gridSize, map.get(position), onIconClickListener, onBlankAreaClickListener);
+        Log.i(TAG, "Size of list of PageWithIconModels is " + list.size());
+        holder.bindData(gridSize, list.get(position).getList(), onIconClickListener, onBlankAreaClickListener);
     }
 
     @Override
     public int getItemCount() {
-        return map == null ? 0 : map.size();
+        return list == null ? 0 : list.size();
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -91,9 +92,9 @@ public class LauncherPageAdapter extends RecyclerView.Adapter<LauncherPageAdapte
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setMap(Map<Integer, List<IconModel>> map) {
-        if (this.map != map) {
-            this.map = map;
+    public void setList(List<PageWithIconModels> list) {
+        if (this.list != list) {
+            this.list = list;
             notifyDataSetChanged();
         }
     }

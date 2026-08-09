@@ -11,17 +11,17 @@ public class LayoutEntity {
     @ColumnInfo(name = "name")
     @NonNull
     private String name;
-    @ColumnInfo(name = "num_rows")
-    private int numRows;
-    @ColumnInfo(name = "num_columns")
-    private int numColumns;
+    @ColumnInfo(name = "column_count")
+    private int columnCount;
+    @ColumnInfo(name = "row_count")
+    private int rowCount;
     @ColumnInfo(name = "is_default")
     private boolean isDefault;
 
-    public LayoutEntity(@NonNull String name, int numColumns, int numRows, boolean isDefault) {
+    public LayoutEntity(@NonNull String name, int columnCount, int rowCount, boolean isDefault) {
         this.name = name;
-        this.numColumns = numColumns;
-        this.numRows = numRows;
+        this.columnCount = columnCount;
+        this.rowCount = rowCount;
         this.isDefault = isDefault;
     }
 
@@ -29,29 +29,29 @@ public class LayoutEntity {
         this.name = name;
     }
 
-    public void setNumColumns(int numColumns) {
-        this.numColumns = numColumns;
-    }
-
-    public void setNumRows(int numRows) {
-        this.numRows = numRows;
-    }
-
-    public void setDefault(boolean isDefault) {
-        this.isDefault = isDefault;
-    }
-
     @NonNull
     public String getName() {
         return name;
     }
 
-    public int getNumColumns() {
-        return numColumns;
+    public void setColumnCount(int columnCount) {
+        this.columnCount = columnCount;
     }
 
-    public int getNumRows() {
-        return numRows;
+    public int getColumnCount() {
+        return columnCount;
+    }
+
+    public void setRowCount(int rowCount) {
+        this.rowCount = rowCount;
+    }
+
+    public int getRowCount() {
+        return rowCount;
+    }
+
+    public void setDefault(boolean isDefault) {
+        this.isDefault = isDefault;
     }
 
     public boolean isDefault() {

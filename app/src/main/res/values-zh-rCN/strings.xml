@@ -94,8 +94,10 @@
     <string name="search_for_apps">搜索应用</string>
     <string name="add_device_admin_reason">此应用需要这个权限以锁定屏幕。</string>
     <string name="device_not_support_this_function">您的设备不支持此功能。</string>
-    <string name="delete_screen_fail_reason">无法删除最后一个页面。</string>
+    <string name="delete_page_fail_reason">无法删除最后一个页面。</string>
     <string name="lock_screen">锁定屏幕</string>
     <string name="choose_an_activity">选择一个活动</string>
+    <string name="insert_page_before">在前插入页</string>
+    <string name="insert_page_after">在后插入页</string>
 
 </resources>

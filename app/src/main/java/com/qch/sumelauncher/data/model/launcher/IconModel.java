@@ -15,8 +15,7 @@ public class IconModel extends ItemModel {
         super(
                 iconEntity.getId(),
                 new CellPosition(
-                        iconEntity.getLayoutName(),
-                        iconEntity.getScreenIndex(),
+                        iconEntity.getPageId(),
                         iconEntity.getCellX(),
                         iconEntity.getCellY(),
                         iconEntity.getSpanX(),
@@ -55,8 +54,7 @@ public class IconModel extends ItemModel {
 
     public IconEntity toIconEntity() {
         return new IconEntity(
-                cellPosition.getLayoutName(),
-                cellPosition.getScreenIndex(),
+                cellPosition.getPageId(),
                 cellPosition.getCellX(),
                 cellPosition.getCellY(),
                 cellPosition.getSpanX(),

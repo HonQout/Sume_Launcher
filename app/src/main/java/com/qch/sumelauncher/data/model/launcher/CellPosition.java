@@ -1,36 +1,26 @@
 package com.qch.sumelauncher.data.model.launcher;
 
 public class CellPosition {
-    private String layoutName;
-    private int screenIndex;
+    private long pageId;
     private int cellX;
     private int cellY;
     private int spanX;
     private int spanY;
 
-    public CellPosition(String layoutName, int screenIndex, int cellX, int cellY, int spanX, int spanY) {
-        this.layoutName = layoutName;
-        this.screenIndex = screenIndex;
+    public CellPosition(long pageId, int cellX, int cellY, int spanX, int spanY) {
+        this.pageId = pageId;
         this.cellX = cellX;
         this.cellY = cellY;
         this.spanX = spanX;
         this.spanY = spanY;
     }
 
-    public void setLayoutName(String layoutName) {
-        this.layoutName = layoutName;
+    public void setPageId(long pageId) {
+        this.pageId = pageId;
     }
 
-    public String getLayoutName() {
-        return layoutName;
-    }
-
-    public void setScreenIndex(int screenIndex) {
-        this.screenIndex = screenIndex;
-    }
-
-    public int getScreenIndex() {
-        return screenIndex;
+    public long getPageId() {
+        return pageId;
     }
 
     public void setCellX(int cellX) {

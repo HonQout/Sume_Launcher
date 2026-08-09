@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/add_page"
-        android:title="@string/add_page" />
+        android:id="@+id/insert_page_before"
+        android:title="@string/insert_page_before" />
+
+    <item
+        android:id="@+id/insert_page_after"
+        android:title="@string/insert_page_after" />
 
     <item
         android:id="@+id/delete_page"

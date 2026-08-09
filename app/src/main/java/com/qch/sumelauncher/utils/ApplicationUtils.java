@@ -168,15 +168,22 @@ public class ApplicationUtils {
         return Collections.emptyList();
     }
 
+    /**
+     * Launch a shortcut of an application. This method takes effects on devices running Android 7.1
+     * (API Level 25) and above.
+     *
+     * @return {@code true} if and only if the shortcut is successfully launched; {@code false}
+     * otherwise.
+     */
     public static boolean launchAppShortcut(@NonNull Context context, String packageName,
                                             String shortcutId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             if (TextUtils.isEmpty(packageName)) {
-                Log.e(TAG, "Cannot launch shortcut. The given packageName is null.");
+                Log.e(TAG, "Cannot launch shortcut. The given packageName is null or empty.");
                 return false;
             }
             if (TextUtils.isEmpty(shortcutId)) {
-                Log.e(TAG, "Cannot launch shortcut. The given shortcutId is null.");
+                Log.e(TAG, "Cannot launch shortcut. The given shortcutId is null or empty.");
                 return false;
             }
             LauncherApps launcherApps =
@@ -190,14 +197,16 @@ public class ApplicationUtils {
             } catch (Exception e) {
                 Log.e(TAG, "Cannot launch shortcut " + shortcutId + " of package "
                         + packageName + ".", e);
+                return false;
             }
         }
         return false;
     }
 
     @Nullable
-    public static ActivityInfo getActivityInfo(@NonNull Context context, String packageName,
-                                               String activityName) {
+    public static ActivityInfo getActivityInfo(@NonNull Context context,
+                                               @Nullable String packageName,
+                                               @Nullable String activityName) {
         if (TextUtils.isEmpty(packageName)) {
             Log.e(TAG, "Cannot get activityInfo. The given packageName is empty.");
             return null;
@@ -217,8 +226,9 @@ public class ApplicationUtils {
     }
 
     @NonNull
-    public static Drawable getActivityIcon(@NonNull Context context, String packageName,
-                                           String activityName) {
+    public static Drawable getActivityIcon(@NonNull Context context,
+                                           @Nullable String packageName,
+                                           @Nullable String activityName) {
         PackageManager pm = context.getPackageManager();
         if (TextUtils.isEmpty(packageName)) {
             Log.e(TAG, "Cannot get activity icon. The given packageName is empty.");
@@ -276,40 +286,56 @@ public class ApplicationUtils {
         return activityInfo == null ? null : activityInfo.loadLabel(pm).toString();
     }
 
-    public static List<ResolveInfo> getIntentActivityList(Context context) {
-        return getIntentActivityList(context, null);
+    @Nullable
+    public static ComponentName getLauncherActivity(@NonNull Context context,
+                                                    @Nullable String packageName) {
+        if (TextUtils.isEmpty(packageName)) {
+            Log.e(TAG, "Cannot get launcher activity. The given packageName is empty.");
+            return null;
+        }
+        PackageManager pm = context.getPackageManager();
+        Intent launchIntent = pm.getLaunchIntentForPackage(packageName);
+        return launchIntent == null ? null : launchIntent.getComponent();
     }
 
     /**
-     * Get a list of intent activities.
+     * Get a list of launcher activities. This overload returns all launcher activities of all
+     * applications installed.
+     */
+    public static List<ResolveInfo> getLauncherActivityList(@NonNull Context context) {
+        return getLauncherActivityList(context, null);
+    }
+
+    /**
+     * Get a list of launcher activities.
      *
-     * @param packageName Specify which package should these activities belong to. Passing null or
+     * @param packageName Specify which package should these activities belong to. Pass null or
      *                    empty string ("") to get all activities of all installed packages.
      */
-    public static List<ResolveInfo> getIntentActivityList(Context context, String packageName) {
+    public static List<ResolveInfo> getLauncherActivityList(@NonNull Context context,
+                                                            @Nullable String packageName) {
         PackageManager pm = context.getPackageManager();
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_MAIN);
+        Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        if (packageName != null && !TextUtils.isEmpty(packageName)) {
+        if (!TextUtils.isEmpty(packageName)) {
             intent.setPackage(packageName);
         }
         return pm.queryIntentActivities(intent, 0);
     }
 
     @Nullable
-    public static ResolveInfo getIntentActivity(Context context,
-                                                String packageName,
-                                                String activityName) {
+    public static ResolveInfo getIntentActivity(@NonNull Context context,
+                                                @Nullable String packageName,
+                                                @Nullable String activityName) {
         if (TextUtils.isEmpty(packageName)) {
-            Log.e(TAG, "Cannot get intent activity. The given packageName is empty.");
+            Log.e(TAG, "Cannot get intent activity. The given packageName is null or empty.");
             return null;
         }
         if (TextUtils.isEmpty(activityName)) {
-            Log.e(TAG, "Cannot get intent activity. The given activityName is empty.");
+            Log.e(TAG, "Cannot get intent activity. The given activityName is null or empty.");
             return null;
         }
-        List<ResolveInfo> intentActivities = getIntentActivityList(context, packageName);
+        List<ResolveInfo> intentActivities = getLauncherActivityList(context, packageName);
         for (ResolveInfo resolveInfo : intentActivities) {
             if (Objects.equals(getActivityName(resolveInfo), activityName)) {
                 return resolveInfo;
@@ -318,27 +344,34 @@ public class ApplicationUtils {
         return null;
     }
 
-    private static List<ActivityModel> getActivityModelList(Context context,
-                                                            List<ResolveInfo> intentActivityList) {
-        List<ActivityModel> list = new ArrayList<>();
-        for (ResolveInfo resolveInfo : intentActivityList) {
-            if (resolveInfo == null || resolveInfo.activityInfo == null) {
-                continue;
-            }
-            list.add(new ActivityModel(context, resolveInfo.activityInfo));
-        }
-        return list;
-    }
-
     /**
      * Get a list of ActivityModel of all launchable activity of certain application(s).
      *
-     * @param packageName Specify which package should these ActivityModels belong to. Passing null
+     * @param packageName Specify which package should these ActivityModels belong to. Pass null
      *                    or empty string ("") to get all ActivityModels of all installed packages.
      */
+    @NonNull
     public static List<ActivityModel> getActivityModelList(@NonNull Context context,
                                                            @Nullable String packageName) {
-        List<ResolveInfo> list = getIntentActivityList(context, packageName);
-        return getActivityModelList(context, list);
+        List<ResolveInfo> launcherActivityList = getLauncherActivityList(context, packageName);
+        List<ActivityModel> activityModelList = new ArrayList<>();
+        for (ResolveInfo resolveInfo : launcherActivityList) {
+            if (resolveInfo == null || resolveInfo.activityInfo == null) {
+                continue;
+            }
+            activityModelList.add(new ActivityModel(context, resolveInfo.activityInfo));
+        }
+        return activityModelList;
+    }
+
+    /**
+     * Check if the activity specified by the given packageName and activityName exists. In other
+     * words, check if there is an application with the given packageName installed, and it has an
+     * activity named the given activityName.
+     */
+    public static boolean hasActivity(@NonNull Context context,
+                                      @Nullable String packageName,
+                                      @Nullable String activityName) {
+        return getActivityInfo(context, packageName, activityName) != null;
     }
 }

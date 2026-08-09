@@ -30,8 +30,7 @@ public class FolderModel extends ItemModel {
 
     public FolderEntity toFolderEntity() {
         return new FolderEntity(
-                cellPosition.getLayoutName(),
-                cellPosition.getScreenIndex(),
+                cellPosition.getPageId(),
                 cellPosition.getCellX(),
                 cellPosition.getCellY(),
                 cellPosition.getSpanX(),
