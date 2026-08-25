@@ -18,6 +18,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
 import com.qch.sumelauncher.application.MyApplication;
+import com.qch.sumelauncher.compat.ListCompat;
 import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 import com.qch.sumelauncher.compat.CollectionCompat;
 import com.qch.sumelauncher.data.model.launcher.GridSize;
@@ -77,15 +78,12 @@ public class LauncherViewModel extends AndroidViewModel {
     private LauncherRepository repository;
 
     // broadcast receiver
-    private BroadcastReceiver localeBroadcastReceiver = null;
     private BroadcastReceiver packageBroadcastReceiver = null;
 
 
     public LauncherViewModel(@NonNull Application application) {
         super(application);
         repository = new LauncherRepository(getApplication());
-
-        registerLocaleBR();
         registerPackageBR();
         initLauncherLayout();
         initDisposable();
@@ -94,37 +92,15 @@ public class LauncherViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        unregisterLocaleBR();
         unregisterPackageBR();
         executorService.shutdown();
         compositeDisposable.clear();
     }
 
 
-    private void registerLocaleBR() {
-        if (localeBroadcastReceiver != null) {
-            return;
-        }
-
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_LOCALE_CHANGED);
-
-        localeBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                updateActivityModelList(AppListOp.INIT, null);
-            }
-        };
-
-        ContextCompat.registerReceiver(getApplication(), localeBroadcastReceiver, intentFilter,
-                ContextCompat.RECEIVER_NOT_EXPORTED);
-    }
-
-    private void unregisterLocaleBR() {
-        if (localeBroadcastReceiver != null) {
-            getApplication().unregisterReceiver(localeBroadcastReceiver);
-            localeBroadcastReceiver = null;
-        }
+    public void onLocaleChange() {
+        updateActivityModelList(AppListOp.INIT, null);
+        refreshPagedIconModelList();
     }
 
     private void registerPackageBR() {
@@ -211,6 +187,81 @@ public class LauncherViewModel extends AndroidViewModel {
         }
     }
 
+    private void initDisposable() {
+        // grid_size
+        Disposable disposable = MyApplication.getPreferenceDataStoreImpl()
+                .getStringFlowable("grid_size", GridSize.DEFAULT_VALUE.toString())
+                .subscribe(string -> {
+                            GridSize gridSize = GridSize.parse(string, GridSize.DEFAULT_VALUE);
+                            mGridSize.postValue(gridSize);
+                            updateActivityModelList(AppListOp.INIT, null);
+                        },
+                        throwable -> Log.e(TAG, "Cannot get value of key grid_size.", throwable)
+                );
+        compositeDisposable.add(disposable);
+    }
+
+    private void sortActivityModelList(List<ActivityModel> list) {
+        Collator collator = Collator.getInstance();
+        if (list != null) {
+            Collections.sort(list, (o1, o2) -> {
+                String label1 = o1.getLabel();
+                String label2 = o2.getLabel();
+                return collator.compare(label1, label2);
+            });
+        }
+    }
+
+    private void updateActivityModelList(AppListOp op, @Nullable String packageName) {
+        executorService.execute(() -> {
+            List<ActivityModel> list;
+            if (mActivityModelList.getValue() == null || op == AppListOp.INIT) {
+                // initialize
+                list = new ArrayList<>(ApplicationUtils.getActivityModelList(getApplication(), null));
+                sortActivityModelList(list);
+            } else {
+                list = new ArrayList<>(mActivityModelList.getValue());
+            }
+            if (packageName != null) {
+                // Update ActivityModelList
+                if (op == AppListOp.REMOVE || op == AppListOp.REPLACE) {
+                    try {
+                        CollectionCompat.removeIf(list,
+                                item -> Objects.equals(packageName, item.getPackageName()));
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to remove activity models of " + packageName);
+                    }
+                }
+                if (op == AppListOp.ADD || op == AppListOp.REPLACE) {
+                    try {
+                        list.addAll(ApplicationUtils.getActivityModelList(getApplication(), packageName));
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to add activity models of " + packageName);
+                    }
+                    sortActivityModelList(list);
+                }
+                // Update Database
+                if (op == AppListOp.REMOVE) {
+                    deleteIconsByPackageAsync(packageName);
+                }
+                if (op == AppListOp.REPLACE) {
+                    deleteInvalidIconsByPackageAsync(packageName);
+                }
+            } else if (op != AppListOp.INIT) {
+                Log.e(TAG, "Package name is null. Specified operation has not been executed.");
+            }
+            if (isUpdatingList.compareAndSet(false, true)) {
+                try {
+                    synchronized (updateListLock) {
+                        mActivityModelList.postValue(list);
+                    }
+                } finally {
+                    isUpdatingList.set(false);
+                }
+            }
+        });
+    }
+
     private void initLauncherLayout() {
         LiveData<List<PageWithIconEntities>> rawPagedIconEntityList
                 = Transformations.switchMap(mGridSize, gridSize ->
@@ -257,78 +308,26 @@ public class LauncherViewModel extends AndroidViewModel {
                 repository.getPageCount(gridSize.toString()));
     }
 
-    private void initDisposable() {
-        // grid_size
-        Disposable disposable = MyApplication.getPreferenceDataStore()
-                .getStringFlowable("grid_size", GridSize.DEFAULT_VALUE.toString())
-                .subscribe(string -> {
-                            GridSize gridSize = GridSize.parse(string, GridSize.DEFAULT_VALUE);
-                            mGridSize.postValue(gridSize);
-                            updateActivityModelList(AppListOp.INIT, null);
-                        },
-                        throwable -> Log.e(TAG, "Cannot get value of key grid_size.", throwable)
-                );
-        compositeDisposable.add(disposable);
-    }
-
-    private void sortActivityModelList(List<ActivityModel> list) {
-        Collator collator = Collator.getInstance();
-        if (list != null) {
-            Collections.sort(list, (o1, o2) -> {
-                String label1 = o1.getLabel();
-                String label2 = o2.getLabel();
-                return collator.compare(label1, label2);
-            });
-        }
-    }
-
-    private void updateActivityModelList(AppListOp op, @Nullable String packageName) {
+    private void refreshPagedIconModelList() {
         executorService.execute(() -> {
-            List<ActivityModel> list;
-            if (mActivityModelList.getValue() == null || op == AppListOp.INIT) {
-                // initialize
-                list = new ArrayList<>(ApplicationUtils.getActivityModelList(getApplication(), null));
-                sortActivityModelList(list);
-            } else {
-                list = new ArrayList<>(mActivityModelList.getValue());
+            List<PageWithIconEntities> pageWithIconEntitiesList = pagedIconEntityList.getValue();
+            if (ListCompat.isNullOrEmpty(pageWithIconEntitiesList)) {
+                return;
             }
-            if (packageName != null) {
-                // Update ActivityModelList
-                if (op == AppListOp.REMOVE || op == AppListOp.REPLACE) {
-                    try {
-                        CollectionCompat.removeIf(list,
-                                item -> Objects.equals(packageName, item.getPackageName()));
-                    } catch (Exception e) {
-                        Log.e(TAG, "Cannot remove activity models of " + packageName);
+            List<PageWithIconModels> pageWithIconModelsList = new ArrayList<>();
+            for (PageWithIconEntities pageWithIconEntities : pageWithIconEntitiesList) {
+                List<IconModel> iconModelList = new ArrayList<>();
+                if (pageWithIconEntities.list != null) {
+                    for (IconEntity iconEntity : pageWithIconEntities.list) {
+                        if (ApplicationUtils.hasActivity(getApplication(),
+                                iconEntity.getPackageName(), iconEntity.getActivityName())) {
+                            iconModelList.add(new IconModel(getApplication(), iconEntity));
+                        }
                     }
                 }
-                if (op == AppListOp.ADD || op == AppListOp.REPLACE) {
-                    try {
-                        list.addAll(ApplicationUtils.getActivityModelList(getApplication(), packageName));
-                    } catch (Exception e) {
-                        Log.e(TAG, "Cannot add activity models of " + packageName);
-                    }
-                    sortActivityModelList(list);
-                }
-                // Update Database
-                if (op == AppListOp.REMOVE) {
-                    deleteIconsByPackage(packageName);
-                }
-                if (op == AppListOp.REPLACE) {
-                    // TODO: Ask LauncherLayout to reload activity if package is updated
-                }
-            } else if (op != AppListOp.INIT) {
-                Log.e(TAG, "Package name is null. Specified operation has not been executed.");
+                pageWithIconModelsList.add(new PageWithIconModels(pageWithIconEntities.page, iconModelList));
             }
-            if (isUpdatingList.compareAndSet(false, true)) {
-                try {
-                    synchronized (updateListLock) {
-                        mActivityModelList.postValue(list);
-                    }
-                } finally {
-                    isUpdatingList.set(false);
-                }
-            }
+            pagedIconModelList.postValue(pageWithIconModelsList);
         });
     }
 
@@ -401,13 +400,19 @@ public class LauncherViewModel extends AndroidViewModel {
     }
 
     public void deleteIconAsync(@NonNull IconEntity iconEntity) {
-        repository.deleteIcon(iconEntity)
+        repository.deleteIconAsync(iconEntity)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
     }
 
     public void deleteIconsAsync(@NonNull IconEntity[] iconEntities) {
-        repository.deleteIcons(iconEntities)
+        repository.deleteIconsAsync(iconEntities)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+    }
+
+    public void deleteIconByPositionAsync(@NonNull String layoutName, int pageRank, int cellX, int cellY) {
+        repository.deleteIconByPositionAsync(layoutName, pageRank, cellX, cellY)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
     }
@@ -426,14 +431,14 @@ public class LauncherViewModel extends AndroidViewModel {
         deleteIconByPositionAsync(layoutName, pageRank, iconEntity.getCellX(), iconEntity.getCellY());
     }
 
-    public void deleteIconByPositionAsync(@NonNull String layoutName, int pageRank, int cellX, int cellY) {
-        repository.deleteIconByPositionAsync(layoutName, pageRank, cellX, cellY)
+    public void deleteIconsByPackageAsync(@NonNull String packageName) {
+        repository.deleteIconsByPackageAsync(packageName)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
     }
 
-    public void deleteIconsByPackage(@NonNull String packageName) {
-        repository.deleteIconsByPackage(packageName)
+    public void deleteInvalidIconsByPackageAsync(@NonNull String packageName) {
+        repository.deleteInvalidIconsByPackageAsync(packageName)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
     }

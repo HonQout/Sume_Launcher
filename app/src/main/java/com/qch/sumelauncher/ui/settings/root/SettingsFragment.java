@@ -37,7 +37,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        preferenceDataStoreBridge = new PreferenceDataStoreBridge(MyApplication.getPreferenceDataStore());
+        preferenceDataStoreBridge = new PreferenceDataStoreBridge(MyApplication.getPreferenceDataStoreImpl());
         getPreferenceManager().setPreferenceDataStore(preferenceDataStoreBridge);
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
 

@@ -45,7 +45,7 @@ public class SettingsViewModel extends AndroidViewModel {
 
     private void initDisposable() {
         // display_status_bar
-        Disposable disposable1 = MyApplication.getPreferenceDataStore()
+        Disposable disposable1 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("display_status_bar", true)
                 .subscribe(
                         mDisplayStatusBar::postValue,
@@ -53,7 +53,7 @@ public class SettingsViewModel extends AndroidViewModel {
                 );
         compositeDisposable.add(disposable1);
         // display_top_bar
-        Disposable disposable2 = MyApplication.getPreferenceDataStore()
+        Disposable disposable2 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("display_top_bar", true)
                 .subscribe(
                         mDisplayTopBar::postValue,
@@ -61,7 +61,7 @@ public class SettingsViewModel extends AndroidViewModel {
                 );
         compositeDisposable.add(disposable2);
         // animation
-        Disposable disposable3 = MyApplication.getPreferenceDataStore()
+        Disposable disposable3 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("animation", true)
                 .subscribe(
                         mAnimation::postValue,
@@ -69,7 +69,7 @@ public class SettingsViewModel extends AndroidViewModel {
                 );
         compositeDisposable.add(disposable3);
         // scroll_switch_page
-        Disposable disposable4 = MyApplication.getPreferenceDataStore()
+        Disposable disposable4 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("scroll_switch_page", true)
                 .subscribe(
                         mScrollToSwitchPage::postValue,
@@ -77,7 +77,7 @@ public class SettingsViewModel extends AndroidViewModel {
                 );
         compositeDisposable.add(disposable4);
         // volume_key_switch_page
-        Disposable disposable5 = MyApplication.getPreferenceDataStore()
+        Disposable disposable5 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("volume_key_switch_page", true)
                 .subscribe(
                         mVolumeKeySwitchPage::postValue,
@@ -85,49 +85,49 @@ public class SettingsViewModel extends AndroidViewModel {
                 );
         compositeDisposable.add(disposable5);
         // ask_for_perm_fine_location
-        Disposable disposable6 = MyApplication.getPreferenceDataStore()
+        Disposable disposable6 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("ask_for_perm_fine_location", true)
                 .subscribe(
                         mAskForPermFineLocation::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key ask_for_perm_fine_location.", throwable)
                 );
         compositeDisposable.add(disposable6);
-        Disposable disposable7 = MyApplication.getPreferenceDataStore()
+        Disposable disposable7 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("date", true)
                 .subscribe(
                         mDisplayDate::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key date.", throwable)
                 );
         compositeDisposable.add(disposable7);
-        Disposable disposable8 = MyApplication.getPreferenceDataStore()
+        Disposable disposable8 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("ringer_mode", true)
                 .subscribe(
                         mDisplayRingerMode::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key ringer_mode.", throwable)
                 );
         compositeDisposable.add(disposable8);
-        Disposable disposable9 = MyApplication.getPreferenceDataStore()
+        Disposable disposable9 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("airplane_mode", true)
                 .subscribe(
                         mDisplayAirplaneMode::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key airplane_mode.", throwable)
                 );
         compositeDisposable.add(disposable9);
-        Disposable disposable10 = MyApplication.getPreferenceDataStore()
+        Disposable disposable10 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("wifi", true)
                 .subscribe(
                         mDisplayWifi::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key wifi.", throwable)
                 );
         compositeDisposable.add(disposable10);
-        Disposable disposable11 = MyApplication.getPreferenceDataStore()
+        Disposable disposable11 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("bluetooth", true)
                 .subscribe(
                         mDisplayBluetooth::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key bluetooth.", throwable)
                 );
         compositeDisposable.add(disposable11);
-        Disposable disposable12 = MyApplication.getPreferenceDataStore()
+        Disposable disposable12 = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("battery_percentage", true)
                 .subscribe(
                         mDisplayBatteryPct::postValue,

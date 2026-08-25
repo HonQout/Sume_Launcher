@@ -2,9 +2,9 @@ package com.qch.sumelauncher.ui.launcher.activity;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ShortcutInfo;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -73,7 +73,6 @@ public class LauncherActivity extends AppCompatActivity {
     private BatteryViewModel batteryViewModel;
     private BottomSheetBehavior<View> bottomSheetBehavior;
     private ActivityResultLauncher<String> requestPermissionLauncher;
-    private ActivityResultLauncher<Intent> appPickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -505,6 +504,16 @@ public class LauncherActivity extends AppCompatActivity {
         return false;
     }
 
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        Log.i(TAG, "onConfigurationChanged");
+        super.onConfigurationChanged(newConfig);
+        timeViewModel.update(getApplicationContext());
+        binding.aLauncherDrawer.drawerSv.setQueryHint(getString(R.string.search_for_apps));
+        binding.aLauncherDrawer.drawerBtnQuit.setText(R.string.quit);
+        launcherViewModel.onLocaleChange();
+    }
+
     private void showPermFineLocationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.request_permission)
@@ -512,7 +521,7 @@ public class LauncherActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.app_info, (dialog, which) ->
                         IntentUtils.openAppDetailsPage(this, this.getPackageName()))
                 .setNeutralButton(R.string.deny, (dialog, which) ->
-                        MyApplication.getPreferenceDataStore().putBoolean("ask_for_perm_fine_location", false))
+                        MyApplication.getPreferenceDataStoreImpl().putBoolean("ask_for_perm_fine_location", false))
                 .setNegativeButton(R.string.cancel, null);
         DialogUtils.show(builder, settingsViewModel.getAnimationValue());
     }
@@ -612,6 +621,15 @@ public class LauncherActivity extends AppCompatActivity {
             if (menuId == R.id.remove) {
                 launcherViewModel.deleteIconByPositionAsync(iconModel.toIconEntity());
                 return true;
+            } else if (menuId == R.id.modify) {
+                ActivityPicker activityPicker = ActivityPicker.newInstance(newActivityModel ->
+                        launcherViewModel.insertIconAsync(iconModel.getCellX(), iconModel.getCellY(),
+                                        newActivityModel.getPackageName(), newActivityModel.getActivityName())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe()
+                );
+                activityPicker.show(getSupportFragmentManager(), "ACTIVITY_PICKER");
+                return true;
             } else if (menuId == R.id.uninstall) {
                 requestUninstallApp(activityModel.getPackageName());
                 return true;
@@ -648,9 +666,10 @@ public class LauncherActivity extends AppCompatActivity {
         popupMenu.inflate(R.menu.launcher_blank_area_menu);
         popupMenu.setOnMenuItemClickListener(item -> {
             int menuId = item.getItemId();
-            if (menuId == R.id.modify_item) {
+            if (menuId == R.id.modify) {
                 ActivityPicker activityPicker = ActivityPicker.newInstance(activityModel ->
-                        launcherViewModel.insertIconAsync(cellX, cellY, activityModel.getPackageName(), activityModel.getActivityName())
+                        launcherViewModel.insertIconAsync(cellX, cellY, activityModel.getPackageName(),
+                                        activityModel.getActivityName())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe()
                 );

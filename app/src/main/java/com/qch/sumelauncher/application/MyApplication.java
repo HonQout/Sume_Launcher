@@ -5,15 +5,15 @@ import android.app.Application;
 import com.qch.sumelauncher.persistence.PreferenceDataStoreImpl;
 
 public class MyApplication extends Application {
-    private static PreferenceDataStoreImpl preferenceDataStore;
+    private static PreferenceDataStoreImpl preferenceDataStoreImpl;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        preferenceDataStore = new PreferenceDataStoreImpl(this);
+        preferenceDataStoreImpl = new PreferenceDataStoreImpl(this);
     }
 
-    public static PreferenceDataStoreImpl getPreferenceDataStore() {
-        return preferenceDataStore;
+    public static PreferenceDataStoreImpl getPreferenceDataStoreImpl() {
+        return preferenceDataStoreImpl;
     }
 }

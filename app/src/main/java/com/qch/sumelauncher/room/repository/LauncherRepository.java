@@ -1,6 +1,5 @@
 package com.qch.sumelauncher.room.repository;
 
-import android.content.ComponentName;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -15,6 +14,8 @@ import com.qch.sumelauncher.room.relation.PageWithIconEntities;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
@@ -24,6 +25,7 @@ public class LauncherRepository {
     private static final String TAG = "LauncherRepository";
     private final LauncherDao dao;
     private final Context appContext;
+    private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
 
     public LauncherRepository(Context context) {
         LauncherDatabase db = LauncherDatabase.getInstance(context);
@@ -85,56 +87,40 @@ public class LauncherRepository {
     }
 
     /**
-     * Insert the page described by the given PageEntity.
-     */
-    public Completable insertPage(@NonNull PageEntity pageEntity) {
-        return dao.insertPageAsync(pageEntity);
-    }
-
-    /**
-     * Insert a page at {@code targetPageRank} in {@code layoutName}. This method is synchronous.
+     * Insert a page at {@code targetPageRank} in {@code layoutName} after shifting other pages
+     * whose {@code pageRank}s are no less than it right. Theoretically, this method will not run
+     * into conflicts.
+     * <p>This method should be used to insert pages after the database is initialized.
+     * <p>This method is asynchronous.
      */
     public Completable insertPageAt(@NonNull String layoutName, int targetPageRank) {
         return Completable
-                .fromCallable(() -> {
-                    return dao.shiftAndInsertPageSync(layoutName, targetPageRank);
+                .fromAction(() -> {
+                    LauncherDatabase.getInstance(appContext).runInTransaction(() -> {
+                        dao.shiftPagesRightSync(layoutName, targetPageRank);
+                        dao.insertPageSync(new PageEntity(layoutName, targetPageRank));
+                    });
                 })
-                .subscribeOn(Schedulers.io());
-    }
-
-    public Single<Long> insertPageAndAddIcon(String layoutName, int targetPageRank) {
-        return Single
-                .fromCallable(() -> {
-                    ComponentName componentName
-                            = ApplicationUtils.getLauncherActivity(appContext, appContext.getPackageName());
-                    if (componentName == null) {
-                        return -1L;
-                    }
-                    return dao.shiftAndInsertPageSync(layoutName, targetPageRank);
-                })
-                .subscribeOn(Schedulers.io());
-    }
-
-    public Completable deletePageAt(String layoutName, int pageRank) {
-        return Completable
-                .fromCallable(() -> {
-                    int pageCount = dao.getPageCountSync(layoutName);
-                    if (pageCount > 1) {
-                        dao.deleteAndShiftPageSync(layoutName, pageRank);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                })
-                .subscribeOn(Schedulers.io());
+                .subscribeOn(Schedulers.from(singleThreadExecutor));
     }
 
     /**
-     * Shift all pages whose {@code pageRank} is no less than {@code targetPageRank} right. This
-     * method is synchronous.
+     * Delete a page at {@code pageRank} in {@code layoutName} and shift other pages whose
+     * {@code pageRank}s are bigger than it left. Theoretically, this method will not run into
+     * conflicts.
+     * <p>This method should be used to delete pages after the database is initialized.
+     * <p>This method is asynchronous.
      */
-    public void shiftPageRight(@NonNull String layoutName, int targetPageRank) {
-        dao.shiftPageRightSync(layoutName, targetPageRank);
+    public Completable deletePageAt(String layoutName, int pageRank) {
+        return Completable
+                .fromAction(() -> {
+                    int pageCount = dao.getPageCountSync(layoutName);
+                    if (pageCount > 1) {
+                        dao.deletePageSync(layoutName, pageRank);
+                        dao.shiftPagesLeftSync(layoutName, pageRank);
+                    }
+                })
+                .subscribeOn(Schedulers.from(singleThreadExecutor));
     }
 
     // icons
@@ -195,20 +181,19 @@ public class LauncherRepository {
 
     public Completable insertIconAsync(IconEntity iconEntity) {
         return dao.insertIconAsync(iconEntity)
-                .subscribeOn(Schedulers.io());
+                .subscribeOn(Schedulers.from(singleThreadExecutor));
     }
 
     public Completable insertIconAsync(String layoutName, int pageRank, int cellX, int cellY,
                                        String packageName, String activityName) {
         return Completable
-                .fromCallable(() -> {
+                .fromAction(() -> {
                     long pageId = dao.getPageIdByPositionSync(layoutName, pageRank);
                     IconEntity iconEntity = new IconEntity(pageId, cellX, cellY, 1, 1,
                             packageName, activityName);
                     dao.insertIconSync(iconEntity);
-                    return true;
                 })
-                .subscribeOn(Schedulers.io());
+                .subscribeOn(Schedulers.from(singleThreadExecutor));
     }
 
     public Completable insertIconArray(IconEntity[] iconEntityArray) {
@@ -217,7 +202,7 @@ public class LauncherRepository {
 
     public Completable insertIconListAsync(List<IconEntity> iconEntityList) {
         return dao.insertIconListAsync(iconEntityList)
-                .subscribeOn(Schedulers.io());
+                .subscribeOn(Schedulers.from(singleThreadExecutor));
     }
 
     public void insertIconListSync(List<IconEntity> iconEntityList) {
@@ -225,24 +210,44 @@ public class LauncherRepository {
     }
 
     /**
-     * Delete the icon specified by the given {@code iconEntity}. This method is asynchronous.
+     * Delete the icon specified by the given {@code iconEntity}.
+     * <p>This method is asynchronous.
+     * <p>Notice: This method is intended to delete an IconEntity. However, field {@code id} of
+     * IconEntity cannot be accessed from the outside, so the object of IconEntity in parameter
+     * {@code iconEntity} may not be identical with the one having the same other fields in the
+     * database. This causes the operation of deleting not to be proceeded. In this case, please
+     * consider use {@link LauncherRepository#deleteIconByPositionAsync(String, int, int, int)} to
+     * delete them by positions.
      */
-    public Completable deleteIcon(IconEntity iconEntity) {
+    public Completable deleteIconAsync(IconEntity iconEntity) {
         return dao.deleteIconAsync(iconEntity)
-                .subscribeOn(Schedulers.io());
+                .subscribeOn(Schedulers.from(singleThreadExecutor));
     }
 
     /**
-     * Delete the icons specified by the given {@code iconEntities}. This method is asynchronous.
+     * Delete the icons specified by the given {@code iconEntities}.
+     * <p>This method is asynchronous.
+     * <p>Notice: This method is intended to delete an array of IconEntities. However, field
+     * {@code id} of IconEntity cannot be accessed from the outside, so the objects of IconEntities
+     * in parameter {@code iconEntities} may not be identical with the ones having the same other
+     * fields in the database. This causes the operation of deleting not to be proceeded. In this
+     * case, consider use {@link LauncherRepository#deleteIconByPositionAsync(String, int, int, int)}
+     * to delete them by positions.
      */
-    public Completable deleteIcons(IconEntity[] iconEntities) {
+    public Completable deleteIconsAsync(IconEntity[] iconEntities) {
         return dao.deleteIconsAsync(iconEntities)
-                .subscribeOn(Schedulers.io());
+                .subscribeOn(Schedulers.from(singleThreadExecutor));
     }
 
     /**
-     * Delete the icons specified by the given list of {@code iconEntities}. This method is
-     * synchronous.
+     * Delete the icons specified by the given list of {@code iconEntities}.
+     * <p>This method is synchronous.
+     * <p>Notice: This method is intended to delete a list of IconEntities. However, field
+     * {@code id} of IconEntity cannot be accessed from the outside, so the objects of IconEntities
+     * in parameter {@code iconEntityList} may not be identical with the ones having the same other
+     * fields in the database. This causes the operation of deleting not to be proceeded. In this
+     * case, consider use {@link LauncherRepository#deleteIconByPositionAsync(String, int, int, int)}
+     * to delete them by positions.
      */
     public void deleteIconListSync(List<IconEntity> iconEntityList) {
         dao.deleteIconListSync(iconEntityList);
@@ -250,36 +255,56 @@ public class LauncherRepository {
 
     /**
      * Delete the icon specified by the given {@code layoutName}, {@code pageRank}, {@code cellX}
-     * and {@code cellY}. This method is asynchronous.
+     * and {@code cellY}.
+     * <p>This method is asynchronous.
      */
     public Completable deleteIconByPositionAsync(String layoutName, int pageRank, int cellX, int cellY) {
-        return dao.deleteIconByPosition(layoutName, pageRank, cellX, cellY)
-                .subscribeOn(Schedulers.io());
+        return dao.deleteIconByPositionAsync(layoutName, pageRank, cellX, cellY)
+                .subscribeOn(Schedulers.from(singleThreadExecutor));
     }
 
     /**
      * Delete icons on the page specified by the given {@code pageRank} and {@code layoutName}.
-     * This method is asynchronous.
+     * <p>This method is asynchronous.
      */
-    public Completable deleteIconsOnPage(String layoutName, int pageRank) {
+    public Completable deleteIconsOnPageAsync(String layoutName, int pageRank) {
         return dao.deleteIconsOnPage(layoutName, pageRank)
-                .subscribeOn(Schedulers.io());
+                .subscribeOn(Schedulers.from(singleThreadExecutor));
     }
 
     /**
-     * Delete icons of package with the given {@code packageName}. This method is asynchronous.
+     * Delete icons of package with the given {@code packageName}.
+     * <p>This method is asynchronous.
      */
-    public Completable deleteIconsByPackage(String packageName) {
+    public Completable deleteIconsByPackageAsync(String packageName) {
         return dao.deleteIconsByPackage(packageName)
-                .subscribeOn(Schedulers.io());
+                .subscribeOn(Schedulers.from(singleThreadExecutor));
     }
 
     /**
-     * Delete icons of activity with the given {@code packageName} and {@code activityName}. This
-     * method is asynchronous.
+     * Delete icons of activity with the given {@code packageName} and {@code activityName}.
+     * <p>This method is asynchronous.
      */
-    public Completable deleteIconsByActivity(String packageName, String activityName) {
+    public Completable deleteIconsByActivityAsync(String packageName, String activityName) {
         return dao.deleteIconsByActivity(packageName, activityName)
                 .subscribeOn(Schedulers.io());
+    }
+
+    /**
+     * Delete invalid icons of package with the given {@code packageName}.
+     * <p>This method is asynchronous.
+     */
+    public Single<Boolean> deleteInvalidIconsByPackageAsync(String packageName) {
+        return dao.getIconListByPackageName(packageName)
+                .subscribeOn(Schedulers.from(singleThreadExecutor))
+                .map(iconEntityList -> {
+                    for (IconEntity iconEntity : iconEntityList) {
+                        if (!ApplicationUtils.hasActivity(appContext, iconEntity.getPackageName(),
+                                iconEntity.getActivityName())) {
+                            dao.deleteIconSync(iconEntity);
+                        }
+                    }
+                    return true;
+                });
     }
 }

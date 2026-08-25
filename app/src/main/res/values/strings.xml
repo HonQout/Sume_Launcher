@@ -19,12 +19,14 @@
 
     <!-- Menu -->
     <string name="remove">Remove</string>
+    <string name="modify">Modify</string>
     <string name="uninstall">Uninstall</string>
     <string name="app_info">App info</string>
     <string name="app_market">App market</string>
     <string name="add_page">Add page</string>
     <string name="delete_page">Delete page</string>
-    <string name="modify_item">Add item</string>
+    <string name="insert_page_before">Insert page before</string>
+    <string name="insert_page_after">Insert page after</string>
 
     <!-- Content Description -->
     <string name="apps_icon">Apps icon</string>
@@ -99,7 +101,5 @@
     <string name="device_not_support_this_function">Your device does not support this function.</string>
     <string name="delete_page_fail_reason">The last page cannot be deleted.</string>
     <string name="choose_an_activity">Choose an activity</string>
-    <string name="insert_page_before">Insert page before</string>
-    <string name="insert_page_after">Insert page after</string>
 
 </resources>

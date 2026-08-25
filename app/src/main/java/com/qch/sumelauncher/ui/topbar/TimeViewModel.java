@@ -15,35 +15,37 @@ import androidx.lifecycle.MutableLiveData;
 
 public class TimeViewModel extends AndroidViewModel {
     private static final String TAG = "TimeViewModel";
+
     // data
     private final MutableLiveData<Long> mCurrentTime = new MutableLiveData<>();
     private final MutableLiveData<String> mCurrentTimeText = new MutableLiveData<>();
     private final MutableLiveData<String> mCurrentDateText = new MutableLiveData<>();
+
     // broadcast receiver
-    private BroadcastReceiver broadcastReceiver;
+    private BroadcastReceiver timeBroadcastReceiver;
 
     public TimeViewModel(@NonNull Application application) {
         super(application);
-        update();
-        registerBroadcastReceiver();
+        update(application);
+        registerTimeBR();
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-        unRegisterBroadcastReceiver();
+        unregisterTimeBR();
     }
 
-    private void update() {
+    public void update(@NonNull Context context) {
         long currentTime = System.currentTimeMillis();
         mCurrentTime.postValue(currentTime);
         mCurrentTimeText.postValue(DateUtils.formatDateTime(
-                getApplication(),
+                context,
                 currentTime,
                 DateUtils.FORMAT_SHOW_TIME
         ));
         mCurrentDateText.postValue(DateUtils.formatDateTime(
-                getApplication(),
+                context,
                 currentTime,
                 DateUtils.FORMAT_NO_YEAR
                         | DateUtils.FORMAT_SHOW_DATE
@@ -52,8 +54,8 @@ public class TimeViewModel extends AndroidViewModel {
         ));
     }
 
-    private void registerBroadcastReceiver() {
-        if (broadcastReceiver != null) {
+    private void registerTimeBR() {
+        if (timeBroadcastReceiver != null) {
             return;
         }
 
@@ -63,21 +65,21 @@ public class TimeViewModel extends AndroidViewModel {
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
         intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
 
-        broadcastReceiver = new BroadcastReceiver() {
+        timeBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                update();
+                update(getApplication());
             }
         };
 
-        ContextCompat.registerReceiver(getApplication(), broadcastReceiver, intentFilter,
+        ContextCompat.registerReceiver(getApplication(), timeBroadcastReceiver, intentFilter,
                 ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
-    private void unRegisterBroadcastReceiver() {
-        if (broadcastReceiver != null) {
-            getApplication().unregisterReceiver(broadcastReceiver);
-            broadcastReceiver = null;
+    private void unregisterTimeBR() {
+        if (timeBroadcastReceiver != null) {
+            getApplication().unregisterReceiver(timeBroadcastReceiver);
+            timeBroadcastReceiver = null;
         }
     }
 

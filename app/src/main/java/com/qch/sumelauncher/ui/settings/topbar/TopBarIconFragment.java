@@ -23,7 +23,7 @@ public class TopBarIconFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        preferenceDataStoreBridge = new PreferenceDataStoreBridge(MyApplication.getPreferenceDataStore());
+        preferenceDataStoreBridge = new PreferenceDataStoreBridge(MyApplication.getPreferenceDataStoreImpl());
         getPreferenceManager().setPreferenceDataStore(preferenceDataStoreBridge);
         setPreferencesFromResource(R.xml.top_bar_icon_preferences, rootKey);
 

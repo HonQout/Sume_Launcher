@@ -28,7 +28,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Put a boolean value into the preference data store. This operation is asynchronous.
+     * Put a boolean value into the preference data store.
+     * <p>This operation is asynchronous.
      */
     public @NonNull Disposable putBoolean(String key, boolean value) {
         Preferences.Key<Boolean> preferencesKey = PreferencesKeys.booleanKey(key);
@@ -47,8 +48,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Get the boolean value corresponding to the key from the preference data store. This operation
-     * is synchronous.
+     * Get the boolean value corresponding to the key from the preference data store.
+     * <p>This operation is synchronous.
      */
     public boolean getBoolean(String key, boolean defaultValue) {
         Preferences.Key<Boolean> preferencesKey = PreferencesKeys.booleanKey(key);
@@ -86,7 +87,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Put an integer value into the preference data store. This operation is asynchronous.
+     * Put an integer value into the preference data store.
+     * <p>This operation is asynchronous.
      */
     public @NonNull Disposable putInteger(String key, int value) {
         Preferences.Key<Integer> preferencesKey = PreferencesKeys.intKey(key);
@@ -105,8 +107,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Get the integer value corresponding to the key from the preference data store. This operation
-     * is synchronous.
+     * Get the integer value corresponding to the key from the preference data store.
+     * <p>This operation is synchronous.
      */
     public int getInteger(String key, int defaultValue) {
         Preferences.Key<Integer> preferencesKey = PreferencesKeys.intKey(key);
@@ -144,7 +146,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Put a long value into the preference data store. This operation is asynchronous.
+     * Put a long value into the preference data store.
+     * <p>This operation is asynchronous.
      */
     public @NonNull Disposable putLong(String key, long value) {
         Preferences.Key<Long> preferencesKey = PreferencesKeys.longKey(key);
@@ -163,8 +166,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Get the long value corresponding to the key from the preference data store. This operation is
-     * synchronous.
+     * Get the long value corresponding to the key from the preference data store.
+     * <p>This operation is synchronous.
      */
     public Long getLong(String key, long defaultValue) {
         Preferences.Key<Long> preferencesKey = PreferencesKeys.longKey(key);
@@ -202,7 +205,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Put a float value into the preference data store. This operation is asynchronous.
+     * Put a float value into the preference data store.
+     * <p>This operation is asynchronous.
      */
     public @NonNull Disposable putFloat(String key, float value) {
         Preferences.Key<Float> preferencesKey = PreferencesKeys.floatKey(key);
@@ -221,8 +225,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Get the float value corresponding to the key from the preference data store. This operation
-     * is synchronous.
+     * Get the float value corresponding to the key from the preference data store.
+     * <p>This operation is synchronous.
      */
     public float getFloat(String key, float defaultValue) {
         Preferences.Key<Float> preferencesKey = PreferencesKeys.floatKey(key);
@@ -260,7 +264,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Put a string value into the preference data store. This operation is asynchronous.
+     * Put a string value into the preference data store.
+     * <p>This operation is asynchronous.
      */
     public @NonNull Disposable putString(String key, String value) {
         Preferences.Key<String> preferencesKey = PreferencesKeys.stringKey(key);
@@ -278,8 +283,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Get the string value corresponding to the key from the preference data store. This operation
-     * is synchronous.
+     * Get the string value corresponding to the key from the preference data store.
+     * <p>This operation is synchronous.
      */
     public String getString(String key, String defaultValue) {
         Preferences.Key<String> preferencesKey = PreferencesKeys.stringKey(key);
@@ -297,6 +302,9 @@ public class PreferenceDataStoreImpl {
         }
     }
 
+    /**
+     * Get a Flowable of the string value corresponding to the key from the preference data store.
+     */
     public Flowable<String> getStringFlowable(String key, String defValue) {
         Preferences.Key<String> preferencesKey = PreferencesKeys.stringKey(key);
         return dataStore
@@ -314,7 +322,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Put a string set value into the preference data store. This operation is asynchronous.
+     * Put a string set value into the preference data store.
+     * <p>This operation is asynchronous.
      */
     public @NonNull Disposable putStringSet(String key, Set<String> values) {
         Preferences.Key<Set<String>> preferencesKey = PreferencesKeys.stringSetKey(key);
@@ -333,8 +342,8 @@ public class PreferenceDataStoreImpl {
     }
 
     /**
-     * Get the string set value corresponding to the key from the preference data store. This
-     * operation is synchronous.
+     * Get the string set value corresponding to the key from the preference data store.
+     * <p>This operation is synchronous.
      */
     public Set<String> getStringSet(String key, Set<String> defaultValues) {
         Preferences.Key<Set<String>> preferencesKey = PreferencesKeys.stringSetKey(key);

@@ -58,7 +58,7 @@ public class PermissionViewModel extends AndroidViewModel {
 
     private void initDisposable() {
         // animation
-        Disposable disposable = MyApplication.getPreferenceDataStore()
+        Disposable disposable = MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("animation", true)
                 .subscribe(
                         mAnimation::postValue,

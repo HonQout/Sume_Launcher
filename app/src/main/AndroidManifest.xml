@@ -55,7 +55,7 @@
         <activity
             android:name=".ui.launcher.activity.LauncherActivity"
             android:clearTaskOnLaunch="true"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:configChanges="keyboard|keyboardHidden|layoutDirection|locale|orientation|screenLayout|screenSize|smallestScreenSize"
             android:exported="true"
             android:launchMode="singleTask"
             android:resizeableActivity="true"
@@ -73,7 +73,7 @@
 
         <activity
             android:name=".ui.settings.root.SettingsActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
             android:enabled="true"
             android:exported="true"
             android:label="@string/settings"

@@ -51,7 +51,7 @@ public class ControlCenterShortcutView extends AppCompatTextView {
         setTextSize(TypedValue.COMPLEX_UNIT_PX, labelSizePx);
         setEllipsize(TextUtils.TruncateAt.END);
         setGravity(Gravity.CENTER_VERTICAL);
-        setMaxLines(1);
+        setMaxLines(2);
         setCompoundDrawablePadding(spacePx);
         setPadding(horizontalPaddingPx, verticalPaddingPx, horizontalPaddingPx, verticalPaddingPx);
         // Add border
