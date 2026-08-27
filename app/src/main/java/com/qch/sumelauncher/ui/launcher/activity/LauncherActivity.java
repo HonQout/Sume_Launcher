@@ -73,6 +73,7 @@ public class LauncherActivity extends AppCompatActivity {
     private BatteryViewModel batteryViewModel;
     private BottomSheetBehavior<View> bottomSheetBehavior;
     private ActivityResultLauncher<String> requestPermissionLauncher;
+    private Configuration oldConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -270,6 +271,8 @@ public class LauncherActivity extends AppCompatActivity {
                         ));
             }
         });
+        // Save a copy of configuration
+        oldConfig = new Configuration(getResources().getConfiguration());
         // Observe
         bottomSheetBehavior = BottomSheetBehavior.from(binding.aLauncherFl);
         bottomSheetBehavior.setSkipCollapsed(true);
@@ -508,10 +511,16 @@ public class LauncherActivity extends AppCompatActivity {
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         Log.i(TAG, "onConfigurationChanged");
         super.onConfigurationChanged(newConfig);
-        timeViewModel.update(getApplicationContext());
-        binding.aLauncherDrawer.drawerSv.setQueryHint(getString(R.string.search_for_apps));
-        binding.aLauncherDrawer.drawerBtnQuit.setText(R.string.quit);
-        launcherViewModel.onLocaleChange();
+        if (oldConfig != null) {
+            int diff = oldConfig.diff(newConfig);
+            if ((diff & ActivityInfo.CONFIG_LOCALE) != 0) {
+                timeViewModel.update(getApplicationContext());
+                binding.aLauncherDrawer.drawerSv.setQueryHint(getString(R.string.search_for_apps));
+                binding.aLauncherDrawer.drawerBtnQuit.setText(R.string.quit);
+                launcherViewModel.onLocaleChange();
+            }
+        }
+        oldConfig = new Configuration(newConfig);
     }
 
     private void showPermFineLocationDialog() {
