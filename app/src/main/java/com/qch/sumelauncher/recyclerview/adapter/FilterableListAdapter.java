@@ -19,13 +19,14 @@ public abstract class FilterableListAdapter<T, VH extends RecyclerView.ViewHolde
     protected class ListFilter extends Filter {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            FilterResults result = new FilterResults();
             List<T> resultList;
             if (TextUtils.isEmpty(constraint)) {
                 resultList = list;
             } else {
                 resultList = FilterableListAdapter.this.performFiltering(list, constraint);
             }
+
+            final FilterResults result = new FilterResults();
             result.values = resultList;
             result.count = resultList.size();
             return result;

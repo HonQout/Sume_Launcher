@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.util.Log;
 
@@ -36,7 +37,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
@@ -48,11 +48,17 @@ public class LauncherViewModel extends AndroidViewModel {
     private static final String TAG = "LauncherViewModel";
 
     public enum LauncherState {
-        LAUNCHER, APPS
+        LAUNCHER,
+        APPS
     }
 
     public enum AppListOp {
-        INIT, ADD, REMOVE, REPLACE
+        INIT,
+        ADD,
+        REMOVE,
+        REPLACE,
+        DISABLE,
+        ENABLE
     }
 
     public enum InsertPagePosition {
@@ -70,8 +76,6 @@ public class LauncherViewModel extends AndroidViewModel {
 
     // multi-thread
     private final ExecutorService executorService = Executors.newFixedThreadPool(2);
-    private final AtomicBoolean isUpdatingList = new AtomicBoolean(false);
-    private final Object updateListLock = new Object();
 
     // persistence
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -112,6 +116,7 @@ public class LauncherViewModel extends AndroidViewModel {
         intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
         intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         intentFilter.addAction(Intent.ACTION_PACKAGE_REPLACED);
+        intentFilter.addAction(Intent.ACTION_PACKAGE_CHANGED);
         intentFilter.addDataScheme("package");
 
         packageBroadcastReceiver = new BroadcastReceiver() {
@@ -127,19 +132,18 @@ public class LauncherViewModel extends AndroidViewModel {
                     return;
                 }
                 Log.i(TAG, "Received intent action: " + action);
+                Uri data = intent.getData();
+                String packageName = (data == null) ? null : data.getSchemeSpecificPart();
+                if (packageName == null) {
+                    Log.e(TAG, "Failed to get packageName of the involved package.");
+                    return;
+                }
                 switch (action) {
                     case Intent.ACTION_PACKAGE_ADDED: {
                         boolean replacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false);
                         Log.i(TAG, "Extra: replacing = " + replacing);
                         if (!replacing) {
-                            String packageName;
-                            Uri data = intent.getData();
-                            if (data != null) {
-                                packageName = data.getSchemeSpecificPart();
-                                if (packageName != null) {
-                                    updateActivityModelList(AppListOp.ADD, packageName);
-                                }
-                            }
+                            updateActivityModelList(AppListOp.ADD, packageName);
                         }
                         break;
                     }
@@ -149,26 +153,35 @@ public class LauncherViewModel extends AndroidViewModel {
                         boolean dataRemoved = intent.getBooleanExtra(Intent.EXTRA_DATA_REMOVED, false);
                         Log.i(TAG, "Extra: replacing = " + replacing + ", data_removed = " + dataRemoved);
                         if (!replacing) {
-                            String packageName;
-                            Uri data = intent.getData();
-                            if (data != null) {
-                                packageName = data.getSchemeSpecificPart();
-                                if (packageName != null) {
-                                    updateActivityModelList(AppListOp.REMOVE, packageName);
-                                }
-                            }
+                            updateActivityModelList(AppListOp.REMOVE, packageName);
                         }
                         break;
                     }
 
                     case Intent.ACTION_PACKAGE_REPLACED: {
-                        String packageName;
-                        Uri data = intent.getData();
-                        if (data != null) {
-                            packageName = data.getSchemeSpecificPart();
-                            if (packageName != null) {
-                                updateActivityModelList(AppListOp.REPLACE, packageName);
-                            }
+                        updateActivityModelList(AppListOp.REPLACE, packageName);
+                        break;
+                    }
+
+                    case Intent.ACTION_PACKAGE_CHANGED: {
+                        PackageManager pm = context.getPackageManager();
+                        int state;
+                        try {
+                            state = pm.getApplicationEnabledSetting(packageName);
+                        } catch (Exception e) {
+                            Log.e(
+                                    TAG,
+                                    "Failed to get application enabled setting for package "
+                                            + packageName
+                            );
+                            break;
+                        }
+                        if (state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                                || state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER) {
+                            updateActivityModelList(AppListOp.DISABLE, packageName);
+                        } else if (state == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                                || state == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) {
+                            updateActivityModelList(AppListOp.ENABLE, packageName);
                         }
                         break;
                     }
@@ -224,15 +237,17 @@ public class LauncherViewModel extends AndroidViewModel {
             }
             if (packageName != null) {
                 // Update ActivityModelList
-                if (op == AppListOp.REMOVE || op == AppListOp.REPLACE) {
+                if (op == AppListOp.REMOVE || op == AppListOp.REPLACE || op == AppListOp.DISABLE) {
                     try {
-                        CollectionCompat.removeIf(list,
-                                item -> Objects.equals(packageName, item.getPackageName()));
+                        CollectionCompat.removeIf(
+                                list,
+                                item -> Objects.equals(packageName, item.getPackageName())
+                        );
                     } catch (Exception e) {
                         Log.e(TAG, "Failed to remove activity models of " + packageName);
                     }
                 }
-                if (op == AppListOp.ADD || op == AppListOp.REPLACE) {
+                if (op == AppListOp.ADD || op == AppListOp.REPLACE || op == AppListOp.ENABLE) {
                     try {
                         list.addAll(ApplicationUtils.getActivityModelList(getApplication(), packageName));
                     } catch (Exception e) {
@@ -241,7 +256,7 @@ public class LauncherViewModel extends AndroidViewModel {
                     sortActivityModelList(list);
                 }
                 // Update Database
-                if (op == AppListOp.REMOVE) {
+                if (op == AppListOp.REMOVE || op == AppListOp.DISABLE) {
                     deleteIconsByPackageAsync(packageName);
                 }
                 if (op == AppListOp.REPLACE) {
@@ -250,15 +265,7 @@ public class LauncherViewModel extends AndroidViewModel {
             } else if (op != AppListOp.INIT) {
                 Log.e(TAG, "Package name is null. Specified operation has not been executed.");
             }
-            if (isUpdatingList.compareAndSet(false, true)) {
-                try {
-                    synchronized (updateListLock) {
-                        mActivityModelList.postValue(list);
-                    }
-                } finally {
-                    isUpdatingList.set(false);
-                }
-            }
+            mActivityModelList.postValue(list);
         });
     }
 
