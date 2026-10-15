@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 
 import com.qch.sumelauncher.data.model.permission.PermissionModel;
 import com.qch.sumelauncher.databinding.FragmentPermissionBinding;
-import com.qch.sumelauncher.recyclerview.adapter.FilterableListAdapter;
-import com.qch.sumelauncher.recyclerview.adapter.PermissionListAdapter;
+import com.qch.sumelauncher.ui.recyclerview.adapter.FilterableListAdapter;
+import com.qch.sumelauncher.ui.recyclerview.adapter.PermissionListAdapter;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.recyclerview.decoration;
+package com.qch.sumelauncher.ui.recyclerview.decoration;
 
 import android.graphics.Rect;
 import android.view.View;

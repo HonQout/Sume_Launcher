@@ -1,9 +1,11 @@
 package com.qch.sumelauncher.ui.launcher.fragment.activitypicker;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,13 +13,15 @@ import androidx.appcompat.widget.SearchView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 import com.qch.sumelauncher.databinding.ActivityPickerBinding;
-import com.qch.sumelauncher.recyclerview.adapter.AppGridAdapter;
-import com.qch.sumelauncher.recyclerview.adapter.ClickableListAdapter;
-import com.qch.sumelauncher.recyclerview.decoration.VerticalGridDecoration;
+import com.qch.sumelauncher.ui.recyclerview.adapter.AppGridAdapter;
+import com.qch.sumelauncher.ui.recyclerview.adapter.ClickableListAdapter;
+import com.qch.sumelauncher.ui.recyclerview.decoration.VerticalGridDecoration;
 import com.qch.sumelauncher.ui.launcher.activity.LauncherViewModel;
 import com.qch.sumelauncher.ui.settings.root.SettingsViewModel;
 import com.qch.sumelauncher.utils.UIUtils;
@@ -48,6 +52,22 @@ public class ActivityPicker extends BottomSheetDialogFragment {
         super.onCreate(savedInstanceState);
         launcherViewModel = new ViewModelProvider(requireActivity()).get(LauncherViewModel.class);
         settingsViewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        if (!(dialog instanceof BottomSheetDialog)) {
+            return dialog;
+        }
+        BottomSheetDialog bottomSheetDialog = (BottomSheetDialog) dialog;
+        Window window = bottomSheetDialog.getWindow();
+        if (settingsViewModel.getAnimationValue() && window != null) {
+            window.setWindowAnimations(-1);
+        }
+
+        return dialog;
     }
 
     @Nullable
@@ -113,5 +133,18 @@ public class ActivityPicker extends BottomSheetDialogFragment {
         });
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        View view = getView();
+        if (view == null) {
+            return;
+        }
+        View parent = (View) view.getParent();
+        BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(parent);
+        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        behavior.setSkipCollapsed(true);
     }
 }

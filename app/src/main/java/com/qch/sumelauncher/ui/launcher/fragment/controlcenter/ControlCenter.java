@@ -1,5 +1,6 @@
 package com.qch.sumelauncher.ui.launcher.fragment.controlcenter;
 
+import android.app.Dialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +18,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.br.MyDeviceAdminReceiver;
@@ -23,9 +26,9 @@ import com.qch.sumelauncher.data.model.controlcenter.ActivityShortcutModel;
 import com.qch.sumelauncher.data.model.controlcenter.ControlCenterItemModel;
 import com.qch.sumelauncher.data.model.controlcenter.SettingsShortcutModel;
 import com.qch.sumelauncher.databinding.ControlCenterBinding;
-import com.qch.sumelauncher.recyclerview.adapter.ClickableListAdapter;
-import com.qch.sumelauncher.recyclerview.adapter.ControlCenterListAdapter;
-import com.qch.sumelauncher.recyclerview.decoration.VerticalGridDecoration;
+import com.qch.sumelauncher.ui.recyclerview.adapter.ClickableListAdapter;
+import com.qch.sumelauncher.ui.recyclerview.adapter.ControlCenterListAdapter;
+import com.qch.sumelauncher.ui.recyclerview.decoration.VerticalGridDecoration;
 import com.qch.sumelauncher.ui.settings.root.SettingsViewModel;
 import com.qch.sumelauncher.utils.DeviceAdminUtils;
 import com.qch.sumelauncher.utils.UIUtils;
@@ -48,6 +51,17 @@ public class ControlCenter extends BottomSheetDialogFragment {
         super.onCreate(savedInstanceState);
         controlCenterViewModel = new ViewModelProvider(requireActivity()).get(ControlCenterViewModel.class);
         settingsViewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        Window window = dialog.getWindow();
+        if (settingsViewModel.getAnimationValue() && window != null) {
+            window.setWindowAnimations(-1);
+        }
+        return dialog;
     }
 
     @Nullable
@@ -120,5 +134,18 @@ public class ControlCenter extends BottomSheetDialogFragment {
         });
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        View view = getView();
+        if (view == null) {
+            return;
+        }
+        View parent = (View) view.getParent();
+        BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(parent);
+        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        behavior.setSkipCollapsed(true);
     }
 }

@@ -1,7 +1,7 @@
 package com.qch.sumelauncher.utils;
 
-import android.content.Context;
-import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.view.View;
 import android.view.Window;
@@ -73,9 +73,17 @@ public class UIUtils {
         }
     }
 
-    public static boolean isDarkMode(Context context) {
-        Context appContext = context.getApplicationContext();
-        int nightMode = appContext.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-        return nightMode == Configuration.UI_MODE_NIGHT_YES;
+    public static void setLightNavigationBars(@NonNull Window window) {
+        final WindowInsetsControllerCompat windowInsetsController
+                = WindowCompat.getInsetsController(window, window.getDecorView());
+        windowInsetsController.setAppearanceLightNavigationBars(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.setNavigationBarContrastEnforced(true);
+        }
+    }
+
+    public static void showSystemWallpaper(@NonNull Window window) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 }

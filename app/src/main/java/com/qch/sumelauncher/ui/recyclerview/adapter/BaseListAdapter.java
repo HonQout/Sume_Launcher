@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.recyclerview.adapter;
+package com.qch.sumelauncher.ui.recyclerview.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;

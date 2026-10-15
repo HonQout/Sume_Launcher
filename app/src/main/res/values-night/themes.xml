@@ -1,6 +1,7 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.SumeLauncher" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="preferenceTheme">@style/MyPreferenceTheme</item>
         <item name="colorOnSurfaceVariant">@color/white</item>
         <item name="android:windowBackground">@color/black</item>
     </style>

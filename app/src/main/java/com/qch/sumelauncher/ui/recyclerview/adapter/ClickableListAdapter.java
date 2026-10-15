@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.recyclerview.adapter;
+package com.qch.sumelauncher.ui.recyclerview.adapter;
 
 import android.view.View;
 
