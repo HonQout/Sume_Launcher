@@ -13,22 +13,26 @@ import com.qch.sumelauncher.ui.launcher.fragment.controlcenter.view.ControlCente
 import java.util.List;
 import java.util.Objects;
 
-public class ControlCenterListAdapter extends ClickableListAdapter<ControlCenterItemModel, ControlCenterListAdapter.ViewHolder> {
+public class ControlCenterListAdapter
+        extends ClickableListAdapter<ControlCenterItemModel, ControlCenterListAdapter.ViewHolder> {
     private static final String TAG = "ControlCenterListAdapter";
 
-    public static final DiffUtil.ItemCallback<ControlCenterItemModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
-        @Override
-        public boolean areItemsTheSame(@NonNull ControlCenterItemModel oldItem, @NonNull ControlCenterItemModel newItem) {
-            return Objects.equals(oldItem, newItem);
-        }
+    public static final DiffUtil.ItemCallback<ControlCenterItemModel> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<>() {
+                @Override
+                public boolean areItemsTheSame(@NonNull ControlCenterItemModel oldItem,
+                                               @NonNull ControlCenterItemModel newItem) {
+                    return Objects.equals(oldItem, newItem);
+                }
 
-        @Override
-        public boolean areContentsTheSame(@NonNull ControlCenterItemModel oldItem, @NonNull ControlCenterItemModel newItem) {
-            boolean isIconTheSame = Objects.equals(oldItem.getIconRes(), newItem.getIconRes());
-            boolean isTitleTheSame = Objects.equals(oldItem.getTitleRes(), newItem.getTitleRes());
-            return isIconTheSame && isTitleTheSame;
-        }
-    };
+                @Override
+                public boolean areContentsTheSame(@NonNull ControlCenterItemModel oldItem,
+                                                  @NonNull ControlCenterItemModel newItem) {
+                    boolean isIconTheSame = Objects.equals(oldItem.getIconRes(), newItem.getIconRes());
+                    boolean isTitleTheSame = Objects.equals(oldItem.getTitleRes(), newItem.getTitleRes());
+                    return isIconTheSame && isTitleTheSame;
+                }
+            };
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final ControlCenterShortcutView controlCenterShortcutView;

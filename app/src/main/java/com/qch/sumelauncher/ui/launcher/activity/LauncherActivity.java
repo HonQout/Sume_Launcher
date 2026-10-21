@@ -28,14 +28,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 import com.qch.sumelauncher.data.model.launcher.IconModel;
 import com.qch.sumelauncher.databinding.ActivityLauncherBinding;
 import com.qch.sumelauncher.ui.recyclerview.adapter.AppGridAdapter;
-import com.qch.sumelauncher.ui.recyclerview.adapter.FilterableListAdapter;
+import com.qch.sumelauncher.ui.recyclerview.adapter.OnItemClickListener;
 import com.qch.sumelauncher.ui.recyclerview.decoration.VerticalGridDecoration;
 import com.qch.sumelauncher.ui.launcher.fragment.activitypicker.ActivityPicker;
 import com.qch.sumelauncher.ui.launcher.fragment.controlcenter.ControlCenter;
@@ -71,7 +70,6 @@ public class LauncherActivity extends AppCompatActivity {
     private WifiViewModel wifiViewModel;
     private BluetoothViewModel bluetoothViewModel;
     private BatteryViewModel batteryViewModel;
-    private BottomSheetBehavior<View> bottomSheetBehavior;
     private ActivityResultLauncher<String> requestPermissionLauncher;
     private Configuration oldConfig;
 
@@ -273,31 +271,17 @@ public class LauncherActivity extends AppCompatActivity {
         });
         // Save a copy of configuration
         oldConfig = new Configuration(getResources().getConfiguration());
+        // Restore state
+        if (launcherViewModel.getLauncherState() == LauncherViewModel.LauncherState.APPS) {
+            binding.aLauncherDrawerLl.setVisibility(View.VISIBLE);
+        }
         // Observe
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.aLauncherFl);
-        bottomSheetBehavior.setSkipCollapsed(true);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View view, int i) {
-                Log.i(TAG, "BottomSheetBehavior onStateChanged. New state: " + i);
-                if (i == BottomSheetBehavior.STATE_EXPANDED) {
-                    launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.APPS);
-                } else if (i == BottomSheetBehavior.STATE_HIDDEN) {
-                    launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.LAUNCHER);
-                }
-            }
-
-            @Override
-            public void onSlide(@NonNull View view, float v) {
-
-            }
-        });
         OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                if (binding.aLauncherDrawerLl.getVisibility() == View.VISIBLE) {
+                    binding.aLauncherDrawerLl.setVisibility(View.GONE);
+                    launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.LAUNCHER);
                 }
             }
         };
@@ -350,8 +334,7 @@ public class LauncherActivity extends AppCompatActivity {
                 }
             });
         });
-
-        // Set num page
+        // Set text of page count
         launcherViewModel.getPageCount().observe(this, integer -> {
             if (integer == null) {
                 return;
@@ -365,12 +348,14 @@ public class LauncherActivity extends AppCompatActivity {
             );
         });
         // Pattern of switching between pages
-        settingsViewModel.getScrollToSwitchPage().observe(this, scrollToSwitchPage ->
-                binding.aLauncherRoot.launcherVp2.setUserInputEnabled(scrollToSwitchPage));
+        settingsViewModel.getSwitchPageViaScrolling().observe(this, switchPageViaScrolling ->
+                binding.aLauncherRoot.launcherVp2.setUserInputEnabled(switchPageViaScrolling));
         // Set button callback
         // Apps button
-        binding.aLauncherRoot.launcherBtnApps.setOnClickListener(v ->
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED));
+        binding.aLauncherRoot.launcherBtnApps.setOnClickListener(v -> {
+            launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.APPS);
+            binding.aLauncherDrawerLl.setVisibility(View.VISIBLE);
+        });
         // Settings button
         binding.aLauncherRoot.launcherBtnSettings.setOnClickListener(v -> {
             ControlCenter controlCenter = ControlCenter.newInstance();
@@ -409,12 +394,16 @@ public class LauncherActivity extends AppCompatActivity {
                 });
 
         // Drawer
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,
-                getResources().getInteger(R.integer.grid_column_count));
+        int drawerColumnCount = getResources().getInteger(R.integer.drawer_column_count);
+        binding.aLauncherDrawerToolbar.setNavigationOnClickListener(v -> {
+            binding.aLauncherDrawerLl.setVisibility(View.GONE);
+            launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.LAUNCHER);
+        });
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, drawerColumnCount);
         binding.aLauncherDrawer.drawerRv.setLayoutManager(gridLayoutManager);
 
         AppGridAdapter appGridAdapter = new AppGridAdapter(new ArrayList<>());
-        appGridAdapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
+        appGridAdapter.setOnItemClickListener(new OnItemClickListener<>() {
             @Override
             public void onItemClick(ActivityModel item, View view) {
                 IntentUtils.launchActivity(LauncherActivity.this, item.getPackageName(),
@@ -430,7 +419,7 @@ public class LauncherActivity extends AppCompatActivity {
         binding.aLauncherDrawer.drawerRv.setAdapter(appGridAdapter);
 
         VerticalGridDecoration verticalGridDecoration = new VerticalGridDecoration(
-                getResources().getInteger(R.integer.grid_column_count), 0, 0);
+                drawerColumnCount, 0, 0);
         binding.aLauncherDrawer.drawerRv.addItemDecoration(verticalGridDecoration);
 
         binding.aLauncherDrawer.drawerSv.setOnQueryTextFocusChangeListener((v, hasFocus) ->
@@ -446,8 +435,9 @@ public class LauncherActivity extends AppCompatActivity {
                 AppGridAdapter adapter = (AppGridAdapter) binding.aLauncherDrawer.drawerRv.getAdapter();
                 if (adapter != null) {
                     adapter.getFilter().filter(newText);
+                    return true;
                 }
-                return true;
+                return false;
             }
         });
         binding.aLauncherDrawer.drawerBtnQuit.setOnClickListener(v -> {
@@ -456,6 +446,10 @@ public class LauncherActivity extends AppCompatActivity {
             binding.aLauncherDrawer.drawerBtnQuit.setVisibility(View.GONE);
         });
         launcherViewModel.getActivityModelList().observe(LauncherActivity.this, appGridAdapter::setList);
+        launcherViewModel.getDrawerColumnCount().observe(LauncherActivity.this, integer -> {
+            gridLayoutManager.setSpanCount(integer);
+            verticalGridDecoration.setSpanCount(integer);
+        });
     }
 
     @Override
@@ -479,7 +473,7 @@ public class LauncherActivity extends AppCompatActivity {
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP: {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    if (settingsViewModel.getVolumeKeySwitchPageValue()) {
+                    if (settingsViewModel.getSwitchPageViaVolumeKeysValue()) {
                         LauncherViewModel.LauncherState launcherState = launcherViewModel.getLauncherState();
                         if (launcherState == LauncherViewModel.LauncherState.LAUNCHER) {
                             launcherPageUp();
@@ -491,7 +485,7 @@ public class LauncherActivity extends AppCompatActivity {
             }
             case KeyEvent.KEYCODE_VOLUME_DOWN: {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    if (settingsViewModel.getVolumeKeySwitchPageValue()) {
+                    if (settingsViewModel.getSwitchPageViaVolumeKeysValue()) {
                         LauncherViewModel.LauncherState launcherState = launcherViewModel.getLauncherState();
                         if (launcherState == LauncherViewModel.LauncherState.LAUNCHER) {
                             launcherPageDown();
@@ -515,9 +509,13 @@ public class LauncherActivity extends AppCompatActivity {
             int diff = oldConfig.diff(newConfig);
             if ((diff & ActivityInfo.CONFIG_LOCALE) != 0) {
                 timeViewModel.update(getApplicationContext());
+                launcherViewModel.onLocaleChange();
+
                 binding.aLauncherDrawer.drawerSv.setQueryHint(getString(R.string.search_for_apps));
                 binding.aLauncherDrawer.drawerBtnQuit.setText(R.string.quit);
-                launcherViewModel.onLocaleChange();
+            } else if ((diff & ActivityInfo.CONFIG_ORIENTATION) != 0) {
+                launcherViewModel.setDrawerColumnCount(
+                        getResources().getInteger(R.integer.drawer_column_count));
             }
         }
         oldConfig = new Configuration(newConfig);
@@ -630,9 +628,10 @@ public class LauncherActivity extends AppCompatActivity {
             if (menuId == R.id.remove) {
                 launcherViewModel.deleteIconByPositionAsync(iconModel.toIconEntity());
                 return true;
-            } else if (menuId == R.id.modify) {
+            } else if (menuId == R.id.replace) {
                 ActivityPicker activityPicker = ActivityPicker.newInstance(newActivityModel ->
-                        launcherViewModel.insertIconAsync(iconModel.getCellX(), iconModel.getCellY(),
+                        launcherViewModel
+                                .insertIconAsync(iconModel.getCellX(), iconModel.getCellY(),
                                         newActivityModel.getPackageName(), newActivityModel.getActivityName())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe()
@@ -675,9 +674,10 @@ public class LauncherActivity extends AppCompatActivity {
         popupMenu.inflate(R.menu.launcher_blank_area_menu);
         popupMenu.setOnMenuItemClickListener(item -> {
             int menuId = item.getItemId();
-            if (menuId == R.id.modify) {
+            if (menuId == R.id.replace) {
                 ActivityPicker activityPicker = ActivityPicker.newInstance(activityModel ->
-                        launcherViewModel.insertIconAsync(cellX, cellY, activityModel.getPackageName(),
+                        launcherViewModel
+                                .insertIconAsync(cellX, cellY, activityModel.getPackageName(),
                                         activityModel.getActivityName())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe()

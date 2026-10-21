@@ -15,7 +15,8 @@ import com.qch.sumelauncher.data.model.permission.PermissionModel;
 import java.util.List;
 import java.util.Objects;
 
-public class PermissionListAdapter extends ClickableListAdapter<PermissionModel, PermissionListAdapter.ViewHolder> {
+public class PermissionListAdapter
+        extends ClickableListAdapter<PermissionModel, PermissionListAdapter.ViewHolder> {
     private static final String TAG = "PermissionListAdapter";
 
     public static final DiffUtil.ItemCallback<PermissionModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {

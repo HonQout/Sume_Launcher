@@ -1,7 +1,5 @@
 package com.qch.sumelauncher.ui.recyclerview.adapter;
 
-import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,12 +9,6 @@ import java.util.List;
 public abstract class ClickableListAdapter<T, VH extends RecyclerView.ViewHolder>
         extends BaseListAdapter<T, VH> {
     protected OnItemClickListener<T> onItemClickListener;
-
-    public interface OnItemClickListener<T> {
-        void onItemClick(T item, View view);
-
-        boolean onItemLongClick(T item, View view);
-    }
 
     public ClickableListAdapter(@NonNull DiffUtil.ItemCallback<T> diffCallback) {
         super(diffCallback);

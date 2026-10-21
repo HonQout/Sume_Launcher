@@ -11,10 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class FilterableListAdapter<T, VH extends RecyclerView.ViewHolder>
-        extends ClickableListAdapter<T, VH>
+public abstract class FilterableClickableListAdapter<T, VH extends RecyclerView.ViewHolder>
+        extends BaseListAdapter<T, VH>
         implements Filterable {
     protected ListFilter listFilter;
+    protected OnItemClickListener<T> onItemClickListener;
 
     protected class ListFilter extends Filter {
         @Override
@@ -23,9 +24,8 @@ public abstract class FilterableListAdapter<T, VH extends RecyclerView.ViewHolde
             if (TextUtils.isEmpty(constraint)) {
                 resultList = list;
             } else {
-                resultList = FilterableListAdapter.this.performFiltering(list, constraint);
+                resultList = filterList(list, constraint);
             }
-
             final FilterResults result = new FilterResults();
             result.values = resultList;
             result.count = resultList.size();
@@ -40,15 +40,21 @@ public abstract class FilterableListAdapter<T, VH extends RecyclerView.ViewHolde
                 newList.add((T) item);
             }
             submitList(newList);
+
         }
     }
 
-    public FilterableListAdapter(@NonNull DiffUtil.ItemCallback<T> diffCallback) {
+    public FilterableClickableListAdapter(@NonNull DiffUtil.ItemCallback<T> diffCallback) {
         super(diffCallback);
     }
 
-    public FilterableListAdapter(@NonNull DiffUtil.ItemCallback<T> diffCallback, List<T> list) {
+    public FilterableClickableListAdapter(@NonNull DiffUtil.ItemCallback<T> diffCallback,
+                                          List<T> list) {
         super(diffCallback, list);
+    }
+
+    public void setOnItemClickListener(@NonNull OnItemClickListener<T> onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     @Override
@@ -60,5 +66,5 @@ public abstract class FilterableListAdapter<T, VH extends RecyclerView.ViewHolde
     }
 
     @NonNull
-    protected abstract List<T> performFiltering(List<T> list, CharSequence constraint);
+    protected abstract List<T> filterList(List<T> list, CharSequence constraint);
 }

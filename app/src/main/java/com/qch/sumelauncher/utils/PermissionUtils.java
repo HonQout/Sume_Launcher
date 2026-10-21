@@ -21,20 +21,16 @@ public class PermissionUtils {
     /**
      * Check if a permission is granted.
      */
-    public static boolean isPermissionGranted(
-            @NonNull Context context,
-            @NonNull String permission
-    ) {
+    public static boolean isPermissionGranted(@NonNull Context context,
+                                              @NonNull String permission) {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     /**
      * Check if a group of permissions is granted.
      */
-    public static boolean arePermissionsGranted(
-            @NonNull Context context,
-            @NonNull String[] permissions
-    ) {
+    public static boolean arePermissionsGranted(@NonNull Context context,
+                                                @NonNull String[] permissions) {
         for (String permission : permissions) {
             if (!isPermissionGranted(context, permission)) {
                 return false;
@@ -47,10 +43,8 @@ public class PermissionUtils {
      * Get the denied permissions in a group of permissions.
      */
     @NonNull
-    public static List<String> getDeniedPermissions(
-            @NonNull Context context,
-            @NonNull String[] permissions
-    ) {
+    public static List<String> getDeniedPermissions(@NonNull Context context,
+                                                    @NonNull String[] permissions) {
         List<String> permissionDenied = new ArrayList<>();
         for (String permission : permissions) {
             if (!isPermissionGranted(context, permission)) {
@@ -121,7 +115,8 @@ public class PermissionUtils {
      * do nothing on devices which run Android 10 or below, for the reason that not until Android 11
      * did Google started to restrict access to package list.
      */
-    public static void requestQueryAllPackagesPermission(@NonNull Activity activity, int requestCode) {
+    public static void requestQueryAllPackagesPermission(@NonNull Activity activity,
+                                                         int requestCode) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             ActivityCompat.requestPermissions(
                     activity,

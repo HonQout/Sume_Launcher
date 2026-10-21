@@ -5,22 +5,19 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 import com.qch.sumelauncher.databinding.ActivityPickerBinding;
 import com.qch.sumelauncher.ui.recyclerview.adapter.AppGridAdapter;
-import com.qch.sumelauncher.ui.recyclerview.adapter.ClickableListAdapter;
+import com.qch.sumelauncher.ui.recyclerview.adapter.OnItemClickListener;
 import com.qch.sumelauncher.ui.recyclerview.decoration.VerticalGridDecoration;
 import com.qch.sumelauncher.ui.launcher.activity.LauncherViewModel;
 import com.qch.sumelauncher.ui.settings.root.SettingsViewModel;
@@ -28,7 +25,7 @@ import com.qch.sumelauncher.utils.UIUtils;
 
 import java.util.ArrayList;
 
-public class ActivityPicker extends BottomSheetDialogFragment {
+public class ActivityPicker extends DialogFragment {
     private static final String TAG = "ActivityPicker";
     private ActivityPickerBinding binding;
     private LauncherViewModel launcherViewModel;
@@ -39,7 +36,12 @@ public class ActivityPicker extends BottomSheetDialogFragment {
         void onActivitySelected(ActivityModel activityModel);
     }
 
-    private ActivityPicker(OnActivitySelectedListener onActivitySelectedListener) {
+    // Require empty constructor.
+    public ActivityPicker() {
+
+    }
+
+    public ActivityPicker(OnActivitySelectedListener onActivitySelectedListener) {
         this.onActivitySelectedListener = onActivitySelectedListener;
     }
 
@@ -54,34 +56,20 @@ public class ActivityPicker extends BottomSheetDialogFragment {
         settingsViewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
     }
 
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
-        if (!(dialog instanceof BottomSheetDialog)) {
-            return dialog;
-        }
-        BottomSheetDialog bottomSheetDialog = (BottomSheetDialog) dialog;
-        Window window = bottomSheetDialog.getWindow();
-        if (settingsViewModel.getAnimationValue() && window != null) {
-            window.setWindowAnimations(-1);
-        }
-
-        return dialog;
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = ActivityPickerBinding.inflate(inflater, container, false);
 
+        binding.activityPickerToolbar.setNavigationOnClickListener(v -> dismiss());
+
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),
-                getResources().getInteger(R.integer.grid_column_count));
+                getResources().getInteger(R.integer.drawer_column_count));
         binding.activityPickerDrawer.drawerRv.setLayoutManager(gridLayoutManager);
 
         AppGridAdapter appGridAdapter = new AppGridAdapter(new ArrayList<>());
-        appGridAdapter.setOnItemClickListener(new ClickableListAdapter.OnItemClickListener<>() {
+        appGridAdapter.setOnItemClickListener(new OnItemClickListener<>() {
             @Override
             public void onItemClick(ActivityModel item, View view) {
                 onActivitySelectedListener.onActivitySelected(item);
@@ -96,7 +84,7 @@ public class ActivityPicker extends BottomSheetDialogFragment {
         binding.activityPickerDrawer.drawerRv.setAdapter(appGridAdapter);
 
         VerticalGridDecoration verticalGridDecoration = new VerticalGridDecoration(
-                getResources().getInteger(R.integer.grid_column_count), 0, 0);
+                getResources().getInteger(R.integer.drawer_column_count), 0, 0);
         binding.activityPickerDrawer.drawerRv.addItemDecoration(verticalGridDecoration);
 
         binding.activityPickerDrawer.drawerSv.setOnQueryTextFocusChangeListener((v, hasFocus) ->
@@ -112,8 +100,9 @@ public class ActivityPicker extends BottomSheetDialogFragment {
                 AppGridAdapter adapter = (AppGridAdapter) binding.activityPickerDrawer.drawerRv.getAdapter();
                 if (adapter != null) {
                     adapter.getFilter().filter(newText);
+                    return true;
                 }
-                return true;
+                return false;
             }
         });
         binding.activityPickerDrawer.drawerBtnQuit.setOnClickListener(v -> {
@@ -122,13 +111,31 @@ public class ActivityPicker extends BottomSheetDialogFragment {
             binding.activityPickerDrawer.drawerBtnQuit.setVisibility(View.GONE);
         });
 
-        launcherViewModel.getActivityModelList().observe(requireActivity(), appGridAdapter::setList);
-        settingsViewModel.getDisplayStatusBar().observe(getViewLifecycleOwner(), display -> {
-            if (display == null) {
+        launcherViewModel.getActivityModelList().observe(requireActivity(), activityModels -> {
+            appGridAdapter.setList(activityModels);
+            appGridAdapter.getFilter().filter(binding.activityPickerDrawer.drawerSv.getQuery());
+        });
+        launcherViewModel.getDrawerColumnCount().observe(requireActivity(), integer -> {
+            gridLayoutManager.setSpanCount(integer);
+            verticalGridDecoration.setSpanCount(integer);
+        });
+        settingsViewModel.getDisplayStatusBar().observe(getViewLifecycleOwner(), aBoolean -> {
+            if (aBoolean == null) {
                 return;
             }
             if (getDialog() != null && getDialog().getWindow() != null) {
-                UIUtils.forceHandleStatusBarVisibility(getDialog().getWindow(), display);
+                UIUtils.forceHandleStatusBarVisibility(getDialog().getWindow(), aBoolean);
+            }
+        });
+        settingsViewModel.getForceToApplyBgColor().observe(getViewLifecycleOwner(), aBoolean -> {
+            if (aBoolean == null) {
+                return;
+            }
+            if (getDialog() != null && getDialog().getWindow() != null) {
+                binding.activityPickerRoot.setBackgroundColor(
+                        getResources()
+                                .getColor(aBoolean ? R.color.windowBackgroundColor : R.color.transparent, null)
+                );
             }
         });
 
@@ -138,13 +145,12 @@ public class ActivityPicker extends BottomSheetDialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-        View view = getView();
-        if (view == null) {
-            return;
+        Dialog dialog = getDialog();
+        if (dialog != null && dialog.getWindow() != null) {
+            dialog.getWindow().setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+            );
         }
-        View parent = (View) view.getParent();
-        BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(parent);
-        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        behavior.setSkipCollapsed(true);
     }
 }

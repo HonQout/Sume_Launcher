@@ -4,8 +4,8 @@
         android:id="@+id/remove"
         android:title="@string/remove" />
     <item
-        android:id="@+id/modify"
-        android:title="@string/modify" />
+        android:id="@+id/replace"
+        android:title="@string/replace" />
     <item
         android:id="@+id/uninstall"
         android:title="@string/uninstall" />

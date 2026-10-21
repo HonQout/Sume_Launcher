@@ -13,13 +13,14 @@
     <!-- Title -->
     <string name="settings">设置</string>
     <string name="app_drawer">应用抽屉</string>
-    <string name="select_app">选择应用</string>
+    <string name="replace_with">替换为</string>
 
     <!-- Button -->
     <string name="quit">退出</string>
 
     <!-- Menu -->
     <string name="remove">移除</string>
+    <string name="replace">替换</string>
     <string name="modify">修改</string>
     <string name="uninstall">卸载</string>
     <string name="app_info">应用信息</string>
@@ -56,14 +57,16 @@
     <string name="header_about">关于</string>
 
     <!-- Preference Items -->
-    <string name="grid_size">网格尺寸</string>
     <string name="display_status_bar">显示状态栏</string>
     <string name="display_top_bar">显示顶栏</string>
     <string name="top_bar_icon">顶栏图标</string>
+    <string name="grid_size">网格尺寸</string>
+    <string name="force_to_apply_bg_color">强制应用背景色</string>
+    <string name="force_to_apply_bg_color_summary">强制部分组件应用背景色</string>
     <string name="animation">动画</string>
-    <string name="scroll_switch_page">滑动翻页</string>
-    <string name="volume_key_switch_page">音量键翻页</string>
-    <string name="volume_key_switch_page_summary">翻页键也被视为音量键</string>
+    <string name="switch_page_via_scrolling">滑动翻页</string>
+    <string name="switch_page_via_volume_keys">音量键翻页</string>
+    <string name="switch_page_via_volume_keys_summary">翻页键也被视为音量键</string>
     <string name="default_app">默认应用</string>
     <string name="deactivate_device_manager">反激活设备管理器</string>
     <string name="permission">权限</string>
@@ -87,6 +90,7 @@
     <string name="sound">声音</string>
     <string name="display">显示</string>
     <string name="launcher_settings">桌面设置</string>
+    <string name="lock_screen">锁定屏幕</string>
 
     <!-- Others -->
     <string name="request_permission">请求权限</string>
@@ -97,7 +101,5 @@
     <string name="add_device_admin_reason">此应用需要这个权限以锁定屏幕。</string>
     <string name="device_not_support_this_function">您的设备不支持此功能。</string>
     <string name="delete_page_fail_reason">无法删除最后一个页面。</string>
-    <string name="lock_screen">锁定屏幕</string>
-    <string name="choose_an_activity">选择一个活动</string>
 
 </resources>

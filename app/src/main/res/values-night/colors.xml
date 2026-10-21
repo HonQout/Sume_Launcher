@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="windowBackgroundColor">#FF424242</color>
+
     <color name="batteryBorderColor">@color/white</color>
     <color name="batteryCapColor">@color/white</color>
     <color name="batteryFillColor">@color/light_gray</color>

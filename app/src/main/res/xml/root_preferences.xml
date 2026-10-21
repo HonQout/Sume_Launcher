@@ -31,6 +31,13 @@
             app:title="@string/grid_size"
             app:useSimpleSummaryProvider="true" />
 
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:iconSpaceReserved="false"
+            app:key="force_to_apply_bg_color"
+            app:summary="@string/force_to_apply_bg_color_summary"
+            app:title="@string/force_to_apply_bg_color" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -46,15 +53,15 @@
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:iconSpaceReserved="false"
-            app:key="scroll_switch_page"
-            app:title="@string/scroll_switch_page" />
+            app:key="switch_page_via_scrolling"
+            app:title="@string/switch_page_via_scrolling" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:iconSpaceReserved="false"
-            app:key="volume_key_switch_page"
-            app:summary="@string/volume_key_switch_page_summary"
-            app:title="@string/volume_key_switch_page" />
+            app:key="switch_page_via_volume_keys"
+            app:summary="@string/switch_page_via_volume_keys_summary"
+            app:title="@string/switch_page_via_volume_keys" />
 
     </PreferenceCategory>
 

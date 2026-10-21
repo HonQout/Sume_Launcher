@@ -7,7 +7,7 @@
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            app:icon="@drawable/baseline_calendar_month_24"
+            app:icon="@drawable/baseline_calendar_month_day_night_24"
             app:iconSpaceReserved="true"
             app:key="date"
             app:title="@string/date" />

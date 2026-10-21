@@ -11,16 +11,16 @@ import androidx.lifecycle.MutableLiveData;
 import com.qch.sumelauncher.application.MyApplication;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
 
 public class SettingsViewModel extends AndroidViewModel {
     private static final String TAG = "SettingsViewModel";
     // data
     private final MutableLiveData<Boolean> mDisplayStatusBar = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayTopBar = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mForceToApplyBgColor = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mAnimation = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> mScrollToSwitchPage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> mVolumeKeySwitchPage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mSwitchPageViaScrolling = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mSwitchPageViaVolumeKeys = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mAskForPermFineLocation = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayDate = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mDisplayRingerMode = new MutableLiveData<>();
@@ -45,95 +45,109 @@ public class SettingsViewModel extends AndroidViewModel {
 
     private void initDisposable() {
         // display_status_bar
-        Disposable disposable1 = MyApplication.getPreferenceDataStoreImpl()
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("display_status_bar", true)
                 .subscribe(
                         mDisplayStatusBar::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key display_status_bar.", throwable)
-                );
-        compositeDisposable.add(disposable1);
+                )
+        );
         // display_top_bar
-        Disposable disposable2 = MyApplication.getPreferenceDataStoreImpl()
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("display_top_bar", true)
                 .subscribe(
                         mDisplayTopBar::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key display_top_bar.", throwable)
-                );
-        compositeDisposable.add(disposable2);
+                )
+        );
+        // force_to_apply_bg_color
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
+                .getBooleanFlowable("force_to_apply_bg_color", false)
+                .subscribe(
+                        mForceToApplyBgColor::postValue,
+                        throwable -> Log.e(TAG, "Cannot get value of key force_to_apply_bg_color.", throwable)
+                )
+        );
         // animation
-        Disposable disposable3 = MyApplication.getPreferenceDataStoreImpl()
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("animation", true)
                 .subscribe(
                         mAnimation::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key animation.", throwable)
-                );
-        compositeDisposable.add(disposable3);
-        // scroll_switch_page
-        Disposable disposable4 = MyApplication.getPreferenceDataStoreImpl()
-                .getBooleanFlowable("scroll_switch_page", true)
+                )
+        );
+        // switch_page_via_scrolling
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
+                .getBooleanFlowable("switch_page_via_scrolling", true)
                 .subscribe(
-                        mScrollToSwitchPage::postValue,
-                        throwable -> Log.e(TAG, "Cannot get value of key scroll_switch_page.", throwable)
-                );
-        compositeDisposable.add(disposable4);
-        // volume_key_switch_page
-        Disposable disposable5 = MyApplication.getPreferenceDataStoreImpl()
-                .getBooleanFlowable("volume_key_switch_page", true)
+                        mSwitchPageViaScrolling::postValue,
+                        throwable -> Log.e(TAG, "Cannot get value of key switch_page_via_scrolling.", throwable)
+                )
+        );
+        // switch_page_via_volume_keys
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
+                .getBooleanFlowable("switch_page_via_volume_keys", true)
                 .subscribe(
-                        mVolumeKeySwitchPage::postValue,
-                        throwable -> Log.e(TAG, "Cannot get value of key volume_key_switch_page.", throwable)
-                );
-        compositeDisposable.add(disposable5);
+                        mSwitchPageViaVolumeKeys::postValue,
+                        throwable -> Log.e(TAG, "Cannot get value of key switch_page_via_volume_keys.", throwable)
+                )
+        );
         // ask_for_perm_fine_location
-        Disposable disposable6 = MyApplication.getPreferenceDataStoreImpl()
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("ask_for_perm_fine_location", true)
                 .subscribe(
                         mAskForPermFineLocation::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key ask_for_perm_fine_location.", throwable)
-                );
-        compositeDisposable.add(disposable6);
-        Disposable disposable7 = MyApplication.getPreferenceDataStoreImpl()
+                )
+        );
+        // Top bar icon - Date
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("date", true)
                 .subscribe(
                         mDisplayDate::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key date.", throwable)
-                );
-        compositeDisposable.add(disposable7);
-        Disposable disposable8 = MyApplication.getPreferenceDataStoreImpl()
+                )
+        );
+        // Top bar icon - Ringer mode
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("ringer_mode", true)
                 .subscribe(
                         mDisplayRingerMode::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key ringer_mode.", throwable)
-                );
-        compositeDisposable.add(disposable8);
-        Disposable disposable9 = MyApplication.getPreferenceDataStoreImpl()
+                )
+        );
+        // Top bar icon - Airplane mode
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("airplane_mode", true)
                 .subscribe(
                         mDisplayAirplaneMode::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key airplane_mode.", throwable)
-                );
-        compositeDisposable.add(disposable9);
-        Disposable disposable10 = MyApplication.getPreferenceDataStoreImpl()
+                )
+        );
+        // Top bar icon - Wi-Fi
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("wifi", true)
                 .subscribe(
                         mDisplayWifi::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key wifi.", throwable)
-                );
-        compositeDisposable.add(disposable10);
-        Disposable disposable11 = MyApplication.getPreferenceDataStoreImpl()
+                )
+        );
+        // Top bar icon - Bluetooth
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("bluetooth", true)
                 .subscribe(
                         mDisplayBluetooth::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key bluetooth.", throwable)
-                );
-        compositeDisposable.add(disposable11);
-        Disposable disposable12 = MyApplication.getPreferenceDataStoreImpl()
+                )
+        );
+        // Top bar icon - Battery percentage
+        compositeDisposable.add(MyApplication.getPreferenceDataStoreImpl()
                 .getBooleanFlowable("battery_percentage", true)
                 .subscribe(
                         mDisplayBatteryPct::postValue,
                         throwable -> Log.e(TAG, "Cannot get value of key battery_percentage.", throwable)
-                );
-        compositeDisposable.add(disposable12);
+                )
+        );
     }
 
     public LiveData<Boolean> getDisplayStatusBar() {
@@ -144,16 +158,20 @@ public class SettingsViewModel extends AndroidViewModel {
         return mDisplayTopBar;
     }
 
+    public LiveData<Boolean> getForceToApplyBgColor() {
+        return mForceToApplyBgColor;
+    }
+
     public boolean getAnimationValue() {
         return mAnimation.getValue() == null || mAnimation.getValue();
     }
 
-    public LiveData<Boolean> getScrollToSwitchPage() {
-        return mScrollToSwitchPage;
+    public LiveData<Boolean> getSwitchPageViaScrolling() {
+        return mSwitchPageViaScrolling;
     }
 
-    public boolean getVolumeKeySwitchPageValue() {
-        return mVolumeKeySwitchPage.getValue() == null || mVolumeKeySwitchPage.getValue();
+    public boolean getSwitchPageViaVolumeKeysValue() {
+        return mSwitchPageViaVolumeKeys.getValue() == null || mSwitchPageViaVolumeKeys.getValue();
     }
 
     public boolean getAskForPermFineLocationValue() {

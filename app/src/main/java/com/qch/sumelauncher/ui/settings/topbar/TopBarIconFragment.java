@@ -2,7 +2,6 @@ package com.qch.sumelauncher.ui.settings.topbar;
 
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -15,11 +14,6 @@ import com.qch.sumelauncher.utils.WifiUtils;
 public class TopBarIconFragment extends PreferenceFragmentCompat {
     private static final String TAG = "TopBarIconFragment";
     private PreferenceDataStoreBridge preferenceDataStoreBridge;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {

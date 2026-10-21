@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 
 import com.qch.sumelauncher.data.model.permission.PermissionModel;
 import com.qch.sumelauncher.databinding.FragmentPermissionBinding;
-import com.qch.sumelauncher.ui.recyclerview.adapter.FilterableListAdapter;
+import com.qch.sumelauncher.ui.recyclerview.adapter.OnItemClickListener;
 import com.qch.sumelauncher.ui.recyclerview.adapter.PermissionListAdapter;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class PermissionFragment extends Fragment {
         binding = FragmentPermissionBinding.inflate(inflater, container, false);
         binding.fPermissionRv.setLayoutManager(new LinearLayoutManager(requireContext()));
         PermissionListAdapter adapter = new PermissionListAdapter(new ArrayList<>());
-        adapter.setOnItemClickListener(new FilterableListAdapter.OnItemClickListener<>() {
+        adapter.setOnItemClickListener(new OnItemClickListener<>() {
             @Override
             public void onItemClick(PermissionModel item, View view) {
                 viewModel.showPermissionDetailDialog(requireActivity(), item);

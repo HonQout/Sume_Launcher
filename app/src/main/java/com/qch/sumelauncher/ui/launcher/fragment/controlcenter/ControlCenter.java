@@ -26,8 +26,8 @@ import com.qch.sumelauncher.data.model.controlcenter.ActivityShortcutModel;
 import com.qch.sumelauncher.data.model.controlcenter.ControlCenterItemModel;
 import com.qch.sumelauncher.data.model.controlcenter.SettingsShortcutModel;
 import com.qch.sumelauncher.databinding.ControlCenterBinding;
-import com.qch.sumelauncher.ui.recyclerview.adapter.ClickableListAdapter;
 import com.qch.sumelauncher.ui.recyclerview.adapter.ControlCenterListAdapter;
+import com.qch.sumelauncher.ui.recyclerview.adapter.OnItemClickListener;
 import com.qch.sumelauncher.ui.recyclerview.decoration.VerticalGridDecoration;
 import com.qch.sumelauncher.ui.settings.root.SettingsViewModel;
 import com.qch.sumelauncher.utils.DeviceAdminUtils;
@@ -75,7 +75,7 @@ public class ControlCenter extends BottomSheetDialogFragment {
         binding.controlCenterRv.setLayoutManager(gridLayoutManager);
 
         ControlCenterListAdapter adapter = new ControlCenterListAdapter(new ArrayList<>());
-        adapter.setOnItemClickListener(new ClickableListAdapter.OnItemClickListener<>() {
+        adapter.setOnItemClickListener(new OnItemClickListener<>() {
             @Override
             public void onItemClick(ControlCenterItemModel item, View view) {
                 if (item instanceof SettingsShortcutModel) {

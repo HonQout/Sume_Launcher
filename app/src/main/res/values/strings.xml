@@ -12,13 +12,14 @@
     <!-- Title -->
     <string name="settings">Settings</string>
     <string name="app_drawer">App drawer</string>
-    <string name="select_app">Select App</string>
+    <string name="replace_with">Replace with</string>
 
     <!-- Button -->
     <string name="quit">Quit</string>
 
     <!-- Menu -->
     <string name="remove">Remove</string>
+    <string name="replace">Replace</string>
     <string name="modify">Modify</string>
     <string name="uninstall">Uninstall</string>
     <string name="app_info">App info</string>
@@ -55,14 +56,16 @@
     <string name="header_about">About</string>
 
     <!-- Preference Items -->
-    <string name="grid_size">Grid size</string>
     <string name="display_status_bar">Display status bar</string>
     <string name="display_top_bar">Display top bar</string>
     <string name="top_bar_icon">Top bar icon</string>
+    <string name="grid_size">Grid size</string>
+    <string name="force_to_apply_bg_color">Force to apply background color</string>
+    <string name="force_to_apply_bg_color_summary">Force some components to apply background color</string>
     <string name="animation">Animation</string>
-    <string name="scroll_switch_page">Scroll to switch page</string>
-    <string name="volume_key_switch_page">Use volume key to switch page</string>
-    <string name="volume_key_switch_page_summary">PageUp and PageDown key are also regarded as volume keys</string>
+    <string name="switch_page_via_scrolling">Switch page via scrolling</string>
+    <string name="switch_page_via_volume_keys">Switch page via volume keys</string>
+    <string name="switch_page_via_volume_keys_summary">PageUp key and PageDown key are also regarded as volume keys</string>
     <string name="default_app">Default app</string>
     <string name="deactivate_device_manager">Deactivate device manager</string>
     <string name="permission">Permission</string>
@@ -100,6 +103,5 @@
     <string name="add_device_admin_reason">This app needs this permission to lock the screen.</string>
     <string name="device_not_support_this_function">Your device does not support this function.</string>
     <string name="delete_page_fail_reason">The last page cannot be deleted.</string>
-    <string name="choose_an_activity">Choose an activity</string>
 
 </resources>

@@ -71,6 +71,7 @@ public class LauncherViewModel extends AndroidViewModel {
     private final MediatorLiveData<List<PageWithIconEntities>> pagedIconEntityList = new MediatorLiveData<>();
     private final MediatorLiveData<List<PageWithIconModels>> pagedIconModelList = new MediatorLiveData<>();
     private final MutableLiveData<List<ActivityModel>> mActivityModelList = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mDrawerColumnCount = new MutableLiveData<>();
     private LauncherState launcherState = LauncherState.LAUNCHER;
     private int currentPageIndex;
 
@@ -376,6 +377,14 @@ public class LauncherViewModel extends AndroidViewModel {
 
     public int getCurrentPageIndex() {
         return currentPageIndex;
+    }
+
+    public void setDrawerColumnCount(int newValue) {
+        mDrawerColumnCount.postValue(newValue);
+    }
+
+    public LiveData<Integer> getDrawerColumnCount() {
+        return mDrawerColumnCount;
     }
 
     public LiveData<List<ActivityModel>> getActivityModelList() {

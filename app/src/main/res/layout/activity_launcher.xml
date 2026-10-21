@@ -29,23 +29,40 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <FrameLayout
-            android:id="@+id/a_launcher_fl"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/a_launcher_drawer_ll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clickable="true"
-            android:focusable="true"
-            app:behavior_hideable="true"
-            app:behavior_peekHeight="0dp"
-            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+            android:background="?android:windowBackground"
+            android:orientation="vertical"
+            android:padding="0dp"
+            android:visibility="gone">
 
-            <include
-                android:id="@+id/a_launcher_drawer"
-                layout="@layout/drawer_root"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/a_launcher_drawer_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/transparent"
+                app:navigationIcon="@drawable/baseline_arrow_back_24"
+                app:navigationIconTint="?android:textColorPrimary"
+                app:title="@string/app_drawer"
+                app:titleTextColor="?android:textColorPrimary" />
 
-        </FrameLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="@dimen/drawer_horizontal_padding"
+                android:paddingVertical="@dimen/drawer_vertical_padding">
+
+                <include
+                    android:id="@+id/a_launcher_drawer"
+                    layout="@layout/drawer_root"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </FrameLayout>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

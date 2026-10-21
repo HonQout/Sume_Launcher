@@ -7,6 +7,8 @@
     <color name="light_gray">#FFCCCCCC</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="windowBackgroundColor">#FFFFFFFF</color>
+
     <color name="batteryBorderColor">@color/black</color>
     <color name="batteryCapColor">@color/black</color>
     <color name="batteryFillColor">@color/dark_gray</color>

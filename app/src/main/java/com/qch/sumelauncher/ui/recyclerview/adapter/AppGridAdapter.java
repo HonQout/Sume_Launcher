@@ -8,14 +8,14 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.qch.sumelauncher.data.model.launcher.ActivityModel;
-import com.qch.sumelauncher.ui.launcher.item.IconView;
+import com.qch.sumelauncher.ui.launcher.view.IconView;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class AppGridAdapter extends FilterableListAdapter<ActivityModel, AppGridAdapter.ViewHolder> {
+public class AppGridAdapter extends FilterableClickableListAdapter<ActivityModel, AppGridAdapter.ViewHolder> {
     private static final String TAG = "AppGridAdapter";
 
     private static final DiffUtil.ItemCallback<ActivityModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
@@ -75,7 +75,7 @@ public class AppGridAdapter extends FilterableListAdapter<ActivityModel, AppGrid
 
     @NonNull
     @Override
-    protected List<ActivityModel> performFiltering(List<ActivityModel> list, CharSequence constraint) {
+    protected List<ActivityModel> filterList(List<ActivityModel> list, CharSequence constraint) {
         List<ActivityModel> resultList = new ArrayList<>();
         CharSequence cs = constraint.toString().toLowerCase(Locale.ROOT);
         for (ActivityModel item : list) {

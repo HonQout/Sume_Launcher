@@ -20,7 +20,7 @@ import com.qch.sumelauncher.compat.MapCompat;
 import com.qch.sumelauncher.data.model.launcher.Coordinate;
 import com.qch.sumelauncher.data.model.launcher.GridSize;
 import com.qch.sumelauncher.data.model.launcher.IconModel;
-import com.qch.sumelauncher.ui.launcher.item.IconView;
+import com.qch.sumelauncher.ui.launcher.view.IconView;
 import com.qch.sumelauncher.utils.UnitUtils;
 import com.qch.sumelauncher.utils.ViewUtils;
 

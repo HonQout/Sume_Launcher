@@ -1,4 +1,4 @@
-package com.qch.sumelauncher.ui.launcher.item;
+package com.qch.sumelauncher.ui.launcher.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

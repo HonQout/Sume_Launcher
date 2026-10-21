@@ -1,10 +1,9 @@
-package com.qch.sumelauncher.ui.launcher.item;
+package com.qch.sumelauncher.ui.launcher.view;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 
@@ -28,6 +27,8 @@ public class IconView extends AppCompatTextView {
     private final int verticalPaddingPx;
     private ActivityModel activityModel;
     private boolean isContentLoaded = false;
+    @Nullable
+    private CustomTarget<Drawable> currentTarget;
 
     public IconView(@NonNull Context context) {
         this(context, null, 0);
@@ -100,41 +101,45 @@ public class IconView extends AppCompatTextView {
         // Set icon
         Drawable defaultIcon = getContext().getPackageManager().getDefaultActivityIcon();
         defaultIcon.setBounds(0, 0, iconSizePx, iconSizePx);
-        Glide.with(this)
+        // Get target
+        CustomTarget<Drawable> target = new CustomTarget<Drawable>(iconSizePx, iconSizePx) {
+            @Override
+            public void onResourceReady(@NonNull Drawable resource,
+                                        @Nullable Transition<? super Drawable> transition) {
+                resource.setBounds(0, 0, iconSizePx, iconSizePx);
+                setCompoundDrawables(null, resource, null, null);
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+                setCompoundDrawables(null, defaultIcon, null, null);
+            }
+
+            @Override
+            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                setCompoundDrawables(null, defaultIcon, null, null);
+            }
+        };
+        currentTarget = target;
+        // Set icon
+        Glide.with(getContext().getApplicationContext())
                 .asDrawable()
                 .load(activityModel)
                 .override(iconSizePx, iconSizePx)
                 .placeholder(defaultIcon)
                 .error(defaultIcon)
-                .into(new CustomTarget<Drawable>(iconSizePx, iconSizePx) {
-                    @Override
-                    public void onResourceReady(@NonNull Drawable resource,
-                                                @Nullable Transition<? super Drawable> transition) {
-                        resource.setBounds(0, 0, iconSizePx, iconSizePx);
-                        setCompoundDrawables(null, resource, null, null);
-                    }
-
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
-                        setCompoundDrawables(null, defaultIcon, null, null);
-                    }
-
-                    @Override
-                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                        setCompoundDrawables(null, defaultIcon, null, null);
-                    }
-                });
+                .into(target);
         // Set text
         setText(activityModel.getLabel());
-
+        // Set flag
         isContentLoaded = true;
     }
 
     public void cancelLoadingContent() {
-        try {
-            Glide.with(this).clear(this);
-        } catch (IllegalArgumentException e) {
-            Log.e(TAG, "Failed to cancel loading content.", e);
+        if (currentTarget != null) {
+            Glide.with(getContext().getApplicationContext())
+                    .clear(currentTarget);
+            currentTarget = null;
         }
     }
 
