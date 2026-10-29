@@ -18,11 +18,11 @@ This app is dedicated to satisfy fundamental requirements while being as smooth 
 ### System requirements
 Recommended Version: Android 11 (API 30) or above, armeabi-v7a or arm64-v8a
 
-Minimum version: Android 6.0 (API 23) or above, armeavi-v7a or arm64-v8a
+Minimum version: Android 6.0 (API 23) or above, armeabi-v7a or arm64-v8a
 
 ### Installation guide
 1. Click the latest version in Releases block on the right side of the page and open the page of version details;
-2. Scroll down, find Sume_Launcher_<Version Name>_all.apk in Assets block and click it to download;
+2. Scroll down, find Sume_Launcher_`<Version Name>`_all.apk in Assets block and click it to download;
 3. Enable "Install Apps From Unknown Source" in Settings;
 4. Import the package into your device and click to install.
 
