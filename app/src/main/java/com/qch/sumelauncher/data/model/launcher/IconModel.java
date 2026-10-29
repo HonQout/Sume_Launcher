@@ -1,13 +1,16 @@
 package com.qch.sumelauncher.data.model.launcher;
 
 import android.content.Context;
+import android.content.pm.ShortcutInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.qch.sumelauncher.room.entity.IconEntity;
 
-public class IconModel extends ItemModel {
+import java.util.List;
+
+public class IconModel extends LauncherItemModel {
     private static final String TAG = "IconModel";
     private final ActivityModel activityModel;
 
@@ -22,8 +25,11 @@ public class IconModel extends ItemModel {
                         iconEntity.getSpanY()
                 )
         );
-        this.activityModel = new ActivityModel(context, iconEntity.getPackageName(),
-                iconEntity.getActivityName());
+        this.activityModel = new ActivityModel(
+                context,
+                iconEntity.getPackageName(),
+                iconEntity.getActivityName()
+        );
     }
 
     @Override
@@ -50,6 +56,10 @@ public class IconModel extends ItemModel {
     @Nullable
     public String getLabel() {
         return activityModel.getLabel();
+    }
+
+    public List<ShortcutInfo> getShortcutList() {
+        return activityModel.getShortcutList();
     }
 
     public IconEntity toIconEntity() {

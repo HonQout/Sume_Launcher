@@ -248,7 +248,8 @@ public class ApplicationUtils {
     }
 
     @NonNull
-    public static Drawable getActivityIcon(@NonNull Context context, ActivityInfo activityInfo) {
+    public static Drawable getActivityIcon(@NonNull Context context,
+                                           @Nullable ActivityInfo activityInfo) {
         if (activityInfo != null) {
             return getActivityIcon(context, activityInfo.packageName, activityInfo.name);
         }
@@ -256,26 +257,29 @@ public class ApplicationUtils {
     }
 
     /**
-     * Return the id of icon of the activity specified by the given ActivityInfo, or 0 if the given
-     * ActivityInfo is null.
+     * Get the id of icon of the activity specified by the given {@code activityInfo}. Returns 0 if
+     * the given {@code activityInfo} is null.
      */
     @DrawableRes
     public static int getActivityIconId(@Nullable ActivityInfo activityInfo) {
         return activityInfo == null ? 0 : activityInfo.icon;
     }
 
+    /**
+     * Get the id of icon of the activity specified by the ActivityInfo of the activity with the
+     * given {@code packageName} and {@code activityName}. Returns 0 if the given
+     * {@code packageName} or {@code activityName} is null.
+     */
     @DrawableRes
-    public static int getActivityIconId(@NonNull Context context, String packageName,
-                                        String activityName) {
-        if (packageName != null && activityName != null) {
-            ActivityInfo activityInfo = getActivityInfo(context, packageName, activityName);
-            return getActivityIconId(activityInfo);
-        }
-        return 0;
+    public static int getActivityIconId(@NonNull Context context,
+                                        @Nullable String packageName,
+                                        @Nullable String activityName) {
+        ActivityInfo activityInfo = getActivityInfo(context, packageName, activityName);
+        return getActivityIconId(activityInfo);
     }
 
     @Nullable
-    public static String getActivityName(ResolveInfo resolveInfo) {
+    public static String getActivityName(@Nullable ResolveInfo resolveInfo) {
         return resolveInfo == null ? null : resolveInfo.activityInfo.name;
     }
 
@@ -296,14 +300,6 @@ public class ApplicationUtils {
         PackageManager pm = context.getPackageManager();
         Intent launchIntent = pm.getLaunchIntentForPackage(packageName);
         return launchIntent == null ? null : launchIntent.getComponent();
-    }
-
-    /**
-     * Get a list of launcher activities. This overload returns all launcher activities of all
-     * applications installed.
-     */
-    public static List<ResolveInfo> getLauncherActivityList(@NonNull Context context) {
-        return getLauncherActivityList(context, null);
     }
 
     /**

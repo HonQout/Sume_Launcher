@@ -12,8 +12,4 @@ public class MainThreadExecutor implements Executor {
     public void execute(Runnable command) {
         mainHandler.post(command);
     }
-
-    public Handler getMainHandler() {
-        return mainHandler;
-    }
 }

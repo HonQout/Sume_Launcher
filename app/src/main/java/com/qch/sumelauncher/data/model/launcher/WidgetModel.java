@@ -1,6 +1,6 @@
 package com.qch.sumelauncher.data.model.launcher;
 
-public class WidgetModel extends ItemModel {
+public class WidgetModel extends LauncherItemModel {
     private final String packageName;
     private final String receiverName;
 

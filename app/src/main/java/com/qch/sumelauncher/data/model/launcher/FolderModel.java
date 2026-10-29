@@ -4,7 +4,7 @@ import com.qch.sumelauncher.room.entity.FolderEntity;
 
 import java.util.List;
 
-public class FolderModel extends ItemModel {
+public class FolderModel extends LauncherItemModel {
     private static final String TAG = "FolderModel";
     private final String name;
     private final List<ActivityRecord> items;

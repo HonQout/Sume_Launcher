@@ -2,6 +2,7 @@ package com.qch.sumelauncher.application;
 
 import android.app.Application;
 
+import com.qch.sumelauncher.multithread.AppExecutors;
 import com.qch.sumelauncher.persistence.PreferenceDataStoreImpl;
 
 public class MyApplication extends Application {
@@ -11,6 +12,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         preferenceDataStoreImpl = new PreferenceDataStoreImpl(this);
+        AppExecutors.getInstance();
     }
 
     public static PreferenceDataStoreImpl getPreferenceDataStoreImpl() {

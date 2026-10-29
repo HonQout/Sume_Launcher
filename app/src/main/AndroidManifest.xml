@@ -99,6 +99,20 @@
             </intent-filter>
         </receiver>
 
+        <service
+            android:name=".ui.daydream.EInkDreamService"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/eink_dream"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
+
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </service>
+
     </application>
 
 </manifest>

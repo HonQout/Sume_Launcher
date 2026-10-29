@@ -11,6 +11,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.qch.sumelauncher.data.model.launcher.ActivityModel;
 import com.qch.sumelauncher.data.model.launcher.GridSize;
+import com.qch.sumelauncher.multithread.AppExecutors;
 import com.qch.sumelauncher.room.converter.Converters;
 import com.qch.sumelauncher.room.dao.LauncherDao;
 import com.qch.sumelauncher.room.entity.IconEntity;
@@ -20,8 +21,6 @@ import com.qch.sumelauncher.utils.ApplicationUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Database(
         entities = {LayoutEntity.class, PageEntity.class, IconEntity.class},
@@ -36,8 +35,6 @@ public abstract class LauncherDatabase extends RoomDatabase {
 
     private static volatile LauncherDatabase instance;
 
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
     public static LauncherDatabase getInstance(@NonNull Context context) {
         if (instance == null) {
             synchronized (LauncherDatabase.class) {
@@ -51,7 +48,7 @@ public abstract class LauncherDatabase extends RoomDatabase {
                                 @Override
                                 public void onCreate(@NonNull SupportSQLiteDatabase db) {
                                     super.onCreate(db);
-                                    executorService.execute(() ->
+                                    AppExecutors.getInstance().diskIO().execute(() ->
                                             initLayouts(context.getApplicationContext()));
                                 }
                             })

@@ -11,7 +11,9 @@ public class ControlCenterItemModel {
     @DrawableRes
     private int iconRes;
 
-    public ControlCenterItemModel(@NonNull String tag, @StringRes int titleRes, @DrawableRes int iconRes) {
+    public ControlCenterItemModel(@NonNull String tag,
+                                  @StringRes int titleRes,
+                                  @DrawableRes int iconRes) {
         this.tag = tag;
         this.titleRes = titleRes;
         this.iconRes = iconRes;

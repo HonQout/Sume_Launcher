@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
+import com.qch.sumelauncher.multithread.AppExecutors;
 import com.qch.sumelauncher.room.dao.LauncherDao;
 import com.qch.sumelauncher.room.database.LauncherDatabase;
 import com.qch.sumelauncher.room.entity.IconEntity;
@@ -14,8 +15,7 @@ import com.qch.sumelauncher.room.relation.PageWithIconEntities;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
@@ -25,12 +25,13 @@ public class LauncherRepository {
     private static final String TAG = "LauncherRepository";
     private final LauncherDao dao;
     private final Context appContext;
-    private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
+    private final Executor singleThreadExecutor;
 
     public LauncherRepository(Context context) {
         LauncherDatabase db = LauncherDatabase.getInstance(context);
         this.dao = db.launcherIconDao();
         this.appContext = context.getApplicationContext();
+        singleThreadExecutor = AppExecutors.getInstance().diskIO();
     }
 
     // layout

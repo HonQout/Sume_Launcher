@@ -20,6 +20,18 @@ public class ActivityModel implements Serializable {
     private final int iconRes;
     private final List<ShortcutInfo> shortcutInfoList;
 
+    public ActivityModel(String packageName,
+                         String activityName,
+                         String label,
+                         int iconRes,
+                         List<ShortcutInfo> shortcutInfoList) {
+        this.packageName = packageName;
+        this.activityName = activityName;
+        this.label = label;
+        this.iconRes = iconRes;
+        this.shortcutInfoList = shortcutInfoList;
+    }
+
     public ActivityModel(Context context, String packageName, String activityName) {
         this.packageName = packageName;
         this.activityName = activityName;
@@ -58,7 +70,7 @@ public class ActivityModel implements Serializable {
         return iconRes;
     }
 
-    public List<ShortcutInfo> getShortcutInfoList() {
+    public List<ShortcutInfo> getShortcutList() {
         return shortcutInfoList;
     }
 }

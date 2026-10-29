@@ -45,7 +45,6 @@ public class LauncherLayout extends ViewGroup {
     private int numRows = GridSize.DEFAULT_NUM_ROW;
     private int borderHorizontalPaddingPx;
     private int borderVerticalPaddingPx;
-    private boolean isEditMode = false;
     private Map<Coordinate, IconModel> iconModelMap = new ConcurrentHashMap<>();
     private Map<Coordinate, IconView> iconViewMap = new ConcurrentHashMap<>();
 
@@ -406,11 +405,6 @@ public class LauncherLayout extends ViewGroup {
         } else {
             throw new IllegalArgumentException("Border vertical padding cannot be less than 0.");
         }
-    }
-
-    public void setEditMode(boolean isEditMode) {
-        this.isEditMode = isEditMode;
-        postInvalidate();
     }
 
     public void setItems(List<IconModel> itemList) {

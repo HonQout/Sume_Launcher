@@ -1,14 +1,16 @@
 package com.qch.sumelauncher.data.model.launcher;
 
-public abstract class ItemModel {
+public abstract class LauncherItemModel {
     protected long id;
     protected CellPosition cellPosition;
 
     public enum Type {
-        ICON, FOLDER, WIDGET
+        ICON,
+        FOLDER,
+        WIDGET
     }
 
-    public ItemModel(long id, CellPosition cellPosition) {
+    public LauncherItemModel(long id, CellPosition cellPosition) {
         this.id = id;
         this.cellPosition = cellPosition;
     }

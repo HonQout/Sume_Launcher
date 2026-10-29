@@ -17,6 +17,7 @@ import com.qch.sumelauncher.application.MyApplication;
 import com.qch.sumelauncher.R;
 import com.qch.sumelauncher.data.model.permission.PermissionModel;
 import com.qch.sumelauncher.data.model.permission.SortedPermissions;
+import com.qch.sumelauncher.multithread.AppExecutors;
 import com.qch.sumelauncher.utils.ApplicationUtils;
 import com.qch.sumelauncher.utils.DialogUtils;
 import com.qch.sumelauncher.utils.PackageUtils;
@@ -26,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -38,8 +37,6 @@ public class PermissionViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> mAnimation = new MutableLiveData<>();
     private final MutableLiveData<PackageInfo> mPackageInfo = new MutableLiveData<>();
     private final MutableLiveData<List<PermissionModel>> mRequestedPermissionModelList = new MutableLiveData<>();
-    // multi-thread
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     // persistence
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -52,7 +49,6 @@ public class PermissionViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        executorService.shutdown();
         compositeDisposable.clear();
     }
 
@@ -68,7 +64,7 @@ public class PermissionViewModel extends AndroidViewModel {
     }
 
     public void init() {
-        executorService.execute(() -> {
+        AppExecutors.getInstance().cpu().execute(() -> {
             Context context = getApplication();
             PackageInfo packageInfo = ApplicationUtils.getPackageInfo(context, context.getPackageName());
             mPackageInfo.postValue(packageInfo);

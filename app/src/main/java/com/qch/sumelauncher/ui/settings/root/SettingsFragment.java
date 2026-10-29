@@ -54,7 +54,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public boolean onPreferenceTreeClick(@NonNull Preference preference) {
         String key = preference.getKey();
         if (Objects.equals(key, "default_app")) {
-            startManageDefaultAppsActivity();
+            launchManageDefaultAppsSettings();
         } else if (Objects.equals(key, "deactivate_device_manager")) {
             ComponentName componentName = new ComponentName(requireContext(), MyDeviceAdminReceiver.class);
             boolean result = DeviceAdminUtils.removeActiveAdmin(requireContext(), componentName);
@@ -65,16 +65,20 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         return super.onPreferenceTreeClick(preference);
     }
 
-    private void startManageDefaultAppsActivity() {
+    private void launchManageDefaultAppsSettings() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             if (!settingsViewModel.getAnimationValue()) {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             }
-            requireActivity().startActivity(intent);
+            try {
+                requireActivity().startActivity(intent);
+            } catch (Exception e) {
+                Toast.makeText(requireContext(), R.string.cannot_find_activity, Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Toast.makeText(requireContext(), R.string.cannot_find_activity, Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), R.string.device_not_support_this_function, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -83,7 +87,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         if (settingsViewModel.getAnimationValue()) {
             flags |= Intent.FLAG_ACTIVITY_NO_ANIMATION;
         }
-        IntentUtils.openNetAddress(
+        IntentUtils.openWebsite(
                 requireActivity(),
                 ContextCompat.getString(requireContext(), R.string.github_address),
                 flags

@@ -8,7 +8,7 @@ public class ActivityRecord implements Serializable {
 
     /**
      * No-Arg Constructor
-     * Gson need this constructor. Do not delete it.
+     * Gson needs this constructor. Do not delete it.
      */
     public ActivityRecord() {
 

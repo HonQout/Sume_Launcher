@@ -2,6 +2,7 @@ package com.qch.sumelauncher.ui.launcher.activity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ShortcutInfo;
 import android.content.res.Configuration;
@@ -603,14 +604,13 @@ public class LauncherActivity extends AppCompatActivity {
             Log.e(TAG, "Cannot find corresponding ActivityInfo.");
             return;
         }
-        ActivityModel activityModel = new ActivityModel(context, activityInfo);
 
         PopupMenu popupMenu = new PopupMenu(context, view);
         popupMenu.inflate(R.menu.launcher_icon_menu);
         int baseIndex = popupMenu.getMenu().size();
         List<ShortcutInfo> shortcutInfoList;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            shortcutInfoList = activityModel.getShortcutInfoList();
+            shortcutInfoList = iconModel.getShortcutList();
             for (int i = 0; i < shortcutInfoList.size(); i++) {
                 ShortcutInfo shortcutInfo = shortcutInfoList.get(i);
                 popupMenu.getMenu().add(
@@ -639,25 +639,39 @@ public class LauncherActivity extends AppCompatActivity {
                 activityPicker.show(getSupportFragmentManager(), "ACTIVITY_PICKER");
                 return true;
             } else if (menuId == R.id.uninstall) {
-                requestUninstallApp(activityModel.getPackageName());
+                requestUninstallApp(iconModel.getPackageName());
                 return true;
             } else if (menuId == R.id.app_info) {
                 handleLaunchIntentResult(
                         this,
-                        IntentUtils.openAppDetailsPage(LauncherActivity.this, activityModel.getPackageName())
+                        IntentUtils.openAppDetailsPage(
+                                LauncherActivity.this,
+                                iconModel.getPackageName()
+                        )
                 );
                 return true;
             } else if (menuId == R.id.app_market) {
+                int flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                if (!settingsViewModel.getAnimationValue()) {
+                    flags |= Intent.FLAG_ACTIVITY_NO_ANIMATION;
+                }
                 handleLaunchIntentResult(
                         this,
-                        IntentUtils.openAppInMarket(LauncherActivity.this, activityModel.getPackageName())
+                        IntentUtils.openAppInMarket(
+                                LauncherActivity.this,
+                                iconModel.getPackageName(),
+                                flags
+                        )
                 );
                 return true;
             } else if (menuId >= baseIndex) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
                     ShortcutInfo shortcutInfo = shortcutInfoList.get(menuId - baseIndex);
-                    ApplicationUtils.launchAppShortcut(context, activityModel.getPackageName(),
-                            shortcutInfo.getId());
+                    ApplicationUtils.launchAppShortcut(
+                            context,
+                            iconModel.getPackageName(),
+                            shortcutInfo.getId()
+                    );
                     return true;
                 } else {
                     return false;
@@ -696,7 +710,7 @@ public class LauncherActivity extends AppCompatActivity {
         int baseIndex = popupMenu.getMenu().size();
         List<ShortcutInfo> shortcutInfoList;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            shortcutInfoList = item.getShortcutInfoList();
+            shortcutInfoList = item.getShortcutList();
             for (int i = 0; i < shortcutInfoList.size(); i++) {
                 ShortcutInfo shortcutInfo = shortcutInfoList.get(i);
                 popupMenu.getMenu()
@@ -717,7 +731,14 @@ public class LauncherActivity extends AppCompatActivity {
                 requestUninstallApp(item.getPackageName());
                 return true;
             } else if (menuId == R.id.app_market) {
-                IntentUtils.openAppInMarket(LauncherActivity.this, item.getPackageName());
+                int flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                if (!settingsViewModel.getAnimationValue()) {
+                    flags |= Intent.FLAG_ACTIVITY_NO_ANIMATION;
+                }
+                handleLaunchIntentResult(
+                        this,
+                        IntentUtils.openAppInMarket(LauncherActivity.this, item.getPackageName(), flags)
+                );
                 return true;
             } else if (menuId >= baseIndex) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {

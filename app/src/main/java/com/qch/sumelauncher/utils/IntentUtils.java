@@ -82,9 +82,10 @@ public class IntentUtils {
                 launchActivity(context, activityInfo, newTask);
     }
 
-    public static LaunchIntentResult openAppDetailsPage(Context context, String packageName) {
-        if (packageName == null || TextUtils.isEmpty(packageName)) {
-            Log.e(TAG, "Cannot launch activity because the given packageName is null or empty.");
+    public static LaunchIntentResult openAppDetailsPage(@NonNull Context context,
+                                                        @Nullable String packageName) {
+        if (TextUtils.isEmpty(packageName)) {
+            Log.e(TAG, "Cannot launch AppDetailsPage in Settings. The given packageName is null or empty.");
             return LaunchIntentResult.URI_IS_EMPTY;
         }
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -94,14 +95,15 @@ public class IntentUtils {
             context.startActivity(intent);
             return LaunchIntentResult.SUCCESS;
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "Cannot launch Settings because requested package cannot be found.", e);
+            Log.e(TAG, "Failed to launch AppDetailsPage in Settings. Requested package cannot be found.", e);
             return LaunchIntentResult.NO_MATCHING_ACTIVITY;
         }
     }
 
-    public static LaunchIntentResult uninstallApp(@NonNull Context context, String packageName) {
+    public static LaunchIntentResult uninstallApp(@NonNull Context context,
+                                                  @Nullable String packageName) {
         if (TextUtils.isEmpty(packageName)) {
-            Log.e(TAG, "Cannot uninstall app. The given packageName is empty.");
+            Log.e(TAG, "Cannot uninstall app. The given packageName is null or empty.");
             return LaunchIntentResult.URI_IS_EMPTY;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
@@ -121,9 +123,10 @@ public class IntentUtils {
         }
     }
 
-    public static void requestUninstallApp(@NonNull Context context, @Nullable String packageName,
-                                           OnRequestUninstallApp callback) {
-        if (TextUtils.isEmpty(packageName)) {
+    public static void requestUninstallApp(@NonNull Context context,
+                                           @Nullable String packageName,
+                                           @Nullable OnRequestUninstallApp callback) {
+        if (TextUtils.isEmpty(packageName) || callback == null) {
             return;
         }
 
@@ -152,25 +155,30 @@ public class IntentUtils {
         }
     }
 
-    public static LaunchIntentResult openAppInMarket(Context context, String packageName) {
-        if (packageName == null || TextUtils.isEmpty(packageName)) {
-            Log.e(TAG, "Failed to open detail page of this app in app market because the given packageName is null or empty.");
+    public static LaunchIntentResult openAppInMarket(@NonNull Context context,
+                                                     @Nullable String packageName,
+                                                     int flags) {
+        if (TextUtils.isEmpty(packageName)) {
+            Log.e(TAG, "Failed to open detail page of this app in app market. The given packageName is null or empty.");
             return LaunchIntentResult.URI_IS_EMPTY;
         }
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("market://details?id=" + packageName));
+        intent.setFlags(flags);
         try {
             context.startActivity(intent);
             return LaunchIntentResult.SUCCESS;
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "Failed to open detail page of this app in app market because no activity can open this uri.", e);
+            Log.e(TAG, "Failed to open detail page of this app in app market. No activity can open this uri.", e);
             return LaunchIntentResult.NO_MATCHING_ACTIVITY;
         }
     }
 
-    public static LaunchIntentResult openNetAddress(Context context, String address, int flags) {
-        if (address == null || TextUtils.isEmpty(address)) {
-            Log.e(TAG, "Failed to open net address because the given address is null or empty.");
+    public static LaunchIntentResult openWebsite(@NonNull Context context,
+                                                 @Nullable String address,
+                                                 int flags) {
+        if (TextUtils.isEmpty(address)) {
+            Log.e(TAG, "Failed to open website. The given address is null or empty.");
             return LaunchIntentResult.URI_IS_EMPTY;
         }
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -180,7 +188,7 @@ public class IntentUtils {
             context.startActivity(intent);
             return LaunchIntentResult.SUCCESS;
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "Failed to open net address because no activity can open this uri.", e);
+            Log.e(TAG, "Failed to open website. No activity can open this uri.", e);
             return LaunchIntentResult.NO_MATCHING_ACTIVITY;
         }
     }
