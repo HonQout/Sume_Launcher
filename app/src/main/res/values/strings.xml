@@ -68,12 +68,13 @@
     <string name="switch_page_via_volume_keys">Switch page via volume keys</string>
     <string name="switch_page_via_volume_keys_summary">PageUp key and PageDown key are also regarded as volume keys</string>
     <string name="default_app">Default app</string>
-    <string name="deactivate_device_manager">Deactivate device manager</string>
+    <string name="device_manager">Device manager</string>
     <string name="permission">Permission</string>
     <string name="ask_for_perm_fine_location">Ask for permission to access fine location</string>
     <string name="ask_for_perm_fine_location_summary">Allow this app to ask for permission to access fine location</string>
     <string name="version">Version</string>
-    <string name="view_github_page">View GitHub page</string>
+    <string name="visit_github_page">Visit GitHub page</string>
+    <string name="visit_github_page_summary">Get source code and the latest release version</string>
     <string name="github_address" translatable="false">https://github.com/HonQout/Sume_Launcher</string>
     <string name="date_and_time">Date and time</string>
     <string name="date">Date</string>
@@ -87,7 +88,6 @@
     <string name="battery_percentage">Battery percentage</string>
 
     <!-- Control Center Items -->
-    <string name="network">Network</string>
     <string name="sound">Sound</string>
     <string name="display">Display</string>
     <string name="launcher_settings">Launcher settings</string>
@@ -104,5 +104,10 @@
     <string name="add_device_admin_reason">This app needs this permission to lock the screen.</string>
     <string name="device_not_support_this_function">Your device does not support this function.</string>
     <string name="delete_page_fail_reason">The last page cannot be deleted.</string>
+    <string name="device_manager_active">Device manager of this app is active.\nYou should deactivate its device manager before uninstalling this app.</string>
+    <string name="deactivate">Deactivate</string>
+    <string name="device_manager_inactive">Device manager of this app is inactive.\nYou can activate its device manager by clicking \"Lock screen\" button in Control Center.\nAfter activation, you can lock the screen with a single button pressed.</string>
+    <string name="visit_github_page_message">Visit GitHub page of this project, where you can get source code and the latest release version of this app.</string>
+    <string name="visit">Visit</string>
 
 </resources>

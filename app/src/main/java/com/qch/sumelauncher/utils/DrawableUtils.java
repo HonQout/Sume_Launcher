@@ -5,9 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 public class DrawableUtils {
     private static final String TAG = "DrawableUtils";
 
+    @Nullable
     public static Bitmap toBitmap(Drawable drawable) {
         int width = drawable.getIntrinsicWidth();
         int height = drawable.getIntrinsicHeight();
@@ -15,7 +18,7 @@ public class DrawableUtils {
         try {
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         } catch (IllegalArgumentException e) {
-            Log.e(TAG, "Cannot create bitmap because of illegal argument.", e);
+            Log.e(TAG, "Failed to create bitmap. Argument is illegal.", e);
         }
         if (bitmap == null) {
             return null;

@@ -17,14 +17,16 @@ import com.qch.sumelauncher.glide.datafetcher.ActivityIconDataFetcher;
 public class ActivityIconModelLoader implements ModelLoader<ActivityModel, Drawable> {
     private final Context context;
 
-    public ActivityIconModelLoader(Context context) {
+    public ActivityIconModelLoader(@NonNull Context context) {
         this.context = context.getApplicationContext();
     }
 
     @Nullable
     @Override
-    public LoadData<Drawable> buildLoadData(@NonNull ActivityModel activityModel, int width, int height,
-                                          @NonNull Options options) {
+    public LoadData<Drawable> buildLoadData(@NonNull ActivityModel activityModel,
+                                            int width,
+                                            int height,
+                                            @NonNull Options options) {
         return new LoadData<>(new GlideUrl(activityModel.getKey()),
                 new ActivityIconDataFetcher(context, activityModel));
     }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LauncherIcon">
+        <attr name="packageName" format="string" />
+        <attr name="activityName" format="string" />
+        <attr name="pageIndex" format="integer" />
+        <attr name="x" format="integer" />
+        <attr name="y" format="integer" />
+    </declare-styleable>
+</resources>

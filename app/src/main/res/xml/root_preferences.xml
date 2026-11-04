@@ -95,8 +95,8 @@
 
         <Preference
             app:iconSpaceReserved="false"
-            app:key="deactivate_device_manager"
-            app:title="@string/deactivate_device_manager" />
+            app:key="device_manager"
+            app:title="@string/device_manager" />
 
     </PreferenceCategory>
 
@@ -111,9 +111,9 @@
 
         <Preference
             app:iconSpaceReserved="false"
-            app:key="view_github_page"
-            app:summary="@string/github_address"
-            app:title="@string/view_github_page" />
+            app:key="visit_github_page"
+            app:summary="@string/visit_github_page_summary"
+            app:title="@string/visit_github_page" />
 
     </PreferenceCategory>
 

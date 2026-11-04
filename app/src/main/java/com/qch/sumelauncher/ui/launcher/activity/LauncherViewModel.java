@@ -57,7 +57,8 @@ public class LauncherViewModel extends AndroidViewModel {
     }
 
     public enum InsertPagePosition {
-        BEFORE, AFTER
+        BEFORE,
+        AFTER
     }
 
     // data

@@ -32,7 +32,7 @@ public class ActivityModel implements Serializable {
         this.shortcutInfoList = shortcutInfoList;
     }
 
-    public ActivityModel(Context context, String packageName, String activityName) {
+    public ActivityModel(@NonNull Context context, String packageName, String activityName) {
         this.packageName = packageName;
         this.activityName = activityName;
         ActivityInfo activityInfo = ApplicationUtils.getActivityInfo(context, packageName, activityName);
@@ -41,7 +41,7 @@ public class ActivityModel implements Serializable {
         this.shortcutInfoList = ApplicationUtils.getShortcuts(context, packageName);
     }
 
-    public ActivityModel(Context context, @NonNull ActivityInfo activityInfo) {
+    public ActivityModel(@NonNull Context context, @NonNull ActivityInfo activityInfo) {
         this.packageName = activityInfo.packageName;
         this.activityName = activityInfo.name;
         this.label = ApplicationUtils.getActivityLabel(context, activityInfo);

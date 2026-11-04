@@ -14,7 +14,7 @@ public class IconModel extends LauncherItemModel {
     private static final String TAG = "IconModel";
     private final ActivityModel activityModel;
 
-    public IconModel(@NonNull Context context, IconEntity iconEntity) {
+    public IconModel(@NonNull Context context, @NonNull IconEntity iconEntity) {
         super(
                 iconEntity.getId(),
                 new CellPosition(

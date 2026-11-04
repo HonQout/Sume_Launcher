@@ -282,6 +282,9 @@ public class LauncherActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 if (binding.aLauncherDrawerLl.getVisibility() == View.VISIBLE) {
                     binding.aLauncherDrawerLl.setVisibility(View.GONE);
+                    binding.aLauncherDrawer.drawerSv.setQuery("", false);
+                    binding.aLauncherDrawer.drawerSv.clearFocus();
+                    binding.aLauncherDrawer.drawerRv.scrollToPosition(0);
                     launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.LAUNCHER);
                 }
             }
@@ -398,6 +401,9 @@ public class LauncherActivity extends AppCompatActivity {
         int drawerColumnCount = getResources().getInteger(R.integer.drawer_column_count);
         binding.aLauncherDrawerToolbar.setNavigationOnClickListener(v -> {
             binding.aLauncherDrawerLl.setVisibility(View.GONE);
+            binding.aLauncherDrawer.drawerSv.setQuery("", false);
+            binding.aLauncherDrawer.drawerSv.clearFocus();
+            binding.aLauncherDrawer.drawerRv.scrollToPosition(0);
             launcherViewModel.setLauncherState(LauncherViewModel.LauncherState.LAUNCHER);
         });
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, drawerColumnCount);
@@ -413,7 +419,7 @@ public class LauncherActivity extends AppCompatActivity {
 
             @Override
             public boolean onItemLongClick(ActivityModel item, View view) {
-                showGridIconMenu(view, item);
+                showDrawerIconMenu(view, item);
                 return true;
             }
         });
@@ -424,7 +430,7 @@ public class LauncherActivity extends AppCompatActivity {
         binding.aLauncherDrawer.drawerRv.addItemDecoration(verticalGridDecoration);
 
         binding.aLauncherDrawer.drawerSv.setOnQueryTextFocusChangeListener((v, hasFocus) ->
-                binding.aLauncherDrawer.drawerBtnQuit.setVisibility(View.VISIBLE));
+                binding.aLauncherDrawer.drawerBtnQuit.setVisibility(hasFocus ? View.VISIBLE : View.GONE));
         binding.aLauncherDrawer.drawerSv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -444,7 +450,6 @@ public class LauncherActivity extends AppCompatActivity {
         binding.aLauncherDrawer.drawerBtnQuit.setOnClickListener(v -> {
             binding.aLauncherDrawer.drawerSv.setQuery("", false);
             binding.aLauncherDrawer.drawerSv.clearFocus();
-            binding.aLauncherDrawer.drawerBtnQuit.setVisibility(View.GONE);
         });
         launcherViewModel.getActivityModelList().observe(LauncherActivity.this, appGridAdapter::setList);
         launcherViewModel.getDrawerColumnCount().observe(LauncherActivity.this, integer -> {
@@ -593,10 +598,11 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     private void showLauncherIconMenu(@NonNull View view, @NonNull IconModel iconModel) {
-        Context context = view.getContext();
+        Context viewContext = view.getContext();
+        Context appContext = viewContext.getApplicationContext();
 
         ActivityInfo activityInfo = ApplicationUtils.getActivityInfo(
-                context,
+                appContext,
                 iconModel.getPackageName(),
                 iconModel.getActivityName()
         );
@@ -605,7 +611,7 @@ public class LauncherActivity extends AppCompatActivity {
             return;
         }
 
-        PopupMenu popupMenu = new PopupMenu(context, view);
+        PopupMenu popupMenu = new PopupMenu(viewContext, view);
         popupMenu.inflate(R.menu.launcher_icon_menu);
         int baseIndex = popupMenu.getMenu().size();
         List<ShortcutInfo> shortcutInfoList;
@@ -668,7 +674,7 @@ public class LauncherActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
                     ShortcutInfo shortcutInfo = shortcutInfoList.get(menuId - baseIndex);
                     ApplicationUtils.launchAppShortcut(
-                            context,
+                            appContext,
                             iconModel.getPackageName(),
                             shortcutInfo.getId()
                     );
@@ -704,7 +710,7 @@ public class LauncherActivity extends AppCompatActivity {
         popupMenu.show();
     }
 
-    private void showGridIconMenu(@NonNull View view, @NonNull ActivityModel item) {
+    private void showDrawerIconMenu(@NonNull View view, @NonNull ActivityModel item) {
         PopupMenu popupMenu = new PopupMenu(LauncherActivity.this, view);
         popupMenu.inflate(R.menu.drawer_icon_menu);
         int baseIndex = popupMenu.getMenu().size();

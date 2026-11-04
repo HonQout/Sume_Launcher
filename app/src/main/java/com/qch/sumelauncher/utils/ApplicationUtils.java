@@ -63,7 +63,7 @@ public class ApplicationUtils {
                 return pm.getPackageInfo(packageName, 0);
             }
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Cannot get packageInfo. Package " + packageName + " doesn't exist.", e);
+            Log.e(TAG, "Failed to get packageInfo. Package " + packageName + " doesn't exist.", e);
             return null;
         }
     }
@@ -112,9 +112,12 @@ public class ApplicationUtils {
         return 0;
     }
 
+    /**
+     * Get the label of the application corresponding to the given packageInfo.
+     * <p>This method can be used if the package is not installed on the device.
+     */
     @Nullable
-    public static String getApplicationLabel(@NonNull Context context, String packageName) {
-        PackageInfo packageInfo = getPackageInfo(context, packageName);
+    public static String getApplicationLabel(@NonNull Context context, PackageInfo packageInfo) {
         if (packageInfo != null) {
             ApplicationInfo applicationInfo = packageInfo.applicationInfo;
             if (applicationInfo != null) {
@@ -123,6 +126,17 @@ public class ApplicationUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * Get the label of the application corresponding to the given {@code packageName}.
+     * <p>This method can only be used if the package corresponding to the given {@code packageName}
+     * is installed on the device.
+     */
+    @Nullable
+    public static String getApplicationLabel(@NonNull Context context, String packageName) {
+        PackageInfo packageInfo = getPackageInfo(context, packageName);
+        return getApplicationLabel(context, packageInfo);
     }
 
     @Nullable
@@ -257,8 +271,9 @@ public class ApplicationUtils {
     }
 
     /**
-     * Get the id of icon of the activity specified by the given {@code activityInfo}. Returns 0 if
-     * the given {@code activityInfo} is null.
+     * Get the id of icon of the activity specified by the given {@code activityInfo}.
+     * @return The id of icon of the activity specified by the given {@code activityInfo}, or
+     * {@code 0} if the given {@code activityInfo} is null.
      */
     @DrawableRes
     public static int getActivityIconId(@Nullable ActivityInfo activityInfo) {
@@ -267,7 +282,9 @@ public class ApplicationUtils {
 
     /**
      * Get the id of icon of the activity specified by the ActivityInfo of the activity with the
-     * given {@code packageName} and {@code activityName}. Returns 0 if the given
+     * given {@code packageName} and {@code activityName}.
+     * @return The id of icon of the activity specified by the ActivityInfo of the activity with the
+     * given {@code packageName} and {@code activityName}, or {@code 0} if the given
      * {@code packageName} or {@code activityName} is null.
      */
     @DrawableRes

@@ -17,13 +17,15 @@ import com.qch.sumelauncher.data.model.launcher.IconModel;
 public class LauncherIconModelLoader implements ModelLoader<IconModel, Drawable> {
     private final Context context;
 
-    public LauncherIconModelLoader(Context context) {
+    public LauncherIconModelLoader(@NonNull Context context) {
         this.context = context.getApplicationContext();
     }
 
     @Nullable
     @Override
-    public LoadData<Drawable> buildLoadData(@NonNull IconModel iconModel, int width, int height,
+    public LoadData<Drawable> buildLoadData(@NonNull IconModel iconModel,
+                                            int width,
+                                            int height,
                                             @NonNull Options options) {
         return new LoadData<>(new GlideUrl(iconModel.getKey()), new LauncherIconDataFetcher(context, iconModel));
     }
